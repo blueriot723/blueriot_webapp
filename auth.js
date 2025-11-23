@@ -91,13 +91,21 @@ async function handleLogin(e) {
     hideError();
 
     try {
+        // DEBUG: Show attempt
+        console.log('🔐 Tentativo login con:', email);
+
         // Sign in with Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Errore Supabase auth:', error);
+            throw new Error(`Auth: ${error.message}`);
+        }
+
+        console.log('✅ Auth OK, user ID:', data.user?.id);
 
         // Check if TL profile exists
         const { data: tlData, error: tlError } = await supabase
@@ -106,16 +114,32 @@ async function handleLogin(e) {
             .eq('user_id', data.user.id)
             .single();
 
-        if (tlError || !tlData) {
-            throw new Error('Profilo Tour Leader non trovato');
+        if (tlError) {
+            console.error('❌ Errore TL profile:', tlError);
+            throw new Error(`DB: ${tlError.message} (code: ${tlError.code})`);
         }
+
+        if (!tlData) {
+            console.error('❌ TL profile vuoto');
+            throw new Error('Profilo TL non trovato nel database');
+        }
+
+        console.log('✅ TL profile trovato:', tlData);
 
         // Login successful
         showDashboard(data.user, tlData);
 
     } catch (error) {
-        console.error('Login error:', error);
-        showError(error.message || 'Errore durante il login');
+        console.error('💥 Login error:', error);
+        // Show detailed error to user (visible on iPad)
+        const errorMsg = error.message || 'Errore durante il login';
+        showError(errorMsg);
+
+        // Also show alert for iPad users
+        setTimeout(() => {
+            alert('LOGIN FALLITO:\n\n' + errorMsg + '\n\nControlla Supabase RLS policies e credenziali.');
+        }, 500);
+
         if (loginBtn) {
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<span class="btn-text">Accedi</span>';

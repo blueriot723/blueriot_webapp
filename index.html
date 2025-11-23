@@ -17,30 +17,29 @@
                 <p>Accedi con le tue credenziali BlueRiot Syndicate</p>
             </div>
 
-```
-        <form id="loginForm" class="login-form">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required placeholder="tuo@email.com">
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="tuo@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <span class="btn-text">Accedi</span>
+                </button>
+
+                <div id="loginError" class="error-message"></div>
+            </form>
+
+            <div class="login-footer">
+                <p>Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="••••••••">
-            </div>
-            
-            <button type="submit" class="btn btn-primary" id="loginBtn">
-                <span class="btn-text">Accedi</span>
-            </button>
-            
-            <div id="loginError" class="error-message"></div>
-        </form>
-        
-        <div class="login-footer">
-            <p>Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
         </div>
     </div>
-</div>
 
 <!-- DASHBOARD SCREEN -->
 <div id="dashboardScreen" class="screen">
@@ -117,9 +116,7 @@
     </div>
 </div>
 
-<script type="module" src="auth.js"></script>
-<script type="module" src="app.js"></script>
-```
-
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

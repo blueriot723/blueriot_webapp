@@ -7,17 +7,48 @@ const SUPABASE_ANON_KEY = ‘eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdX
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// DOM elements
-const loginScreen = document.getElementById(‘loginScreen’);
-const dashboardScreen = document.getElementById(‘dashboardScreen’);
-const loginForm = document.getElementById(‘loginForm’);
-const loginError = document.getElementById(‘loginError’);
-const loginBtn = document.getElementById(‘loginBtn’);
-const logoutBtn = document.getElementById(‘logoutBtn’);
-const userEmail = document.getElementById(‘userEmail’);
+// DOM elements - will be initialized when DOM is ready
+let loginScreen, dashboardScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
 
-// Check if user is already logged in
-checkAuth();
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', initAuth);
+
+function initAuth() {
+    // Initialize DOM elements
+    loginScreen = document.getElementById('loginScreen');
+    dashboardScreen = document.getElementById('dashboardScreen');
+    loginForm = document.getElementById('loginForm');
+    loginError = document.getElementById('loginError');
+    loginBtn = document.getElementById('loginBtn');
+    logoutBtn = document.getElementById('logoutBtn');
+    userEmail = document.getElementById('userEmail');
+
+    // Check for missing elements
+    if (!loginScreen || !dashboardScreen || !loginForm) {
+        console.error('Critical DOM elements missing!');
+        alert('Errore: Elementi pagina non trovati. Ricarica la pagina.');
+        return;
+    }
+
+    // Set up event listeners
+    setupEventListeners();
+
+    // Check if user is already logged in
+    checkAuth();
+}
+
+function setupEventListeners() {
+    // Login form handler
+    loginForm.addEventListener('submit', handleLogin);
+
+    // Logout handler
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            location.reload();
+        });
+    }
+}
 
 async function checkAuth() {
 try {
@@ -48,79 +79,87 @@ const { data: { session } } = await supabase.auth.getSession();
 
 }
 
-// Login form handler
-loginForm.addEventListener(‘submit’, async (e) => {
-e.preventDefault();
+// Login handler
+async function handleLogin(e) {
+    e.preventDefault();
 
-```
-const email = document.getElementById('email').value;
-const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-// Disable button and show loading
-loginBtn.disabled = true;
-loginBtn.innerHTML = '<span class="btn-text">Caricamento...</span>';
-hideError();
-
-try {
-    // Sign in with Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-    });
-    
-    if (error) throw error;
-    
-    // Check if TL profile exists
-    const { data: tlData, error: tlError } = await supabase
-        .from('tl_users')
-        .select('*')
-        .eq('user_id', data.user.id)
-        .single();
-    
-    if (tlError || !tlData) {
-        throw new Error('Profilo Tour Leader non trovato');
+    // Disable button and show loading
+    if (loginBtn) {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<span class="btn-text">Caricamento...</span>';
     }
-    
-    // Login successful
-    showDashboard(data.user, tlData);
-    
-} catch (error) {
-    console.error('Login error:', error);
-    showError(error.message || 'Errore durante il login');
-    loginBtn.disabled = false;
-    loginBtn.innerHTML = '<span class="btn-text">Accedi</span>';
+    hideError();
+
+    try {
+        // Sign in with Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) throw error;
+
+        // Check if TL profile exists
+        const { data: tlData, error: tlError } = await supabase
+            .from('tl_users')
+            .select('*')
+            .eq('user_id', data.user.id)
+            .single();
+
+        if (tlError || !tlData) {
+            throw new Error('Profilo Tour Leader non trovato');
+        }
+
+        // Login successful
+        showDashboard(data.user, tlData);
+
+    } catch (error) {
+        console.error('Login error:', error);
+        showError(error.message || 'Errore durante il login');
+        if (loginBtn) {
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = '<span class="btn-text">Accedi</span>';
+        }
+    }
 }
-```
-
-});
-
-// Logout handler
-logoutBtn.addEventListener(‘click’, async () => {
-await supabase.auth.signOut();
-location.reload();
-});
 
 // Show dashboard
 function showDashboard(user, tlData) {
-loginScreen.classList.remove(‘active’);
-dashboardScreen.classList.add(‘active’);
-userEmail.textContent = user.email;
+    if (!loginScreen || !dashboardScreen) {
+        console.error('Screen elements not found');
+        alert('Errore: impossibile mostrare la dashboard. Ricarica la pagina.');
+        return;
+    }
 
-```
-// Dispatch event for app.js to load tours
-window.dispatchEvent(new CustomEvent('userLoggedIn', { 
-    detail: { user, tlData } 
-}));
-```
+    loginScreen.classList.remove('active');
+    dashboardScreen.classList.add('active');
 
+    if (userEmail) {
+        userEmail.textContent = user.email;
+    }
+
+    // Dispatch event for app.js to load tours
+    window.dispatchEvent(new CustomEvent('userLoggedIn', {
+        detail: { user, tlData }
+    }));
 }
 
 // Error handling
 function showError(message) {
-loginError.textContent = message;
-loginError.classList.add(‘show’);
+    if (loginError) {
+        loginError.textContent = message;
+        loginError.classList.add('show');
+    } else {
+        // Fallback se l'elemento error non esiste
+        alert('Errore: ' + message);
+    }
 }
 
 function hideError() {
-loginError.classList.remove(‘show’);
+    if (loginError) {
+        loginError.classList.remove('show');
+    }
 }

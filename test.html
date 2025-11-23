@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueRiot - Test Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #00F0FF;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #333;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Test Login</h1>
+        <p>Versione semplificata per debug</p>
+
+        <input type="email" id="email" placeholder="Email" value="v@blueriot.world">
+        <input type="password" id="password" placeholder="Password" value="test0001">
+
+        <button onclick="testLogin()">ACCEDI</button>
+        <button onclick="testConnection()">TEST CONNESSIONE</button>
+
+        <div id="status">In attesa...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Test immediato al caricamento
+        window.addEventListener('load', function() {
+            document.getElementById('status').innerHTML = '✅ JavaScript caricato!';
+            alert('✅ JavaScript funziona!');
+        });
+
+        // Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(
+            'https://kvomxtzcnczvbcscybcy.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2b214dHpjbmN6dmJjc2N5YmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTIwOTMsImV4cCI6MjA3OTA2ODA5M30.2fd-urmPrcuWrDdZtR6lNaRsfyNQW64fwEvJv2KI9AE'
+        );
+
+        async function testConnection() {
+            const status = document.getElementById('status');
+            status.innerHTML = '🔄 Testando connessione Supabase...';
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('tl_users')
+                    .select('count')
+                    .limit(1);
+
+                if (error) {
+                    status.innerHTML = '❌ Errore DB: ' + error.message;
+                    alert('❌ ERRORE DB:\n' + error.message + '\n\nCode: ' + error.code);
+                } else {
+                    status.innerHTML = '✅ Connessione DB OK!';
+                    alert('✅ Connessione Supabase OK!');
+                }
+            } catch (err) {
+                status.innerHTML = '❌ Errore: ' + err.message;
+                alert('❌ ERRORE:\n' + err.message);
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const status = document.getElementById('status');
+
+            alert('🎯 Inizio login con:\n' + email);
+
+            status.innerHTML = '🔄 Login in corso...';
+
+            try {
+                // Step 1: Auth
+                status.innerHTML = '1️⃣ Tentativo autenticazione...';
+                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (authError) {
+                    status.innerHTML = '❌ Auth fallita: ' + authError.message;
+                    alert('❌ AUTH FALLITA:\n' + authError.message);
+                    return;
+                }
+
+                status.innerHTML = '✅ Auth OK! User ID: ' + authData.user.id;
+                alert('✅ AUTH OK!\nUser ID: ' + authData.user.id);
+
+                // Step 2: Get TL profile
+                status.innerHTML = '2️⃣ Caricamento profilo TL...';
+                const { data: tlData, error: tlError } = await supabaseClient
+                    .from('tl_users')
+                    .select('*')
+                    .eq('user_id', authData.user.id)
+                    .single();
+
+                if (tlError) {
+                    status.innerHTML = '❌ TL profile error: ' + tlError.message;
+                    alert('❌ TL PROFILE ERROR:\n' + tlError.message + '\n\nCode: ' + tlError.code);
+                    return;
+                }
+
+                if (!tlData) {
+                    status.innerHTML = '❌ Profilo TL non trovato';
+                    alert('❌ Profilo TL non trovato nel database!');
+                    return;
+                }
+
+                status.innerHTML = '✅✅ LOGIN COMPLETO!\nEmail: ' + tlData.email + '\nNome: ' + tlData.name;
+                alert('✅✅ LOGIN RIUSCITO!\n\nEmail: ' + tlData.email + '\nNome: ' + (tlData.name || 'N/A'));
+
+            } catch (err) {
+                status.innerHTML = '❌ Errore generale: ' + err.message;
+                alert('❌ ERRORE:\n' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

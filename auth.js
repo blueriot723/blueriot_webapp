@@ -14,6 +14,9 @@ let loginScreen, dashboardScreen, loginForm, loginError, loginBtn, logoutBtn, us
 document.addEventListener('DOMContentLoaded', initAuth);
 
 function initAuth() {
+    // DEBUG: Confirm script is loading
+    console.log('🚀 auth.js loaded successfully');
+
     // Initialize DOM elements
     loginScreen = document.getElementById('loginScreen');
     dashboardScreen = document.getElementById('dashboardScreen');
@@ -26,9 +29,11 @@ function initAuth() {
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
         console.error('Critical DOM elements missing!');
-        alert('Errore: Elementi pagina non trovati. Ricarica la pagina.');
+        alert('❌ ERRORE CRITICO: Elementi pagina non trovati. Ricarica la pagina.');
         return;
     }
+
+    console.log('✅ DOM elements found');
 
     // Set up event listeners
     setupEventListeners();
@@ -80,8 +85,12 @@ async function checkAuth() {
 async function handleLogin(e) {
     e.preventDefault();
 
+    console.log('🎯 handleLogin called!');
+
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+
+    console.log('📧 Email:', email);
 
     // Disable button and show loading
     if (loginBtn) {
@@ -93,6 +102,9 @@ async function handleLogin(e) {
     try {
         // DEBUG: Show attempt
         console.log('🔐 Tentativo login con:', email);
+
+        // Show immediate feedback
+        alert(`⏳ Tentativo login con: ${email}\n\nPremi OK per continuare...`);
 
         // Sign in with Supabase
         const { data, error } = await supabase.auth.signInWithPassword({

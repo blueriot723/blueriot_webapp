@@ -250,6 +250,7 @@ body {
     border-radius: 12px;
     padding: 24px;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .tour-card:hover {
@@ -528,6 +529,93 @@ body {
         </div>
     </div>
 
+    <!-- TOUR DETAIL MODAL -->
+    <div id="tourDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dettaglio Tour</h2>
+                <button class="modal-close" id="closeTourDetail">&times;</button>
+            </div>
+
+            <div style="padding: 24px;">
+                <!-- Tour Info Display -->
+                <div id="tourDetailView">
+                    <div class="form-group">
+                        <label>Codice Tour</label>
+                        <div id="displayCode" style="padding: 14px; background: var(--dark-bg); border-radius: 8px; color: var(--primary-blue); font-weight: 700;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome Tour</label>
+                        <div id="displayName" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Operatore</label>
+                        <div id="displayOperator" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Periodo</label>
+                        <div id="displayDates" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div id="displayStatus" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="editTourBtn">✏️ Modifica</button>
+                        <button type="button" class="btn btn-secondary" id="miniSiteBtn">🌐 Vai al Mini-Site</button>
+                        <button type="button" class="btn btn-secondary" style="background: var(--error); border-color: var(--error);" id="deleteTourBtn">🗑️ Cancella</button>
+                    </div>
+                </div>
+
+                <!-- Tour Edit Form (hidden by default) -->
+                <form id="tourEditForm" style="display: none;">
+                    <div class="form-group">
+                        <label>Codice Tour (non modificabile)</label>
+                        <input type="text" id="editCode" disabled style="opacity: 0.6;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editName">Nome Tour</label>
+                        <input type="text" id="editName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editOperator">Operatore</label>
+                        <select id="editOperator" required>
+                            <option value="">Seleziona operatore...</option>
+                            <option value="Intrepid Travel">Intrepid Travel</option>
+                            <option value="G Adventures">G Adventures</option>
+                            <option value="OAT">OAT</option>
+                            <option value="Altro">Altro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editStartDate">Data Inizio</label>
+                        <input type="date" id="editStartDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEndDate">Data Fine</label>
+                        <input type="date" id="editEndDate" required>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelEditBtn">Annulla</button>
+                        <button type="submit" class="btn btn-primary">💾 Salva Modifiche</button>
+                    </div>
+
+                    <div id="editError" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -540,10 +628,12 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Global state
 let currentUser = null;
 let currentTL = null;
+let currentTourDetail = null;
 
 // DOM elements
 let loginScreen, dashboardScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
 let toursGrid, newTourBtn, newTourModal, newTourForm, closeModal, cancelTour, tourError;
+let tourDetailModal, closeTourDetail, tourDetailView, tourEditForm, editTourBtn, deleteTourBtn, miniSiteBtn, cancelEditBtn, editError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -566,6 +656,17 @@ function init() {
     closeModal = document.getElementById('closeModal');
     cancelTour = document.getElementById('cancelTour');
     tourError = document.getElementById('tourError');
+
+    // Tour detail modal elements
+    tourDetailModal = document.getElementById('tourDetailModal');
+    closeTourDetail = document.getElementById('closeTourDetail');
+    tourDetailView = document.getElementById('tourDetailView');
+    tourEditForm = document.getElementById('tourEditForm');
+    editTourBtn = document.getElementById('editTourBtn');
+    deleteTourBtn = document.getElementById('deleteTourBtn');
+    miniSiteBtn = document.getElementById('miniSiteBtn');
+    cancelEditBtn = document.getElementById('cancelEditBtn');
+    editError = document.getElementById('editError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -626,6 +727,43 @@ function setupEventListeners() {
 
     if (newTourForm) {
         newTourForm.addEventListener('submit', handleCreateTour);
+    }
+
+    // Tour detail modal
+    if (closeTourDetail) {
+        closeTourDetail.addEventListener('click', () => {
+            if (tourDetailModal) tourDetailModal.classList.remove('active');
+        });
+    }
+
+    if (tourDetailModal) {
+        tourDetailModal.addEventListener('click', (e) => {
+            if (e.target === tourDetailModal) {
+                tourDetailModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (editTourBtn) {
+        editTourBtn.addEventListener('click', showEditForm);
+    }
+
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', hideEditForm);
+    }
+
+    if (deleteTourBtn) {
+        deleteTourBtn.addEventListener('click', handleDeleteTour);
+    }
+
+    if (miniSiteBtn) {
+        miniSiteBtn.addEventListener('click', () => {
+            alert('🚧 Mini-Site in arrivo!\n\nQuesta funzionalità sarà disponibile presto.');
+        });
+    }
+
+    if (tourEditForm) {
+        tourEditForm.addEventListener('submit', handleUpdateTour);
     }
 }
 
@@ -788,7 +926,7 @@ function displayTours(tours) {
     if (!toursGrid) return;
 
     toursGrid.innerHTML = tours.map(tour => `
-        <div class="tour-card">
+        <div class="tour-card" data-tour-id="${tour.id}" onclick="openTourDetail('${tour.id}')">
             <span class="tour-code">${tour.code}</span>
             <h3 class="tour-name">${tour.name}</h3>
             <div class="tour-meta">
@@ -798,6 +936,9 @@ function displayTours(tours) {
             </div>
         </div>
     `).join('');
+
+    // Store tours in memory for quick access
+    window.allTours = tours;
 }
 
 function formatDate(dateString) {
@@ -876,6 +1017,147 @@ function showTourError(message) {
 function hideTourError() {
     if (tourError) {
         tourError.classList.remove('show');
+    }
+}
+
+// ===== TOUR DETAIL FUNCTIONS =====
+
+function openTourDetail(tourId) {
+    // Find tour in stored tours
+    const tour = window.allTours?.find(t => t.id === tourId);
+
+    if (!tour) {
+        alert('❌ Tour non trovato');
+        return;
+    }
+
+    currentTourDetail = tour;
+
+    // Populate detail view
+    document.getElementById('displayCode').textContent = tour.code;
+    document.getElementById('displayName').textContent = tour.name;
+    document.getElementById('displayOperator').textContent = tour.operator || 'N/A';
+    document.getElementById('displayDates').textContent = `${formatDate(tour.start_date)} → ${formatDate(tour.end_date)}`;
+    document.getElementById('displayStatus').textContent = tour.status === 'active' ? '✅ Attivo' : '📦 Archiviato';
+
+    // Show detail view, hide edit form
+    if (tourDetailView) tourDetailView.style.display = 'block';
+    if (tourEditForm) tourEditForm.style.display = 'none';
+
+    // Open modal
+    if (tourDetailModal) tourDetailModal.classList.add('active');
+}
+
+function showEditForm() {
+    if (!currentTourDetail) return;
+
+    // Populate edit form
+    document.getElementById('editCode').value = currentTourDetail.code;
+    document.getElementById('editName').value = currentTourDetail.name;
+    document.getElementById('editOperator').value = currentTourDetail.operator || '';
+    document.getElementById('editStartDate').value = currentTourDetail.start_date;
+    document.getElementById('editEndDate').value = currentTourDetail.end_date;
+
+    // Hide detail view, show edit form
+    if (tourDetailView) tourDetailView.style.display = 'none';
+    if (tourEditForm) tourEditForm.style.display = 'block';
+    hideEditError();
+}
+
+function hideEditForm() {
+    // Show detail view, hide edit form
+    if (tourDetailView) tourDetailView.style.display = 'block';
+    if (tourEditForm) tourEditForm.style.display = 'none';
+    hideEditError();
+}
+
+async function handleUpdateTour(e) {
+    e.preventDefault();
+    hideEditError();
+
+    if (!currentTourDetail) return;
+
+    const updatedData = {
+        name: document.getElementById('editName').value,
+        operator: document.getElementById('editOperator').value,
+        start_date: document.getElementById('editStartDate').value,
+        end_date: document.getElementById('editEndDate').value
+    };
+
+    // Validate dates
+    if (new Date(updatedData.end_date) < new Date(updatedData.start_date)) {
+        showEditError('La data di fine deve essere dopo la data di inizio');
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tours')
+            .update(updatedData)
+            .eq('id', currentTourDetail.id);
+
+        if (error) throw error;
+
+        // Success
+        alert('✅ Tour aggiornato con successo!');
+
+        // Close modal
+        if (tourDetailModal) tourDetailModal.classList.remove('active');
+
+        // Reload tours
+        loadTours();
+
+    } catch (error) {
+        console.error('Update tour error:', error);
+        showEditError(error.message || 'Errore nell\'aggiornamento del tour');
+    }
+}
+
+async function handleDeleteTour() {
+    if (!currentTourDetail) return;
+
+    // Confirm deletion
+    const confirmed = confirm(
+        `⚠️ ATTENZIONE!\n\nSei sicuro di voler cancellare il tour:\n\n"${currentTourDetail.code} - ${currentTourDetail.name}"\n\nQuesta azione è IRREVERSIBILE!`
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('tours')
+            .delete()
+            .eq('id', currentTourDetail.id);
+
+        if (error) throw error;
+
+        // Success
+        alert('✅ Tour cancellato con successo!');
+
+        // Close modal
+        if (tourDetailModal) tourDetailModal.classList.remove('active');
+
+        // Reload tours
+        loadTours();
+
+    } catch (error) {
+        console.error('Delete tour error:', error);
+        alert('❌ Errore nella cancellazione:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showEditError(message) {
+    if (editError) {
+        editError.textContent = message;
+        editError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideEditError() {
+    if (editError) {
+        editError.classList.remove('show');
     }
 }
     </script>

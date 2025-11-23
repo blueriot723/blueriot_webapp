@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueRiot Syndicate - TL Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="logo">
+                <h1>Tour Leader Dashboard</h1>
+                <p>Accedi con le tue credenziali BlueRiot Syndicate</p>
+            </div>
+
+```
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="tuo@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+                <span class="btn-text">Accedi</span>
+            </button>
+            
+            <div id="loginError" class="error-message"></div>
+        </form>
+        
+        <div class="login-footer">
+            <p>Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- DASHBOARD SCREEN -->
+<div id="dashboardScreen" class="screen">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="blueriot-logo.png" alt="BlueRiot" class="navbar-logo">
+            <span>BlueRiot Syndicate</span>
+        </div>
+        <div class="navbar-menu">
+            <span id="userEmail" class="user-email"></span>
+            <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>I Miei Tour</h1>
+            <button id="newTourBtn" class="btn btn-primary">+ Nuovo Tour</button>
+        </div>
+
+        <div id="toursGrid" class="tours-grid">
+            <p class="loading">Caricamento...</p>
+        </div>
+    </div>
+</div>
+
+<!-- NEW TOUR MODAL -->
+<div id="newTourModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Nuovo Tour</h2>
+            <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        
+        <form id="newTourForm">
+            <div class="form-group">
+                <label for="tourCode">Codice Tour</label>
+                <input type="text" id="tourCode" required placeholder="es. ITALY001">
+            </div>
+            
+            <div class="form-group">
+                <label for="tourName">Nome Tour</label>
+                <input type="text" id="tourName" required placeholder="es. Italia Classica">
+            </div>
+            
+            <div class="form-group">
+                <label for="tourOperator">Operatore</label>
+                <select id="tourOperator" required>
+                    <option value="">Seleziona operatore...</option>
+                    <option value="Intrepid Travel">Intrepid Travel</option>
+                    <option value="G Adventures">G Adventures</option>
+                    <option value="OAT">OAT</option>
+                    <option value="Altro">Altro</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="startDate">Data Inizio</label>
+                <input type="date" id="startDate" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="endDate">Data Fine</label>
+                <input type="date" id="endDate" required>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="cancelTour">Annulla</button>
+                <button type="submit" class="btn btn-primary">Crea Tour</button>
+            </div>
+            
+            <div id="tourError" class="error-message"></div>
+        </form>
+    </div>
+</div>
+
+<script type="module" src="auth.js"></script>
+<script type="module" src="app.js"></script>
+```
+
+</body>
+</html>

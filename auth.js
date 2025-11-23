@@ -51,32 +51,29 @@ function setupEventListeners() {
 }
 
 async function checkAuth() {
-try {
-const { data: { session } } = await supabase.auth.getSession();
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
 
-```
-    if (session) {
-        // User is logged in, verify TL profile
-        const { data: tlData, error: tlError } = await supabase
-            .from('tl_users')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-        
-        if (tlError || !tlData) {
-            console.error('TL profile not found:', tlError);
-            showError('Profilo Tour Leader non trovato');
-            await supabase.auth.signOut();
-            return;
+        if (session) {
+            // User is logged in, verify TL profile
+            const { data: tlData, error: tlError } = await supabase
+                .from('tl_users')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .single();
+
+            if (tlError || !tlData) {
+                console.error('TL profile not found:', tlError);
+                showError('Profilo Tour Leader non trovato');
+                await supabase.auth.signOut();
+                return;
+            }
+
+            showDashboard(session.user, tlData);
         }
-        
-        showDashboard(session.user, tlData);
+    } catch (error) {
+        console.error('Auth check error:', error);
     }
-} catch (error) {
-    console.error('Auth check error:', error);
-}
-```
-
 }
 
 // Login handler

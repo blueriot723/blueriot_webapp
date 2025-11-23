@@ -528,13 +528,14 @@ body {
         </div>
     </div>
 
-    <script type="module">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
 // ===== SUPABASE SETUP =====
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const { createClient } = supabase;
 
 const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2b214dHpjbmN6dmJjc2N5YmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTIwOTMsImV4cCI6MjA3OTA2ODA5M30.2fd-urmPrcuWrDdZtR6lNaRsfyNQW64fwEvJv2KI9AE';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Global state
 let currentUser = null;
@@ -589,7 +590,7 @@ function setupEventListeners() {
     // Logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             location.reload();
         });
     }
@@ -630,10 +631,10 @@ function setupEventListeners() {
 
 async function checkAuth() {
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseClient.auth.getSession();
 
         if (session) {
-            const { data: tlData, error: tlError } = await supabase
+            const { data: tlData, error: tlError } = await supabaseClient
                 .from('tl_users')
                 .select('*')
                 .eq('user_id', session.user.id)
@@ -642,7 +643,7 @@ async function checkAuth() {
             if (tlError || !tlData) {
                 console.error('TL profile not found:', tlError);
                 showError('Profilo Tour Leader non trovato');
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 return;
             }
 
@@ -671,7 +672,7 @@ async function handleLogin(e) {
     alert(`⏳ Tentativo login con:\n${email}\n\nPremi OK...`);
 
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
             email,
             password
         });
@@ -683,7 +684,7 @@ async function handleLogin(e) {
 
         console.log('✅ Auth OK, user:', data.user?.id);
 
-        const { data: tlData, error: tlError } = await supabase
+        const { data: tlData, error: tlError } = await supabaseClient
             .from('tl_users')
             .select('*')
             .eq('user_id', data.user.id)
@@ -749,7 +750,7 @@ async function loadTours() {
             toursGrid.innerHTML = '<p class="loading">Caricamento tour...</p>';
         }
 
-        const { data: tours, error } = await supabase
+        const { data: tours, error } = await supabaseClient
             .from('tours')
             .select('*')
             .eq('tl_id', currentTL.id)
@@ -827,7 +828,7 @@ async function handleCreateTour(e) {
     }
 
     try {
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('tours')
             .insert([tourData]);
 

@@ -486,6 +486,18 @@ body {
     max-width: 1000px;
 }
 
+/* ===== RATING STARS ===== */
+.star-rating {
+    cursor: pointer;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+}
+
+.star-rating:hover,
+.star-rating.selected {
+    opacity: 1;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .login-form {
@@ -568,6 +580,8 @@ body {
                 <span>BlueRiot Syndicate</span>
             </div>
             <div class="navbar-menu">
+                <button id="myToursBtn" class="btn btn-secondary">I Miei Tour</button>
+                <button id="restaurantDbBtn" class="btn btn-secondary">🍽️ Database Ristoranti</button>
                 <span id="userEmail" class="user-email"></span>
                 <button id="logoutBtn" class="btn btn-secondary">Logout</button>
             </div>
@@ -580,6 +594,61 @@ body {
             </div>
 
             <div id="toursGrid" class="tours-grid">
+                <p class="loading">Caricamento...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESTAURANT DATABASE SCREEN -->
+    <div id="restaurantDatabaseScreen" class="screen">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <img src="blueriot-logo.png" alt="BlueRiot" class="navbar-logo">
+                <span>BlueRiot Syndicate</span>
+            </div>
+            <div class="navbar-menu">
+                <button id="myToursBtn2" class="btn btn-secondary">I Miei Tour</button>
+                <button id="restaurantDbBtn2" class="btn btn-secondary">🍽️ Database Ristoranti</button>
+                <span id="userEmail2" class="user-email"></span>
+                <button id="logoutBtn2" class="btn btn-secondary">Logout</button>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>🍽️ Database Ristoranti Condiviso</h1>
+                <button id="addSharedRestaurantBtn" class="btn btn-primary">+ Aggiungi Ristorante</button>
+            </div>
+
+            <!-- FILTERS -->
+            <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin-bottom: 16px;">Filtri</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div class="form-group" style="margin: 0;">
+                        <label for="filterCity">Città</label>
+                        <input type="text" id="filterCity" placeholder="es. Roma">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label for="filterCuisine">Tipo Cucina</label>
+                        <input type="text" id="filterCuisine" placeholder="es. Italiana">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label for="filterAdvantages">Vantaggi</label>
+                        <select id="filterAdvantages">
+                            <option value="">Tutti</option>
+                            <option value="tl_free">TL Free</option>
+                            <option value="commission">Commission</option>
+                            <option value="discount">Discount</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button id="applyFiltersBtn" class="btn btn-primary" style="width: 100%;">🔍 Cerca</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHARED RESTAURANTS LIST -->
+            <div id="sharedRestaurantsList">
                 <p class="loading">Caricamento...</p>
             </div>
         </div>
@@ -782,6 +851,222 @@ body {
         </div>
     </div>
 
+    <!-- RESTAURANT FORM MODAL -->
+    <div id="restaurantModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="restaurantModalTitle">Aggiungi Ristorante</h2>
+                <button class="modal-close" id="closeRestaurantModal">&times;</button>
+            </div>
+
+            <div style="padding: 16px 24px 0; border-bottom: 1px solid var(--border-color);">
+                <button type="button" class="btn btn-secondary" id="searchDatabaseBtn" style="width: 100%; margin-bottom: 16px;">🔍 Cerca nel Database Condiviso</button>
+            </div>
+
+            <form id="restaurantForm">
+                <div class="form-group">
+                    <label for="restaurantDay">Giorno Tour *</label>
+                    <input type="number" id="restaurantDay" required min="1" max="30" placeholder="es. 3">
+                </div>
+
+                <div class="form-group">
+                    <label for="restaurantName">Nome Ristorante *</label>
+                    <input type="text" id="restaurantName" required placeholder="es. Trattoria da Mario">
+                </div>
+
+                <div class="form-group">
+                    <label for="restaurantCity">Città *</label>
+                    <input type="text" id="restaurantCity" required placeholder="es. Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="restaurantAddress">Indirizzo</label>
+                    <input type="text" id="restaurantAddress" placeholder="es. Via Roma 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="restaurantPhone">Telefono</label>
+                    <input type="tel" id="restaurantPhone" placeholder="es. +39 06 1234567">
+                </div>
+
+                <div class="form-group">
+                    <label>Vantaggi</label>
+                    <div style="margin-top: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="advTlFree">
+                            <span>🎁 TL Free - Descrizione:</span>
+                        </label>
+                        <input type="text" id="advTlFreeDesc" placeholder="es. Pranzo gratuito per il TL" style="margin-left: 24px; margin-bottom: 12px;">
+
+                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="advCommission">
+                            <span>💰 Commission - Descrizione:</span>
+                        </label>
+                        <input type="text" id="advCommissionDesc" placeholder="es. 10% commissione sul gruppo" style="margin-left: 24px; margin-bottom: 12px;">
+
+                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="advDiscount">
+                            <span>🏷️ Discount - Descrizione:</span>
+                        </label>
+                        <input type="text" id="advDiscountDesc" placeholder="es. 15% sconto sul conto" style="margin-left: 24px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="restaurantNotes">Note</label>
+                    <input type="text" id="restaurantNotes" placeholder="Note aggiuntive...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelRestaurant">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="restaurantError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SHARED RESTAURANT FORM MODAL -->
+    <div id="sharedRestaurantModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Aggiungi al Database Condiviso</h2>
+                <button class="modal-close" id="closeSharedRestaurantModal">&times;</button>
+            </div>
+
+            <form id="sharedRestaurantForm">
+                <div class="form-group">
+                    <label for="sharedRestaurantName">Nome Ristorante *</label>
+                    <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
+                </div>
+
+                <div class="form-group">
+                    <label for="sharedRestaurantCity">Città *</label>
+                    <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="sharedRestaurantAddress">Indirizzo</label>
+                    <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="sharedRestaurantPhone">Telefono</label>
+                    <input type="tel" id="sharedRestaurantPhone" placeholder="es. +39 06 1234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="sharedCuisineType">Tipo Cucina</label>
+                    <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
+                </div>
+
+                <div class="form-group">
+                    <label for="sharedPriceRange">Fascia Prezzo</label>
+                    <select id="sharedPriceRange">
+                        <option value="">Seleziona...</option>
+                        <option value="€">€ - Economico</option>
+                        <option value="€€">€€ - Medio</option>
+                        <option value="€€€">€€€ - Alto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Vantaggi TL</label>
+                    <div style="margin-top: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="sharedTlFree">
+                            <span>🎁 TL Free</span>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="sharedHasCommission">
+                            <span>💰 Commission</span>
+                        </label>
+                        <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
+
+                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="sharedHasDiscount">
+                            <span>🏷️ Discount</span>
+                        </label>
+                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% sconto" style="margin-left: 24px; width: calc(100% - 24px);">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sharedNotes">Note</label>
+                    <textarea id="sharedNotes" rows="3" placeholder="Note utili per altri TL..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelSharedRestaurant">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Aggiungi al Database</button>
+                </div>
+
+                <div id="sharedRestaurantError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- RESTAURANT SEARCH MODAL -->
+    <div id="restaurantSearchModal" class="modal">
+        <div class="modal-content wide">
+            <div class="modal-header">
+                <h2>🔍 Cerca Ristorante nel Database</h2>
+                <button class="modal-close" id="closeRestaurantSearchModal">&times;</button>
+            </div>
+
+            <div style="padding: 24px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <input type="text" id="searchCity" placeholder="Città..." style="width: 100%; padding: 12px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
+                    <input type="text" id="searchCuisine" placeholder="Tipo cucina..." style="width: 100%; padding: 12px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
+                    <button class="btn btn-primary" id="searchRestaurantsBtn">🔍 Cerca</button>
+                </div>
+
+                <div id="searchResultsList" style="max-height: 400px; overflow-y: auto;">
+                    <p class="loading">Usa i filtri per cercare</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RATING MODAL -->
+    <div id="ratingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Valuta Ristorante</h2>
+                <button class="modal-close" id="closeRatingModal">&times;</button>
+            </div>
+
+            <form id="ratingForm" style="padding: 24px;">
+                <div class="form-group">
+                    <label>Valutazione *</label>
+                    <div style="display: flex; gap: 8px; font-size: 32px; margin-top: 8px;">
+                        <span class="star-rating" data-rating="1">⭐</span>
+                        <span class="star-rating" data-rating="2">⭐</span>
+                        <span class="star-rating" data-rating="3">⭐</span>
+                        <span class="star-rating" data-rating="4">⭐</span>
+                        <span class="star-rating" data-rating="5">⭐</span>
+                    </div>
+                    <input type="hidden" id="ratingValue" required>
+                    <input type="hidden" id="ratingRestaurantId">
+                </div>
+
+                <div class="form-group">
+                    <label for="ratingNotes">Note (facoltative)</label>
+                    <textarea id="ratingNotes" rows="3" placeholder="Racconta la tua esperienza..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelRating">Annulla</button>
+                    <button type="submit" class="btn btn-primary">⭐ Invia Valutazione</button>
+                </div>
+
+                <div id="ratingError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -795,12 +1080,17 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let currentTL = null;
 let currentTourDetail = null;
+let currentRestaurantEdit = null;
 
 // DOM elements
-let loginScreen, dashboardScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
+let loginScreen, dashboardScreen, restaurantDatabaseScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
 let toursGrid, newTourBtn, newTourModal, newTourForm, closeModal, cancelTour, tourError;
 let tourDetailModal, closeTourDetail, deleteTourBtn;
 let tabButtons, tabPanes;
+let restaurantModal, restaurantForm, closeRestaurantModal, cancelRestaurant, restaurantError;
+let sharedRestaurantModal, sharedRestaurantForm, closeSharedRestaurantModal, cancelSharedRestaurant, sharedRestaurantError;
+let restaurantSearchModal, closeRestaurantSearchModal, searchRestaurantsBtn, searchResultsList;
+let ratingModal, ratingForm, closeRatingModal, cancelRating, ratingError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -811,6 +1101,7 @@ function init() {
     // Initialize DOM elements
     loginScreen = document.getElementById('loginScreen');
     dashboardScreen = document.getElementById('dashboardScreen');
+    restaurantDatabaseScreen = document.getElementById('restaurantDatabaseScreen');
     loginForm = document.getElementById('loginForm');
     loginError = document.getElementById('loginError');
     loginBtn = document.getElementById('loginBtn');
@@ -832,6 +1123,33 @@ function init() {
     // Tab elements
     tabButtons = document.querySelectorAll('.tab-btn');
     tabPanes = document.querySelectorAll('.tab-pane');
+
+    // Restaurant modal elements
+    restaurantModal = document.getElementById('restaurantModal');
+    restaurantForm = document.getElementById('restaurantForm');
+    closeRestaurantModal = document.getElementById('closeRestaurantModal');
+    cancelRestaurant = document.getElementById('cancelRestaurant');
+    restaurantError = document.getElementById('restaurantError');
+
+    // Shared restaurant modal elements
+    sharedRestaurantModal = document.getElementById('sharedRestaurantModal');
+    sharedRestaurantForm = document.getElementById('sharedRestaurantForm');
+    closeSharedRestaurantModal = document.getElementById('closeSharedRestaurantModal');
+    cancelSharedRestaurant = document.getElementById('cancelSharedRestaurant');
+    sharedRestaurantError = document.getElementById('sharedRestaurantError');
+
+    // Restaurant search modal elements
+    restaurantSearchModal = document.getElementById('restaurantSearchModal');
+    closeRestaurantSearchModal = document.getElementById('closeRestaurantSearchModal');
+    searchRestaurantsBtn = document.getElementById('searchRestaurantsBtn');
+    searchResultsList = document.getElementById('searchResultsList');
+
+    // Rating modal elements
+    ratingModal = document.getElementById('ratingModal');
+    ratingForm = document.getElementById('ratingForm');
+    closeRatingModal = document.getElementById('closeRatingModal');
+    cancelRating = document.getElementById('cancelRating');
+    ratingError = document.getElementById('ratingError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -916,6 +1234,156 @@ function setupEventListeners() {
             switchTab(targetTab);
         });
     });
+
+    // Restaurant modal
+    if (closeRestaurantModal) {
+        closeRestaurantModal.addEventListener('click', () => {
+            if (restaurantModal) restaurantModal.classList.remove('active');
+        });
+    }
+
+    if (cancelRestaurant) {
+        cancelRestaurant.addEventListener('click', () => {
+            if (restaurantModal) restaurantModal.classList.remove('active');
+        });
+    }
+
+    if (restaurantModal) {
+        restaurantModal.addEventListener('click', (e) => {
+            if (e.target === restaurantModal) {
+                restaurantModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (restaurantForm) {
+        restaurantForm.addEventListener('submit', handleSaveRestaurant);
+    }
+
+    // Navigation buttons
+    const myToursBtn = document.getElementById('myToursBtn');
+    const myToursBtn2 = document.getElementById('myToursBtn2');
+    const restaurantDbBtn = document.getElementById('restaurantDbBtn');
+    const restaurantDbBtn2 = document.getElementById('restaurantDbBtn2');
+    const logoutBtn2 = document.getElementById('logoutBtn2');
+
+    if (myToursBtn) myToursBtn.addEventListener('click', () => showScreen('dashboard'));
+    if (myToursBtn2) myToursBtn2.addEventListener('click', () => showScreen('dashboard'));
+    if (restaurantDbBtn) restaurantDbBtn.addEventListener('click', () => showScreen('restaurantDatabase'));
+    if (restaurantDbBtn2) restaurantDbBtn2.addEventListener('click', () => showScreen('restaurantDatabase'));
+    if (logoutBtn2) {
+        logoutBtn2.addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            location.reload();
+        });
+    }
+
+    // Search database button in restaurant form
+    const searchDatabaseBtn = document.getElementById('searchDatabaseBtn');
+    if (searchDatabaseBtn) {
+        searchDatabaseBtn.addEventListener('click', openRestaurantSearchModal);
+    }
+
+    // Shared restaurant modal
+    if (closeSharedRestaurantModal) {
+        closeSharedRestaurantModal.addEventListener('click', () => {
+            if (sharedRestaurantModal) sharedRestaurantModal.classList.remove('active');
+        });
+    }
+
+    if (cancelSharedRestaurant) {
+        cancelSharedRestaurant.addEventListener('click', () => {
+            if (sharedRestaurantModal) sharedRestaurantModal.classList.remove('active');
+        });
+    }
+
+    if (sharedRestaurantModal) {
+        sharedRestaurantModal.addEventListener('click', (e) => {
+            if (e.target === sharedRestaurantModal) {
+                sharedRestaurantModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (sharedRestaurantForm) {
+        sharedRestaurantForm.addEventListener('submit', handleSaveSharedRestaurant);
+    }
+
+    // Restaurant search modal
+    if (closeRestaurantSearchModal) {
+        closeRestaurantSearchModal.addEventListener('click', () => {
+            if (restaurantSearchModal) restaurantSearchModal.classList.remove('active');
+        });
+    }
+
+    if (restaurantSearchModal) {
+        restaurantSearchModal.addEventListener('click', (e) => {
+            if (e.target === restaurantSearchModal) {
+                restaurantSearchModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (searchRestaurantsBtn) {
+        searchRestaurantsBtn.addEventListener('click', performRestaurantSearch);
+    }
+
+    // Rating modal
+    if (closeRatingModal) {
+        closeRatingModal.addEventListener('click', () => {
+            if (ratingModal) ratingModal.classList.remove('active');
+        });
+    }
+
+    if (cancelRating) {
+        cancelRating.addEventListener('click', () => {
+            if (ratingModal) ratingModal.classList.remove('active');
+        });
+    }
+
+    if (ratingModal) {
+        ratingModal.addEventListener('click', (e) => {
+            if (e.target === ratingModal) {
+                ratingModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (ratingForm) {
+        ratingForm.addEventListener('submit', handleSubmitRating);
+    }
+
+    // Star rating clicks
+    document.querySelectorAll('.star-rating').forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.dataset.rating);
+            document.getElementById('ratingValue').value = rating;
+
+            // Update visual feedback
+            document.querySelectorAll('.star-rating').forEach((s, idx) => {
+                if (idx < rating) {
+                    s.classList.add('selected');
+                } else {
+                    s.classList.remove('selected');
+                }
+            });
+        });
+    });
+
+    // Add shared restaurant button
+    const addSharedRestaurantBtn = document.getElementById('addSharedRestaurantBtn');
+    if (addSharedRestaurantBtn) {
+        addSharedRestaurantBtn.addEventListener('click', () => {
+            if (sharedRestaurantForm) sharedRestaurantForm.reset();
+            if (sharedRestaurantModal) sharedRestaurantModal.classList.add('active');
+        });
+    }
+
+    // Apply filters button
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', loadSharedRestaurants);
+    }
 
     // Delete tour button (will be reattached when modal opens)
     // Other buttons will be handled in openTourDetail()
@@ -1194,6 +1662,11 @@ function switchTab(tabName) {
             pane.classList.remove('active');
         }
     });
+
+    // Load data when switching to tabs
+    if (tabName === 'ristoranti') {
+        loadRestaurants();
+    }
 }
 
 // ===== TOUR DETAIL FUNCTIONS =====
@@ -1254,7 +1727,7 @@ function setupModalButtons() {
     // Add restaurant button
     const addRestaurantBtn = document.getElementById('addRestaurantBtn');
     if (addRestaurantBtn) {
-        addRestaurantBtn.onclick = () => alert('🚧 Aggiungi ristorante in arrivo!');
+        addRestaurantBtn.onclick = openAddRestaurantForm;
     }
 
     // Add hotel button
@@ -1348,6 +1821,508 @@ async function handleDeleteTour() {
     } catch (error) {
         console.error('Delete tour error:', error);
         alert('❌ Errore nella cancellazione:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+// ===== RESTAURANT FUNCTIONS =====
+
+async function loadRestaurants() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const restaurantsList = document.getElementById('restaurantsList');
+    if (!restaurantsList) return;
+
+    try {
+        restaurantsList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: restaurants, error } = await supabaseClient
+            .from('tour_restaurants')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('city', { ascending: true });
+
+        if (error) throw error;
+
+        if (!restaurants || restaurants.length === 0) {
+            restaurantsList.innerHTML = '<p class="loading">Nessun ristorante ancora</p>';
+        } else {
+            displayRestaurants(restaurants);
+        }
+    } catch (error) {
+        console.error('Load restaurants error:', error);
+        restaurantsList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento ristoranti:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayRestaurants(restaurants) {
+    const restaurantsList = document.getElementById('restaurantsList');
+    if (!restaurantsList) return;
+
+    restaurantsList.innerHTML = restaurants.map(restaurant => {
+        const advantages = restaurant.advantages || [];
+        const badgesHtml = advantages.map(adv => {
+            if (adv.type === 'tl_free') {
+                return `<span class="badge badge-green">🎁 TL Free</span>`;
+            } else if (adv.type === 'commission') {
+                return `<span class="badge badge-yellow">💰 Commission</span>`;
+            } else if (adv.type === 'discount') {
+                return `<span class="badge badge-blue">🏷️ Discount</span>`;
+            }
+            return '';
+        }).join('');
+
+        return `
+            <div class="data-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                    <div>
+                        <h4 style="margin: 0;">${restaurant.name} <span class="badge badge-blue" style="font-size: 11px;">Giorno ${restaurant.day_number || '?'}</span></h4>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;" onclick="openEditRestaurantForm('${restaurant.id}')">✏️</button>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px; background: var(--error); border-color: var(--error);" onclick="handleDeleteRestaurant('${restaurant.id}')">🗑️</button>
+                    </div>
+                </div>
+                <div class="meta">📍 ${restaurant.city || 'N/A'}${restaurant.address ? ' - ' + restaurant.address : ''}</div>
+                ${restaurant.phone ? `<div class="meta">📞 ${restaurant.phone}</div>` : ''}
+                ${badgesHtml ? `<div style="margin-top: 8px;">${badgesHtml}</div>` : ''}
+                ${restaurant.notes ? `<div class="meta" style="margin-top: 8px;">💬 ${restaurant.notes}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+
+    // Store restaurants in memory
+    window.currentRestaurants = restaurants;
+}
+
+function openAddRestaurantForm() {
+    currentRestaurantEdit = null;
+
+    // Reset form
+    if (restaurantForm) restaurantForm.reset();
+
+    // Set title
+    document.getElementById('restaurantModalTitle').textContent = 'Aggiungi Ristorante';
+
+    // Clear error
+    hideRestaurantError();
+
+    // Open modal
+    if (restaurantModal) restaurantModal.classList.add('active');
+}
+
+function openEditRestaurantForm(restaurantId) {
+    const restaurant = window.currentRestaurants?.find(r => r.id === restaurantId);
+    if (!restaurant) {
+        alert('❌ Ristorante non trovato');
+        return;
+    }
+
+    currentRestaurantEdit = restaurant;
+
+    // Populate form
+    document.getElementById('restaurantDay').value = restaurant.day_number || '';
+    document.getElementById('restaurantName').value = restaurant.name || '';
+    document.getElementById('restaurantCity').value = restaurant.city || '';
+    document.getElementById('restaurantAddress').value = restaurant.address || '';
+    document.getElementById('restaurantPhone').value = restaurant.phone || '';
+    document.getElementById('restaurantNotes').value = restaurant.notes || '';
+
+    // Clear all advantages first
+    document.getElementById('advTlFree').checked = false;
+    document.getElementById('advTlFreeDesc').value = '';
+    document.getElementById('advCommission').checked = false;
+    document.getElementById('advCommissionDesc').value = '';
+    document.getElementById('advDiscount').checked = false;
+    document.getElementById('advDiscountDesc').value = '';
+
+    // Populate advantages
+    const advantages = restaurant.advantages || [];
+    advantages.forEach(adv => {
+        if (adv.type === 'tl_free') {
+            document.getElementById('advTlFree').checked = true;
+            document.getElementById('advTlFreeDesc').value = adv.description || '';
+        } else if (adv.type === 'commission') {
+            document.getElementById('advCommission').checked = true;
+            document.getElementById('advCommissionDesc').value = adv.description || '';
+        } else if (adv.type === 'discount') {
+            document.getElementById('advDiscount').checked = true;
+            document.getElementById('advDiscountDesc').value = adv.description || '';
+        }
+    });
+
+    // Set title
+    document.getElementById('restaurantModalTitle').textContent = 'Modifica Ristorante';
+
+    // Clear error
+    hideRestaurantError();
+
+    // Open modal
+    if (restaurantModal) restaurantModal.classList.add('active');
+}
+
+async function handleSaveRestaurant(e) {
+    e.preventDefault();
+    hideRestaurantError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showRestaurantError('Tour non selezionato');
+        return;
+    }
+
+    // Collect form data
+    const restaurantData = {
+        tour_id: currentTourDetail.id,
+        day_number: parseInt(document.getElementById('restaurantDay').value),
+        name: document.getElementById('restaurantName').value,
+        city: document.getElementById('restaurantCity').value,
+        address: document.getElementById('restaurantAddress').value || null,
+        phone: document.getElementById('restaurantPhone').value || null,
+        notes: document.getElementById('restaurantNotes').value || null,
+        advantages: []
+    };
+
+    // Collect advantages
+    if (document.getElementById('advTlFree').checked) {
+        restaurantData.advantages.push({
+            type: 'tl_free',
+            description: document.getElementById('advTlFreeDesc').value || ''
+        });
+    }
+    if (document.getElementById('advCommission').checked) {
+        restaurantData.advantages.push({
+            type: 'commission',
+            description: document.getElementById('advCommissionDesc').value || ''
+        });
+    }
+    if (document.getElementById('advDiscount').checked) {
+        restaurantData.advantages.push({
+            type: 'discount',
+            description: document.getElementById('advDiscountDesc').value || ''
+        });
+    }
+
+    try {
+        if (currentRestaurantEdit) {
+            // Update
+            const { error } = await supabaseClient
+                .from('tour_restaurants')
+                .update(restaurantData)
+                .eq('id', currentRestaurantEdit.id);
+
+            if (error) throw error;
+
+            alert('✅ Ristorante aggiornato!');
+        } else {
+            // Insert
+            const { error } = await supabaseClient
+                .from('tour_restaurants')
+                .insert([restaurantData]);
+
+            if (error) throw error;
+
+            alert('✅ Ristorante aggiunto!');
+        }
+
+        // Close modal
+        if (restaurantModal) restaurantModal.classList.remove('active');
+
+        // Reload restaurants
+        loadRestaurants();
+
+    } catch (error) {
+        console.error('Save restaurant error:', error);
+        showRestaurantError(error.message || 'Errore nel salvataggio');
+    }
+}
+
+async function handleDeleteRestaurant(restaurantId) {
+    const restaurant = window.currentRestaurants?.find(r => r.id === restaurantId);
+    if (!restaurant) return;
+
+    const confirmed = confirm(
+        `⚠️ ATTENZIONE!\n\nSei sicuro di voler cancellare:\n\n"${restaurant.name}"\n\nQuesta azione è IRREVERSIBILE!`
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_restaurants')
+            .delete()
+            .eq('id', restaurantId);
+
+        if (error) throw error;
+
+        alert('✅ Ristorante cancellato!');
+        loadRestaurants();
+
+    } catch (error) {
+        console.error('Delete restaurant error:', error);
+        alert('❌ Errore nella cancellazione:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showRestaurantError(message) {
+    if (restaurantError) {
+        restaurantError.textContent = message;
+        restaurantError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideRestaurantError() {
+    if (restaurantError) {
+        restaurantError.classList.remove('show');
+    }
+}
+
+// ===== SCREEN NAVIGATION =====
+
+function showScreen(screenName) {
+    if (screenName === 'dashboard') {
+        dashboardScreen.classList.add('active');
+        restaurantDatabaseScreen.classList.remove('active');
+        loadTours();
+    } else if (screenName === 'restaurantDatabase') {
+        dashboardScreen.classList.remove('active');
+        restaurantDatabaseScreen.classList.add('active');
+        loadSharedRestaurants();
+    }
+}
+
+// ===== SHARED RESTAURANT DATABASE FUNCTIONS =====
+
+async function loadSharedRestaurants() {
+    const sharedRestaurantsList = document.getElementById('sharedRestaurantsList');
+    if (!sharedRestaurantsList) return;
+
+    try {
+        sharedRestaurantsList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: restaurants, error } = await supabaseClient
+            .from('shared_restaurants')
+            .select('*')
+            .order('city', { ascending: true });
+
+        if (error) throw error;
+
+        if (!restaurants || restaurants.length === 0) {
+            sharedRestaurantsList.innerHTML = '<p class="loading">Nessun ristorante nel database ancora. Sii il primo ad aggiungerne uno!</p>';
+        } else {
+            displaySharedRestaurants(restaurants);
+        }
+    } catch (error) {
+        console.error('Load shared restaurants error:', error);
+        sharedRestaurantsList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento database ristoranti:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displaySharedRestaurants(restaurants) {
+    const sharedRestaurantsList = document.getElementById('sharedRestaurantsList');
+    if (!sharedRestaurantsList) return;
+
+    sharedRestaurantsList.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">` +
+        restaurants.map(restaurant => {
+            const stars = '⭐'.repeat(Math.round(restaurant.rating_avg || 0));
+            return `
+                <div class="data-card">
+                    <h4 style="margin: 0 0 8px 0;">${restaurant.restaurant_name}</h4>
+                    <div class="meta">📍 ${restaurant.city}${restaurant.address ? ' - ' + restaurant.address : ''}</div>
+                    ${restaurant.cuisine_type ? `<div class="meta">🍽️ ${restaurant.cuisine_type}</div>` : ''}
+                    ${restaurant.price_range ? `<div class="meta">${restaurant.price_range}</div>` : ''}
+                    ${restaurant.phone ? `<div class="meta">📞 ${restaurant.phone}</div>` : ''}
+                    <div style="margin-top: 8px;">
+                        ${restaurant.tl_free ? '<span class="badge badge-green">🎁 TL Free</span>' : ''}
+                        ${restaurant.has_commission ? '<span class="badge badge-yellow">💰 Commission ' + (restaurant.commission_percentage || '') + '%</span>' : ''}
+                        ${restaurant.discount_percentage ? '<span class="badge badge-blue">🏷️ Discount ' + restaurant.discount_percentage + '%</span>' : ''}
+                    </div>
+                    ${stars ? `<div style="margin-top: 8px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
+                    ${restaurant.notes ? `<div class="meta" style="margin-top: 8px;">💬 ${restaurant.notes}</div>` : ''}
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 13px;" onclick="openRatingModal('${restaurant.id}')">⭐ Vota</button>
+                    </div>
+                </div>
+            `;
+        }).join('') + '</div>';
+
+    window.allSharedRestaurants = restaurants;
+}
+
+async function handleSaveSharedRestaurant(e) {
+    e.preventDefault();
+
+    if (!currentTL || !currentTL.id) {
+        alert('❌ Errore: TL non identificato');
+        return;
+    }
+
+    const restaurantData = {
+        restaurant_name: document.getElementById('sharedRestaurantName').value,
+        city: document.getElementById('sharedRestaurantCity').value,
+        address: document.getElementById('sharedRestaurantAddress').value || null,
+        phone: document.getElementById('sharedRestaurantPhone').value || null,
+        cuisine_type: document.getElementById('sharedCuisineType').value || null,
+        price_range: document.getElementById('sharedPriceRange').value || null,
+        tl_free: document.getElementById('sharedTlFree').checked,
+        has_commission: document.getElementById('sharedHasCommission').checked,
+        commission_percentage: document.getElementById('sharedCommissionPerc').value ? parseInt(document.getElementById('sharedCommissionPerc').value) : null,
+        discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
+        notes: document.getElementById('sharedNotes').value || null,
+        added_by_tl_id: currentTL.id
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('shared_restaurants')
+            .insert([restaurantData]);
+
+        if (error) throw error;
+
+        alert('✅ Ristorante aggiunto al database condiviso!');
+
+        if (sharedRestaurantModal) sharedRestaurantModal.classList.remove('active');
+        if (sharedRestaurantForm) sharedRestaurantForm.reset();
+
+        loadSharedRestaurants();
+
+    } catch (error) {
+        console.error('Save shared restaurant error:', error);
+        alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function openRestaurantSearchModal() {
+    if (restaurantModal) restaurantModal.classList.remove('active');
+    if (restaurantSearchModal) restaurantSearchModal.classList.add('active');
+}
+
+async function performRestaurantSearch() {
+    const city = document.getElementById('searchCity').value;
+    const cuisine = document.getElementById('searchCuisine').value;
+
+    if (!city && !cuisine) {
+        alert('Inserisci almeno un filtro');
+        return;
+    }
+
+    try {
+        searchResultsList.innerHTML = '<p class="loading">Ricerca...</p>';
+
+        let query = supabaseClient.from('shared_restaurants').select('*');
+
+        if (city) query = query.ilike('city', `%${city}%`);
+        if (cuisine) query = query.ilike('cuisine_type', `%${cuisine}%`);
+
+        const { data: restaurants, error } = await query.order('rating_avg', { ascending: false });
+
+        if (error) throw error;
+
+        if (!restaurants || restaurants.length === 0) {
+            searchResultsList.innerHTML = '<p class="loading">Nessun risultato</p>';
+            return;
+        }
+
+        searchResultsList.innerHTML = restaurants.map(r => `
+            <div class="data-card">
+                <h4>${r.restaurant_name}</h4>
+                <div class="meta">📍 ${r.city}</div>
+                ${r.cuisine_type ? `<div class="meta">🍽️ ${r.cuisine_type}</div>` : ''}
+                <button class="btn btn-primary" style="width: 100%; margin-top: 12px;" onclick="copyRestaurantToTour('${r.id}')">➕ Aggiungi al Tour</button>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Search error:', error);
+        alert('❌ Errore ricerca:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function copyRestaurantToTour(restaurantId) {
+    const restaurant = window.allSharedRestaurants?.find(r => r.id === restaurantId);
+    if (!restaurant || !currentTourDetail) {
+        alert('❌ Errore');
+        return;
+    }
+
+    // Pre-populate form
+    document.getElementById('restaurantDay').value = '';
+    document.getElementById('restaurantName').value = restaurant.restaurant_name;
+    document.getElementById('restaurantCity').value = restaurant.city;
+    document.getElementById('restaurantAddress').value = restaurant.address || '';
+    document.getElementById('restaurantPhone').value = restaurant.phone || '';
+    document.getElementById('restaurantNotes').value = restaurant.notes || '';
+
+    // Close search modal
+    if (restaurantSearchModal) restaurantSearchModal.classList.remove('active');
+    // Open restaurant form
+    if (restaurantModal) restaurantModal.classList.add('active');
+
+    alert('✅ Dati copiati! Seleziona il giorno e salva.');
+}
+
+function openRatingModal(restaurantId) {
+    document.getElementById('ratingRestaurantId').value = restaurantId;
+    document.getElementById('ratingValue').value = '';
+    document.getElementById('ratingNotes').value = '';
+
+    // Reset stars
+    document.querySelectorAll('.star-rating').forEach(s => s.classList.remove('selected'));
+
+    if (ratingModal) ratingModal.classList.add('active');
+}
+
+async function handleSubmitRating(e) {
+    e.preventDefault();
+
+    const restaurantId = document.getElementById('ratingRestaurantId').value;
+    const rating = parseInt(document.getElementById('ratingValue').value);
+    const notes = document.getElementById('ratingNotes').value;
+
+    if (!rating || !currentTL) {
+        alert('❌ Seleziona una valutazione');
+        return;
+    }
+
+    try {
+        // Insert rating
+        const { error: ratingError } = await supabaseClient
+            .from('restaurant_ratings')
+            .upsert([{
+                restaurant_id: restaurantId,
+                tl_id: currentTL.id,
+                rating: rating,
+                notes: notes || null
+            }], { onConflict: 'restaurant_id,tl_id' });
+
+        if (ratingError) throw ratingError;
+
+        // Recalculate average
+        const { data: ratings } = await supabaseClient
+            .from('restaurant_ratings')
+            .select('rating')
+            .eq('restaurant_id', restaurantId);
+
+        const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
+
+        await supabaseClient
+            .from('shared_restaurants')
+            .update({
+                rating_avg: avg,
+                total_ratings: ratings.length
+            })
+            .eq('id', restaurantId);
+
+        alert('✅ Valutazione inviata!');
+
+        if (ratingModal) ratingModal.classList.remove('active');
+        loadSharedRestaurants();
+
+    } catch (error) {
+        console.error('Rating error:', error);
+        alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
     </script>

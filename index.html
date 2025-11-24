@@ -734,7 +734,11 @@ body {
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
                         <div class="data-card">
                             <h4>📊 Feedback Ricevuti</h4>
-                            <div style="font-size: 32px; font-weight: 700; color: var(--primary-blue);" id="feedbackCount">0</div>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+                                <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 20px; width: 40px;" onclick="decrementFeedback()">−</button>
+                                <div style="font-size: 32px; font-weight: 700; color: var(--primary-blue);" id="feedbackCount">0</div>
+                                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 20px; width: 40px;" onclick="incrementFeedback()">+</button>
+                            </div>
                             <div class="meta">di <span id="totalPassengers">0</span> passeggeri</div>
                         </div>
                         <div class="data-card">
@@ -747,6 +751,7 @@ body {
                     <div class="form-group">
                         <label for="totalPassengersInput">Totale Passeggeri</label>
                         <input type="number" id="totalPassengersInput" min="1" placeholder="Inserisci numero passeggeri">
+                        <button class="btn btn-primary" style="margin-top: 8px; width: 100%;" onclick="saveDashboardData()">💾 Salva Dati</button>
                     </div>
 
                     <div style="margin: 24px 0; padding: 24px; background: var(--dark-bg); border-radius: 8px;">
@@ -1774,21 +1779,104 @@ function setupModalButtons() {
 }
 
 function loadDashboardData() {
-    // For now, just set placeholder values
-    // TODO: Load actual data from database
-    document.getElementById('feedbackCount').textContent = '0';
-    document.getElementById('totalPassengers').textContent = '0';
-    document.getElementById('feedbackPercentage').textContent = '0%';
+    if (!currentTourDetail) return;
+
+    // Load from tour data
+    const feedbackCount = currentTourDetail.feedback_count || 0;
+    const totalPassengers = currentTourDetail.total_passengers || 0;
+
+    document.getElementById('feedbackCount').textContent = feedbackCount;
+    document.getElementById('totalPassengers').textContent = totalPassengers;
+    document.getElementById('totalPassengersInput').value = totalPassengers || '';
+
+    // Calculate percentage
+    const percentage = totalPassengers > 0 ? Math.round((feedbackCount / totalPassengers) * 100) : 0;
+    document.getElementById('feedbackPercentage').textContent = percentage + '%';
+}
+
+function incrementFeedback() {
+    const currentCount = parseInt(document.getElementById('feedbackCount').textContent) || 0;
+    const newCount = currentCount + 1;
+    document.getElementById('feedbackCount').textContent = newCount;
+    updatePercentage();
+    // Auto-save
+    saveFeedbackCount(newCount);
+}
+
+function decrementFeedback() {
+    const currentCount = parseInt(document.getElementById('feedbackCount').textContent) || 0;
+    if (currentCount > 0) {
+        const newCount = currentCount - 1;
+        document.getElementById('feedbackCount').textContent = newCount;
+        updatePercentage();
+        // Auto-save
+        saveFeedbackCount(newCount);
+    }
+}
+
+function updatePercentage() {
+    const feedbackCount = parseInt(document.getElementById('feedbackCount').textContent) || 0;
+    const totalPassengers = parseInt(document.getElementById('totalPassengers').textContent) || 0;
+    const percentage = totalPassengers > 0 ? Math.round((feedbackCount / totalPassengers) * 100) : 0;
+    document.getElementById('feedbackPercentage').textContent = percentage + '%';
+}
+
+async function saveFeedbackCount(count) {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('tours')
+            .update({ feedback_count: count })
+            .eq('id', currentTourDetail.id);
+
+        if (error) throw error;
+
+        // Update current tour detail
+        currentTourDetail.feedback_count = count;
+
+    } catch (error) {
+        console.error('Save feedback error:', error);
+        alert('❌ Errore salvataggio feedback:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function saveDashboardData() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const totalPassengers = parseInt(document.getElementById('totalPassengersInput').value) || 0;
+
+    if (totalPassengers < 1) {
+        alert('❌ Inserisci un numero di passeggeri valido');
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tours')
+            .update({ total_passengers: totalPassengers })
+            .eq('id', currentTourDetail.id);
+
+        if (error) throw error;
+
+        // Update current tour detail and display
+        currentTourDetail.total_passengers = totalPassengers;
+        document.getElementById('totalPassengers').textContent = totalPassengers;
+        updatePercentage();
+
+        alert('✅ Dati salvati!');
+
+    } catch (error) {
+        console.error('Save dashboard data error:', error);
+        alert('❌ Errore salvataggio:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
 }
 
 function handlePassengersChange(e) {
+    // Deprecated - now using saveDashboardData button
     const total = parseInt(e.target.value) || 0;
     document.getElementById('totalPassengers').textContent = total;
-
-    // Calculate percentage (feedback count / total)
-    const feedbackCount = parseInt(document.getElementById('feedbackCount').textContent) || 0;
-    const percentage = total > 0 ? Math.round((feedbackCount / total) * 100) : 0;
-    document.getElementById('feedbackPercentage').textContent = percentage + '%';
+    updatePercentage();
 }
 
 async function handleDeleteTour() {

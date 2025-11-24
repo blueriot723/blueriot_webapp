@@ -388,6 +388,104 @@ body {
     display: block;
 }
 
+/* ===== TABS ===== */
+.tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 24px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.tab-btn.active {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.tab-content {
+    padding: 24px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* ===== CARDS FOR DATA ===== */
+.data-card {
+    background: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.data-card:hover {
+    border-color: var(--primary-blue);
+}
+
+.data-card h4 {
+    color: var(--primary-blue);
+    margin-bottom: 8px;
+}
+
+.data-card .meta {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 4px;
+}
+
+.badge-green {
+    background: rgba(0, 255, 136, 0.1);
+    color: #00FF88;
+    border: 1px solid #00FF88;
+}
+
+.badge-blue {
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+}
+
+.badge-yellow {
+    background: rgba(255, 200, 0, 0.1);
+    color: #FFC800;
+    border: 1px solid #FFC800;
+}
+
+/* ===== WIDE MODAL ===== */
+.modal-content.wide {
+    max-width: 1000px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .login-form {
@@ -416,6 +514,14 @@ body {
     .navbar-menu {
         width: 100%;
         justify-content: space-between;
+    }
+
+    .tabs {
+        padding: 0 12px;
+    }
+
+    .modal-content.wide {
+        max-width: 100%;
     }
 }
     </style>
@@ -529,89 +635,149 @@ body {
         </div>
     </div>
 
-    <!-- TOUR DETAIL MODAL -->
+    <!-- TOUR DETAIL MODAL WITH 8 TABS -->
     <div id="tourDetailModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content wide">
             <div class="modal-header">
-                <h2>Dettaglio Tour</h2>
+                <div>
+                    <h2 id="modalTourName">Tour</h2>
+                    <span id="modalTourCode" class="tour-code" style="margin-left: 12px;"></span>
+                </div>
                 <button class="modal-close" id="closeTourDetail">&times;</button>
             </div>
 
-            <div style="padding: 24px;">
-                <!-- Tour Info Display -->
-                <div id="tourDetailView">
-                    <div class="form-group">
-                        <label>Codice Tour</label>
-                        <div id="displayCode" style="padding: 14px; background: var(--dark-bg); border-radius: 8px; color: var(--primary-blue); font-weight: 700;"></div>
+            <!-- TABS NAVIGATION -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="tab-btn" data-tab="ristoranti">🍽️ Ristoranti</button>
+                <button class="tab-btn" data-tab="hotel">🏨 Hotel</button>
+                <button class="tab-btn" data-tab="programma">📅 Programma</button>
+                <button class="tab-btn" data-tab="emergenze">🚨 Emergenze</button>
+                <button class="tab-btn" data-tab="file">📄 File</button>
+                <button class="tab-btn" data-tab="link">🔗 Link</button>
+                <button class="tab-btn" data-tab="templates">📋 Templates</button>
+            </div>
+
+            <!-- TAB CONTENTS -->
+            <div class="tab-content">
+                <!-- DASHBOARD TAB -->
+                <div id="tabDashboard" class="tab-pane active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div class="data-card">
+                            <h4>📊 Feedback Ricevuti</h4>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--primary-blue);" id="feedbackCount">0</div>
+                            <div class="meta">di <span id="totalPassengers">0</span> passeggeri</div>
+                        </div>
+                        <div class="data-card">
+                            <h4>📈 Percentuale</h4>
+                            <div style="font-size: 32px; font-weight: 700; color: #00FF88;" id="feedbackPercentage">0%</div>
+                            <div class="meta">feedback ricevuti</div>
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Nome Tour</label>
-                        <div id="displayName" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
+                        <label for="totalPassengersInput">Totale Passeggeri</label>
+                        <input type="number" id="totalPassengersInput" min="1" placeholder="Inserisci numero passeggeri">
                     </div>
 
-                    <div class="form-group">
-                        <label>Operatore</label>
-                        <div id="displayOperator" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Periodo</label>
-                        <div id="displayDates" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
-                        <div id="displayStatus" style="padding: 14px; background: var(--dark-bg); border-radius: 8px;"></div>
+                    <div style="margin: 24px 0; padding: 24px; background: var(--dark-bg); border-radius: 8px;">
+                        <canvas id="feedbackChart" style="max-height: 200px;"></canvas>
                     </div>
 
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" id="editTourBtn">✏️ Modifica</button>
-                        <button type="button" class="btn btn-secondary" id="miniSiteBtn">🌐 Vai al Mini-Site</button>
-                        <button type="button" class="btn btn-secondary" style="background: var(--error); border-color: var(--error);" id="deleteTourBtn">🗑️ Cancella</button>
+                        <button type="button" class="btn btn-secondary" id="editTourInfoBtn">✏️ Modifica Info Tour</button>
+                        <button type="button" class="btn btn-secondary" id="uploadPdfBtn">📄 Carica PDF</button>
+                        <button type="button" class="btn btn-secondary" id="publishSiteBtn">🌐 Pubblica Mini-Site</button>
+                        <button type="button" class="btn btn-secondary" style="background: var(--error); border-color: var(--error);" id="deleteTourBtn">🗑️ Cancella Tour</button>
                     </div>
                 </div>
 
-                <!-- Tour Edit Form (hidden by default) -->
-                <form id="tourEditForm" style="display: none;">
-                    <div class="form-group">
-                        <label>Codice Tour (non modificabile)</label>
-                        <input type="text" id="editCode" disabled style="opacity: 0.6;">
+                <!-- RISTORANTI TAB -->
+                <div id="tabRistoranti" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3>Ristoranti del Tour</h3>
+                        <button class="btn btn-primary" id="addRestaurantBtn">+ Aggiungi</button>
+                    </div>
+                    <div id="restaurantsList">
+                        <p class="loading">Nessun ristorante ancora</p>
+                    </div>
+                </div>
+
+                <!-- HOTEL TAB -->
+                <div id="tabHotel" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3>Hotel del Tour</h3>
+                        <button class="btn btn-primary" id="addHotelBtn">+ Aggiungi</button>
+                    </div>
+                    <div id="hotelsList">
+                        <p class="loading">Nessun hotel ancora</p>
+                    </div>
+                </div>
+
+                <!-- PROGRAMMA TAB -->
+                <div id="tabProgramma" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3>Programma Giornaliero</h3>
+                        <button class="btn btn-secondary" id="generateDaysBtn">🔄 Genera Giorni</button>
+                    </div>
+                    <div id="daysList">
+                        <p class="loading">Clicca "Genera Giorni" per creare il programma</p>
+                    </div>
+                </div>
+
+                <!-- EMERGENZE TAB -->
+                <div id="tabEmergenze" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3>Contatti di Emergenza</h3>
+                        <button class="btn btn-primary" id="addEmergencyBtn">+ Aggiungi</button>
+                    </div>
+                    <div id="emergencyList">
+                        <p class="loading">Nessun contatto ancora</p>
+                    </div>
+                </div>
+
+                <!-- FILE TAB -->
+                <div id="tabFile" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3>Documenti del Tour</h3>
+                        <button class="btn btn-primary" id="addFileBtn">+ Aggiungi</button>
+                    </div>
+                    <div id="filesList">
+                        <p class="loading">Nessun file ancora</p>
+                    </div>
+                </div>
+
+                <!-- LINK TAB -->
+                <div id="tabLink" class="tab-pane">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3>Link Utili</h3>
+                        <button class="btn btn-primary" id="addLinkBtn">+ Aggiungi</button>
+                    </div>
+                    <div id="linksList">
+                        <p class="loading">Nessun link ancora</p>
+                    </div>
+                </div>
+
+                <!-- TEMPLATES TAB -->
+                <div id="tabTemplates" class="tab-pane">
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="margin-bottom: 16px;">💾 Salva come Template</h3>
+                        <div class="form-group">
+                            <label for="templateName">Nome Template</label>
+                            <input type="text" id="templateName" placeholder="es. Tour Italia Classica">
+                        </div>
+                        <button class="btn btn-primary" id="saveTemplateBtn">💾 Salva Template</button>
                     </div>
 
-                    <div class="form-group">
-                        <label for="editName">Nome Tour</label>
-                        <input type="text" id="editName" required>
-                    </div>
+                    <hr style="border: 1px solid var(--border-color); margin: 24px 0;">
 
-                    <div class="form-group">
-                        <label for="editOperator">Operatore</label>
-                        <select id="editOperator" required>
-                            <option value="">Seleziona operatore...</option>
-                            <option value="Intrepid Travel">Intrepid Travel</option>
-                            <option value="G Adventures">G Adventures</option>
-                            <option value="OAT">OAT</option>
-                            <option value="Altro">Altro</option>
-                        </select>
+                    <div>
+                        <h3 style="margin-bottom: 16px;">📋 Carica da Template</h3>
+                        <div id="templatesList">
+                            <p class="loading">Nessun template disponibile</p>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="editStartDate">Data Inizio</label>
-                        <input type="date" id="editStartDate" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editEndDate">Data Fine</label>
-                        <input type="date" id="editEndDate" required>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" id="cancelEditBtn">Annulla</button>
-                        <button type="submit" class="btn btn-primary">💾 Salva Modifiche</button>
-                    </div>
-
-                    <div id="editError" class="error-message"></div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -633,7 +799,8 @@ let currentTourDetail = null;
 // DOM elements
 let loginScreen, dashboardScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
 let toursGrid, newTourBtn, newTourModal, newTourForm, closeModal, cancelTour, tourError;
-let tourDetailModal, closeTourDetail, tourDetailView, tourEditForm, editTourBtn, deleteTourBtn, miniSiteBtn, cancelEditBtn, editError;
+let tourDetailModal, closeTourDetail, deleteTourBtn;
+let tabButtons, tabPanes;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -660,13 +827,11 @@ function init() {
     // Tour detail modal elements
     tourDetailModal = document.getElementById('tourDetailModal');
     closeTourDetail = document.getElementById('closeTourDetail');
-    tourDetailView = document.getElementById('tourDetailView');
-    tourEditForm = document.getElementById('tourEditForm');
-    editTourBtn = document.getElementById('editTourBtn');
     deleteTourBtn = document.getElementById('deleteTourBtn');
-    miniSiteBtn = document.getElementById('miniSiteBtn');
-    cancelEditBtn = document.getElementById('cancelEditBtn');
-    editError = document.getElementById('editError');
+
+    // Tab elements
+    tabButtons = document.querySelectorAll('.tab-btn');
+    tabPanes = document.querySelectorAll('.tab-pane');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -744,27 +909,16 @@ function setupEventListeners() {
         });
     }
 
-    if (editTourBtn) {
-        editTourBtn.addEventListener('click', showEditForm);
-    }
-
-    if (cancelEditBtn) {
-        cancelEditBtn.addEventListener('click', hideEditForm);
-    }
-
-    if (deleteTourBtn) {
-        deleteTourBtn.addEventListener('click', handleDeleteTour);
-    }
-
-    if (miniSiteBtn) {
-        miniSiteBtn.addEventListener('click', () => {
-            alert('🚧 Mini-Site in arrivo!\n\nQuesta funzionalità sarà disponibile presto.');
+    // Tab switching
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            switchTab(targetTab);
         });
-    }
+    });
 
-    if (tourEditForm) {
-        tourEditForm.addEventListener('submit', handleUpdateTour);
-    }
+    // Delete tour button (will be reattached when modal opens)
+    // Other buttons will be handled in openTourDetail()
 }
 
 async function checkAuth() {
@@ -1020,6 +1174,28 @@ function hideTourError() {
     }
 }
 
+// ===== TAB SWITCHING =====
+
+function switchTab(tabName) {
+    // Update tab buttons
+    tabButtons.forEach(btn => {
+        if (btn.dataset.tab === tabName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Update tab panes
+    tabPanes.forEach(pane => {
+        if (pane.id === `tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`) {
+            pane.classList.add('active');
+        } else {
+            pane.classList.remove('active');
+        }
+    });
+}
+
 // ===== TOUR DETAIL FUNCTIONS =====
 
 function openTourDetail(tourId) {
@@ -1033,84 +1209,113 @@ function openTourDetail(tourId) {
 
     currentTourDetail = tour;
 
-    // Populate detail view
-    document.getElementById('displayCode').textContent = tour.code;
-    document.getElementById('displayName').textContent = tour.name;
-    document.getElementById('displayOperator').textContent = tour.operator || 'N/A';
-    document.getElementById('displayDates').textContent = `${formatDate(tour.start_date)} → ${formatDate(tour.end_date)}`;
-    document.getElementById('displayStatus').textContent = tour.status === 'active' ? '✅ Attivo' : '📦 Archiviato';
+    // Populate modal header
+    document.getElementById('modalTourName').textContent = tour.name;
+    document.getElementById('modalTourCode').textContent = tour.code;
 
-    // Show detail view, hide edit form
-    if (tourDetailView) tourDetailView.style.display = 'block';
-    if (tourEditForm) tourEditForm.style.display = 'none';
+    // Switch to dashboard tab
+    switchTab('dashboard');
+
+    // Load dashboard data
+    loadDashboardData();
+
+    // Set up button listeners (need to be reattached each time modal opens)
+    setupModalButtons();
 
     // Open modal
     if (tourDetailModal) tourDetailModal.classList.add('active');
 }
 
-function showEditForm() {
-    if (!currentTourDetail) return;
-
-    // Populate edit form
-    document.getElementById('editCode').value = currentTourDetail.code;
-    document.getElementById('editName').value = currentTourDetail.name;
-    document.getElementById('editOperator').value = currentTourDetail.operator || '';
-    document.getElementById('editStartDate').value = currentTourDetail.start_date;
-    document.getElementById('editEndDate').value = currentTourDetail.end_date;
-
-    // Hide detail view, show edit form
-    if (tourDetailView) tourDetailView.style.display = 'none';
-    if (tourEditForm) tourEditForm.style.display = 'block';
-    hideEditError();
-}
-
-function hideEditForm() {
-    // Show detail view, hide edit form
-    if (tourDetailView) tourDetailView.style.display = 'block';
-    if (tourEditForm) tourEditForm.style.display = 'none';
-    hideEditError();
-}
-
-async function handleUpdateTour(e) {
-    e.preventDefault();
-    hideEditError();
-
-    if (!currentTourDetail) return;
-
-    const updatedData = {
-        name: document.getElementById('editName').value,
-        operator: document.getElementById('editOperator').value,
-        start_date: document.getElementById('editStartDate').value,
-        end_date: document.getElementById('editEndDate').value
-    };
-
-    // Validate dates
-    if (new Date(updatedData.end_date) < new Date(updatedData.start_date)) {
-        showEditError('La data di fine deve essere dopo la data di inizio');
-        return;
+function setupModalButtons() {
+    // Delete tour button
+    const deleteBtn = document.getElementById('deleteTourBtn');
+    if (deleteBtn) {
+        deleteBtn.onclick = handleDeleteTour;
     }
 
-    try {
-        const { error } = await supabaseClient
-            .from('tours')
-            .update(updatedData)
-            .eq('id', currentTourDetail.id);
-
-        if (error) throw error;
-
-        // Success
-        alert('✅ Tour aggiornato con successo!');
-
-        // Close modal
-        if (tourDetailModal) tourDetailModal.classList.remove('active');
-
-        // Reload tours
-        loadTours();
-
-    } catch (error) {
-        console.error('Update tour error:', error);
-        showEditError(error.message || 'Errore nell\'aggiornamento del tour');
+    // Edit tour info button
+    const editInfoBtn = document.getElementById('editTourInfoBtn');
+    if (editInfoBtn) {
+        editInfoBtn.onclick = () => alert('🚧 Modifica info tour in arrivo!');
     }
+
+    // Upload PDF button
+    const uploadPdfBtn = document.getElementById('uploadPdfBtn');
+    if (uploadPdfBtn) {
+        uploadPdfBtn.onclick = () => alert('🚧 Upload PDF in arrivo! (Phase 3)');
+    }
+
+    // Publish site button
+    const publishSiteBtn = document.getElementById('publishSiteBtn');
+    if (publishSiteBtn) {
+        publishSiteBtn.onclick = () => alert('🚧 Mini-Site in arrivo!');
+    }
+
+    // Add restaurant button
+    const addRestaurantBtn = document.getElementById('addRestaurantBtn');
+    if (addRestaurantBtn) {
+        addRestaurantBtn.onclick = () => alert('🚧 Aggiungi ristorante in arrivo!');
+    }
+
+    // Add hotel button
+    const addHotelBtn = document.getElementById('addHotelBtn');
+    if (addHotelBtn) {
+        addHotelBtn.onclick = () => alert('🚧 Aggiungi hotel in arrivo!');
+    }
+
+    // Generate days button
+    const generateDaysBtn = document.getElementById('generateDaysBtn');
+    if (generateDaysBtn) {
+        generateDaysBtn.onclick = () => alert('🚧 Genera giorni in arrivo!');
+    }
+
+    // Add emergency button
+    const addEmergencyBtn = document.getElementById('addEmergencyBtn');
+    if (addEmergencyBtn) {
+        addEmergencyBtn.onclick = () => alert('🚧 Aggiungi emergenza in arrivo!');
+    }
+
+    // Add file button
+    const addFileBtn = document.getElementById('addFileBtn');
+    if (addFileBtn) {
+        addFileBtn.onclick = () => alert('🚧 Aggiungi file in arrivo!');
+    }
+
+    // Add link button
+    const addLinkBtn = document.getElementById('addLinkBtn');
+    if (addLinkBtn) {
+        addLinkBtn.onclick = () => alert('🚧 Aggiungi link in arrivo!');
+    }
+
+    // Save template button
+    const saveTemplateBtn = document.getElementById('saveTemplateBtn');
+    if (saveTemplateBtn) {
+        saveTemplateBtn.onclick = () => alert('🚧 Salva template in arrivo!');
+    }
+
+    // Total passengers input
+    const totalPassengersInput = document.getElementById('totalPassengersInput');
+    if (totalPassengersInput) {
+        totalPassengersInput.onchange = handlePassengersChange;
+    }
+}
+
+function loadDashboardData() {
+    // For now, just set placeholder values
+    // TODO: Load actual data from database
+    document.getElementById('feedbackCount').textContent = '0';
+    document.getElementById('totalPassengers').textContent = '0';
+    document.getElementById('feedbackPercentage').textContent = '0%';
+}
+
+function handlePassengersChange(e) {
+    const total = parseInt(e.target.value) || 0;
+    document.getElementById('totalPassengers').textContent = total;
+
+    // Calculate percentage (feedback count / total)
+    const feedbackCount = parseInt(document.getElementById('feedbackCount').textContent) || 0;
+    const percentage = total > 0 ? Math.round((feedbackCount / total) * 100) : 0;
+    document.getElementById('feedbackPercentage').textContent = percentage + '%';
 }
 
 async function handleDeleteTour() {
@@ -1143,21 +1348,6 @@ async function handleDeleteTour() {
     } catch (error) {
         console.error('Delete tour error:', error);
         alert('❌ Errore nella cancellazione:\n\n' + (error.message || 'Errore sconosciuto'));
-    }
-}
-
-function showEditError(message) {
-    if (editError) {
-        editError.textContent = message;
-        editError.classList.add('show');
-    } else {
-        alert('Errore: ' + message);
-    }
-}
-
-function hideEditError() {
-    if (editError) {
-        editError.classList.remove('show');
     }
 }
     </script>

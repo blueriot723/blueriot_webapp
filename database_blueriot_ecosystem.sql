@@ -1,6 +1,7 @@
 -- =====================================================
 -- BLUERIOT ECOSYSTEM - COMPLETE DATABASE SCHEMA
 -- blueriot.world - Official WebApp Database
+-- VERSIONE PULITA - Nessun riferimento a tabelle vecchie
 -- =====================================================
 
 -- Enable UUID extension
@@ -15,8 +16,8 @@ ALTER TABLE tl_users
 ADD COLUMN IF NOT EXISTS first_name VARCHAR(100),
 ADD COLUMN IF NOT EXISTS last_name VARCHAR(100),
 ADD COLUMN IF NOT EXISTS username VARCHAR(50) UNIQUE,
-ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'tl',  -- 'admin', 'tl', 'member'
-ADD COLUMN IF NOT EXISTS membership_status VARCHAR(50) DEFAULT 'pending',  -- 'active', 'pending', 'expired'
+ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'tl',
+ADD COLUMN IF NOT EXISTS membership_status VARCHAR(50) DEFAULT 'pending',
 ADD COLUMN IF NOT EXISTS membership_start DATE,
 ADD COLUMN IF NOT EXISTS membership_end DATE,
 ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW(),
@@ -41,31 +42,31 @@ CREATE INDEX IF NOT EXISTS idx_users_role ON tl_users(role);
 -- Database ristoranti, bar, bakery, gelaterie, etc.
 -- =====================================================
 
-CREATE TABLE IF NOT EXISTS blueriot_tastes (
+CREATE TABLE blueriot_tastes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
     -- Info base
     name VARCHAR(255) NOT NULL,
-    type VARCHAR(100) NOT NULL,  -- 'restaurant', 'bar', 'bakery', 'quick_bite', 'gelateria', 'aperitivo', etc.
-    cuisine VARCHAR(100),         -- 'Italian', 'Japanese', 'Mexican', etc.
+    type VARCHAR(100) NOT NULL,
+    cuisine VARCHAR(100),
 
     -- Pricing
-    price_range VARCHAR(10),      -- '€', '€€', '€€€'
+    price_range VARCHAR(10),
 
     -- Vantaggi TL (può essere multiplo)
     gratuity BOOLEAN DEFAULT FALSE,
     commission BOOLEAN DEFAULT FALSE,
     discount BOOLEAN DEFAULT FALSE,
-    discount_percentage INTEGER,   -- Se discount = true, percentuale
+    discount_percentage INTEGER,
 
     -- Location
-    location VARCHAR(255),         -- Es. "Rome, Italy" o "Trastevere, Rome"
+    location VARCHAR(255),
     address TEXT,
     google_maps_link TEXT,
 
     -- Orari e booking
-    opening_hours TEXT,            -- Es. "Mon-Fri 9-18, Sat 10-20"
-    closed_days TEXT[],            -- Array: ['monday', 'tuesday']
+    opening_hours TEXT,
+    closed_days TEXT[],
     booking_needed BOOLEAN DEFAULT FALSE,
 
     -- Idoneità
@@ -74,10 +75,10 @@ CREATE TABLE IF NOT EXISTS blueriot_tastes (
     max_group_size INTEGER,
 
     -- Tour relevance
-    tours_relevant TEXT[],         -- Array di codici tour o destinazioni
+    tours_relevant TEXT[],
 
     -- Metadata
-    tested_by VARCHAR(255),        -- Nome del TL che ha testato
+    tested_by VARCHAR(255),
     tested_date DATE,
     notes TEXT,
 
@@ -93,7 +94,7 @@ CREATE TABLE IF NOT EXISTS blueriot_tastes (
     updated_at TIMESTAMP DEFAULT NOW(),
 
     -- Social proof
-    times_used INTEGER DEFAULT 0,  -- Quante volte è stato usato nei tour
+    times_used INTEGER DEFAULT 0,
     last_used DATE
 );
 
@@ -104,56 +105,56 @@ COMMENT ON COLUMN blueriot_tastes.commission IS 'TL riceve commissione';
 COMMENT ON COLUMN blueriot_tastes.discount IS 'Sconto per il gruppo';
 
 -- Indici
-CREATE INDEX IF NOT EXISTS idx_tastes_type ON blueriot_tastes(type);
-CREATE INDEX IF NOT EXISTS idx_tastes_location ON blueriot_tastes(location);
-CREATE INDEX IF NOT EXISTS idx_tastes_verified ON blueriot_tastes(verified);
-CREATE INDEX IF NOT EXISTS idx_tastes_gratuity ON blueriot_tastes(gratuity);
-CREATE INDEX IF NOT EXISTS idx_tastes_rating ON blueriot_tastes(rating_avg DESC);
+CREATE INDEX idx_tastes_type ON blueriot_tastes(type);
+CREATE INDEX idx_tastes_location ON blueriot_tastes(location);
+CREATE INDEX idx_tastes_verified ON blueriot_tastes(verified);
+CREATE INDEX idx_tastes_gratuity ON blueriot_tastes(gratuity);
+CREATE INDEX idx_tastes_rating ON blueriot_tastes(rating_avg DESC);
 
 -- =====================================================
 -- SECTION 2: BLUERIOT ROUTES
 -- Database trasporti: bus, ferry, NCC, taxi, treni
 -- =====================================================
 
-CREATE TABLE IF NOT EXISTS blueriot_routes (
+CREATE TABLE blueriot_routes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
     -- Tipo trasporto
-    transport_type VARCHAR(100) NOT NULL,  -- 'bus', 'ferry', 'ncc', 'taxi', 'private', 'train'
-    train_category VARCHAR(50),            -- Se train: 'AV', 'IC', 'EC', 'R', 'RV', 'S', 'RE', etc.
+    transport_type VARCHAR(100) NOT NULL,
+    train_category VARCHAR(50),
 
     -- Operatore
     operator_name VARCHAR(255) NOT NULL,
 
     -- Area e tratta
-    area_served VARCHAR(255),              -- Es. "Rome Metro Area"
+    area_served VARCHAR(255),
     start_point VARCHAR(255),
     end_point VARCHAR(255),
 
     -- Frequenza e durata
-    frequency VARCHAR(100),                -- Es. "Every 15 min", "Hourly", "Daily"
-    duration VARCHAR(100),                 -- Es. "45 minutes", "2 hours"
+    frequency VARCHAR(100),
+    duration VARCHAR(100),
 
     -- Pricing
-    price VARCHAR(100),                    -- Es. "€1.50", "€15-25", "From €50"
-    ticket_info TEXT,                      -- Come/dove comprare biglietti
+    price VARCHAR(100),
+    ticket_info TEXT,
 
     -- Affidabilità
-    reliability VARCHAR(50),               -- 'high', 'medium', 'low'
+    reliability VARCHAR(50),
     reliability_notes TEXT,
 
     -- Contatti
-    contacts TEXT,                         -- Email, telefono, etc.
+    contacts TEXT,
     website VARCHAR(500),
     booking_url VARCHAR(500),
 
     -- Maps
     maps_link TEXT,
-    route_map_url TEXT,                    -- URL mappa del percorso
+    route_map_url TEXT,
 
     -- Metadata
     notes TEXT,
-    tips TEXT,                             -- Suggerimenti per TL
+    tips TEXT,
 
     -- Ratings
     rating_avg DECIMAL(3,2),
@@ -173,39 +174,39 @@ CREATE TABLE IF NOT EXISTS blueriot_routes (
 
 COMMENT ON TABLE blueriot_routes IS 'BlueRiot Routes - Database trasporti: bus, ferry, NCC, taxi, treni';
 COMMENT ON COLUMN blueriot_routes.transport_type IS 'Tipo: bus, ferry, ncc, taxi, private, train';
-COMMENT ON COLUMN blueriot_routes.train_category IS 'Categoria treno: AV, IC, EC, R, RV, S, RE (solo se transport_type=train)';
+COMMENT ON COLUMN blueriot_routes.train_category IS 'Categoria treno: AV, IC, EC, R, RV, S, RE';
 COMMENT ON COLUMN blueriot_routes.reliability IS 'Affidabilità: high, medium, low';
 
 -- Indici
-CREATE INDEX IF NOT EXISTS idx_routes_type ON blueriot_routes(transport_type);
-CREATE INDEX IF NOT EXISTS idx_routes_operator ON blueriot_routes(operator_name);
-CREATE INDEX IF NOT EXISTS idx_routes_area ON blueriot_routes(area_served);
-CREATE INDEX IF NOT EXISTS idx_routes_verified ON blueriot_routes(verified);
-CREATE INDEX IF NOT EXISTS idx_routes_reliability ON blueriot_routes(reliability);
+CREATE INDEX idx_routes_type ON blueriot_routes(transport_type);
+CREATE INDEX idx_routes_operator ON blueriot_routes(operator_name);
+CREATE INDEX idx_routes_area ON blueriot_routes(area_served);
+CREATE INDEX idx_routes_verified ON blueriot_routes(verified);
+CREATE INDEX idx_routes_reliability ON blueriot_routes(reliability);
 
 -- =====================================================
 -- SECTION 3: BLUERIOT STAY
 -- Database hotel, B&B, guesthouse suggeriti dai TL
 -- =====================================================
 
-CREATE TABLE IF NOT EXISTS blueriot_stay (
+CREATE TABLE blueriot_stay (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
     -- Info base
     name VARCHAR(255) NOT NULL,
-    type VARCHAR(100) NOT NULL,  -- 'hotel', 'bnb', 'guesthouse', 'boutique', 'hostel', 'apartment'
+    type VARCHAR(100) NOT NULL,
 
     -- Location
-    location VARCHAR(255),        -- Città/area
+    location VARCHAR(255),
     address TEXT,
     google_maps_link TEXT,
-    distance_from_center VARCHAR(100),  -- Es. "2 km", "Walking distance"
+    distance_from_center VARCHAR(100),
 
     -- Pricing
-    price_range VARCHAR(100),     -- Es. "€50-80/night", "€€"
+    price_range VARCHAR(100),
 
     -- Contatti e booking
-    contact VARCHAR(255),         -- Email o telefono
+    contact VARCHAR(255),
     phone VARCHAR(50),
     website VARCHAR(500),
     booking_url VARCHAR(500),
@@ -216,8 +217,8 @@ CREATE TABLE IF NOT EXISTS blueriot_stay (
     max_guests INTEGER,
 
     -- Facilities
-    facilities TEXT,              -- Es. "WiFi, Breakfast, Parking, AC"
-    facilities_array TEXT[],      -- Array per filtri: ['wifi', 'breakfast', 'parking']
+    facilities TEXT,
+    facilities_array TEXT[],
 
     -- Commissioni TL
     commission BOOLEAN DEFAULT FALSE,
@@ -229,7 +230,7 @@ CREATE TABLE IF NOT EXISTS blueriot_stay (
     notes TEXT,
     tested_by VARCHAR(255),
     tested_date DATE,
-    recommended_for TEXT,         -- Es. "Budget travelers", "Luxury seekers"
+    recommended_for TEXT,
 
     -- Ratings
     rating_avg DECIMAL(3,2),
@@ -247,38 +248,38 @@ CREATE TABLE IF NOT EXISTS blueriot_stay (
     last_used DATE
 );
 
-COMMENT ON TABLE blueriot_stay IS 'BlueRiot Stay - Database hotel, B&B, guesthouse suggeriti (non quelli ufficiali Intrepid)';
+COMMENT ON TABLE blueriot_stay IS 'BlueRiot Stay - Database hotel, B&B, guesthouse suggeriti';
 COMMENT ON COLUMN blueriot_stay.type IS 'Tipo: hotel, bnb, guesthouse, boutique, hostel, apartment';
 COMMENT ON COLUMN blueriot_stay.facilities_array IS 'Array facilities per filtri';
 
 -- Indici
-CREATE INDEX IF NOT EXISTS idx_stay_type ON blueriot_stay(type);
-CREATE INDEX IF NOT EXISTS idx_stay_location ON blueriot_stay(location);
-CREATE INDEX IF NOT EXISTS idx_stay_verified ON blueriot_stay(verified);
-CREATE INDEX IF NOT EXISTS idx_stay_families ON blueriot_stay(suitable_for_families);
-CREATE INDEX IF NOT EXISTS idx_stay_rating ON blueriot_stay(rating_avg DESC);
+CREATE INDEX idx_stay_type ON blueriot_stay(type);
+CREATE INDEX idx_stay_location ON blueriot_stay(location);
+CREATE INDEX idx_stay_verified ON blueriot_stay(verified);
+CREATE INDEX idx_stay_families ON blueriot_stay(suitable_for_families);
+CREATE INDEX idx_stay_rating ON blueriot_stay(rating_avg DESC);
 
 -- =====================================================
 -- SECTION 4: SYNDICATE HUB
 -- =====================================================
 
 -- Tabella per documenti/PDFs del Syndicate
-CREATE TABLE IF NOT EXISTS syndicate_documents (
+CREATE TABLE syndicate_documents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
     -- Info documento
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    document_type VARCHAR(100),   -- 'form', 'guide', 'template', 'contract', etc.
+    document_type VARCHAR(100),
 
     -- File
-    file_url TEXT NOT NULL,       -- URL del file su Supabase Storage
+    file_url TEXT NOT NULL,
     file_name VARCHAR(255),
-    file_size INTEGER,            -- Bytes
-    file_type VARCHAR(50),        -- 'pdf', 'docx', etc.
+    file_size INTEGER,
+    file_type VARCHAR(50),
 
     -- Accesso
-    access_level VARCHAR(50) DEFAULT 'member',  -- 'public', 'member', 'tl_only', 'admin'
+    access_level VARCHAR(50) DEFAULT 'member',
 
     -- Metadata
     uploaded_by UUID REFERENCES tl_users(id),
@@ -293,7 +294,7 @@ CREATE TABLE IF NOT EXISTS syndicate_documents (
 COMMENT ON TABLE syndicate_documents IS 'Documenti del Syndicate: forms, guide, template, contratti';
 
 -- Tabella per feedback count
-CREATE TABLE IF NOT EXISTS syndicate_feedback (
+CREATE TABLE syndicate_feedback (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
     -- Tour reference
@@ -306,7 +307,7 @@ CREATE TABLE IF NOT EXISTS syndicate_feedback (
     negative_count INTEGER DEFAULT 0,
 
     -- Dettagli
-    feedback_data JSONB,          -- JSON con tutti i feedback
+    feedback_data JSONB,
 
     -- Metadata
     tl_id UUID REFERENCES tl_users(id),
@@ -317,12 +318,12 @@ CREATE TABLE IF NOT EXISTS syndicate_feedback (
 COMMENT ON TABLE syndicate_feedback IS 'Conteggio feedback per tour del Syndicate';
 
 -- Tabella per e-tickets
-CREATE TABLE IF NOT EXISTS syndicate_etickets (
+CREATE TABLE syndicate_etickets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
     -- Ticket info
     ticket_code VARCHAR(100) UNIQUE NOT NULL,
-    ticket_type VARCHAR(100),     -- 'event', 'workshop', 'membership', etc.
+    ticket_type VARCHAR(100),
 
     -- Riferimenti
     user_id UUID REFERENCES tl_users(id),
@@ -338,10 +339,10 @@ CREATE TABLE IF NOT EXISTS syndicate_etickets (
     used_by UUID REFERENCES tl_users(id),
 
     -- Dati ticket
-    ticket_data JSONB,            -- JSON con dettagli specifici
+    ticket_data JSONB,
 
     -- QR code
-    qr_code_url TEXT,             -- URL immagine QR code
+    qr_code_url TEXT,
 
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
@@ -465,19 +466,16 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Applica trigger a tutte le tabelle
-DROP TRIGGER IF EXISTS set_updated_at_tastes ON blueriot_tastes;
 CREATE TRIGGER set_updated_at_tastes
     BEFORE UPDATE ON blueriot_tastes
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at();
 
-DROP TRIGGER IF EXISTS set_updated_at_routes ON blueriot_routes;
 CREATE TRIGGER set_updated_at_routes
     BEFORE UPDATE ON blueriot_routes
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at();
 
-DROP TRIGGER IF EXISTS set_updated_at_stay ON blueriot_stay;
 CREATE TRIGGER set_updated_at_stay
     BEFORE UPDATE ON blueriot_stay
     FOR EACH ROW

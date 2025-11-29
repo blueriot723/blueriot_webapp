@@ -1232,6 +1232,54 @@ body {
         </div>
     </div>
 
+    <!-- LINK MODAL -->
+    <div id="linkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="linkModalTitle">Aggiungi Link Utile</h2>
+                <button class="modal-close" id="closeLinkModal">&times;</button>
+            </div>
+
+            <form id="linkForm">
+                <div class="form-group">
+                    <label for="linkTitle">Titolo *</label>
+                    <input type="text" id="linkTitle" required placeholder="es. Meteo Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="linkCategory">Categoria *</label>
+                    <select id="linkCategory" required>
+                        <option value="">Seleziona categoria...</option>
+                        <option value="weather">🌤️ Meteo</option>
+                        <option value="transport">🚇 Trasporti</option>
+                        <option value="restaurant">🍽️ Ristoranti</option>
+                        <option value="attraction">🏛️ Attrazioni</option>
+                        <option value="booking">🏨 Prenotazioni</option>
+                        <option value="map">🗺️ Mappe</option>
+                        <option value="other">🔗 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="linkUrl">URL *</label>
+                    <input type="url" id="linkUrl" required placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="linkDescription">Descrizione</label>
+                    <input type="text" id="linkDescription" placeholder="Breve descrizione...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelLink">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="linkError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -1249,6 +1297,7 @@ let currentRestaurantEdit = null;
 let currentHotelEdit = null;
 let currentEmergencyEdit = null;
 let currentFileEdit = null;
+let currentLinkEdit = null;
 
 // DOM elements
 let loginScreen, dashboardScreen, restaurantDatabaseScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
@@ -1262,6 +1311,7 @@ let ratingModal, ratingForm, closeRatingModal, cancelRating, ratingError;
 let hotelModal, hotelForm, closeHotelModal, cancelHotel, hotelError;
 let emergencyModal, emergencyForm, closeEmergencyModal, cancelEmergency, emergencyError;
 let fileModal, fileForm, closeFileModal, cancelFile, fileError;
+let linkModal, linkForm, closeLinkModal, cancelLink, linkError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -1342,6 +1392,13 @@ function init() {
     closeFileModal = document.getElementById('closeFileModal');
     cancelFile = document.getElementById('cancelFile');
     fileError = document.getElementById('fileError');
+
+    // Link modal elements
+    linkModal = document.getElementById('linkModal');
+    linkForm = document.getElementById('linkForm');
+    closeLinkModal = document.getElementById('closeLinkModal');
+    cancelLink = document.getElementById('cancelLink');
+    linkError = document.getElementById('linkError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -1635,6 +1692,31 @@ function setupEventListeners() {
 
     if (fileForm) {
         fileForm.addEventListener('submit', handleSaveFile);
+    }
+
+    // Link modal
+    if (closeLinkModal) {
+        closeLinkModal.addEventListener('click', () => {
+            if (linkModal) linkModal.classList.remove('active');
+        });
+    }
+
+    if (cancelLink) {
+        cancelLink.addEventListener('click', () => {
+            if (linkModal) linkModal.classList.remove('active');
+        });
+    }
+
+    if (linkModal) {
+        linkModal.addEventListener('click', (e) => {
+            if (e.target === linkModal) {
+                linkModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (linkForm) {
+        linkForm.addEventListener('submit', handleSaveLink);
     }
 
     // Add shared restaurant button
@@ -1939,6 +2021,8 @@ function switchTab(tabName) {
         loadEmergencyContacts();
     } else if (tabName === 'file') {
         loadFiles();
+    } else if (tabName === 'link') {
+        loadLinks();
     }
 }
 
@@ -2030,7 +2114,7 @@ function setupModalButtons() {
     // Add link button
     const addLinkBtn = document.getElementById('addLinkBtn');
     if (addLinkBtn) {
-        addLinkBtn.onclick = () => alert('🚧 Aggiungi link in arrivo!');
+        addLinkBtn.onclick = openAddLinkForm;
     }
 
     // Save template button
@@ -3048,6 +3132,210 @@ function showFileError(message) {
 function hideFileError() {
     if (fileError) {
         fileError.classList.remove('show');
+    }
+}
+
+// ===== LINK FUNCTIONS =====
+
+const linkCategoryIcons = {
+    weather: '🌤️',
+    transport: '🚇',
+    restaurant: '🍽️',
+    attraction: '🏛️',
+    booking: '🏨',
+    map: '🗺️',
+    other: '🔗'
+};
+
+const linkCategoryNames = {
+    weather: 'Meteo',
+    transport: 'Trasporti',
+    restaurant: 'Ristoranti',
+    attraction: 'Attrazioni',
+    booking: 'Prenotazioni',
+    map: 'Mappe',
+    other: 'Altro'
+};
+
+async function loadLinks() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const linksList = document.getElementById('linksList');
+    if (!linksList) return;
+
+    try {
+        linksList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: links, error } = await supabaseClient
+            .from('tour_links')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!links || links.length === 0) {
+            linksList.innerHTML = '<p class="loading">Nessun link ancora</p>';
+        } else {
+            displayLinks(links);
+        }
+    } catch (error) {
+        console.error('Load links error:', error);
+        linksList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento link:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayLinks(links) {
+    const linksList = document.getElementById('linksList');
+    if (!linksList) return;
+
+    linksList.innerHTML = links.map(link => `
+        <div class="data-card" style="margin-bottom: 12px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 20px;">${linkCategoryIcons[link.category] || '🔗'}</span>
+                        <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${link.title}</h4>
+                        <span style="font-size: 13px; color: var(--text-secondary);">(${linkCategoryNames[link.category] || link.category})</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <a href="${link.url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-blue); text-decoration: none; font-size: 14px;">
+                            🔗 Apri link →
+                        </a>
+                    </div>
+                    ${link.description ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${link.description}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 8px; margin-left: 12px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditLinkForm(${link.id})">✏️</button>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteLink(${link.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAddLinkForm() {
+    currentLinkEdit = null;
+
+    if (linkForm) linkForm.reset();
+
+    document.getElementById('linkModalTitle').textContent = 'Aggiungi Link Utile';
+
+    hideLinkError();
+
+    if (linkModal) linkModal.classList.add('active');
+}
+
+async function openEditLinkForm(linkId) {
+    try {
+        const { data: link, error } = await supabaseClient
+            .from('tour_links')
+            .select('*')
+            .eq('id', linkId)
+            .single();
+
+        if (error) throw error;
+        if (!link) throw new Error('Link non trovato');
+
+        currentLinkEdit = link;
+
+        // Fill form
+        document.getElementById('linkTitle').value = link.title;
+        document.getElementById('linkCategory').value = link.category;
+        document.getElementById('linkUrl').value = link.url;
+        document.getElementById('linkDescription').value = link.description || '';
+
+        document.getElementById('linkModalTitle').textContent = 'Modifica Link';
+
+        hideLinkError();
+
+        if (linkModal) linkModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load link error:', error);
+        alert('❌ Errore caricamento link:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveLink(e) {
+    e.preventDefault();
+    hideLinkError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showLinkError('Tour non selezionato');
+        return;
+    }
+
+    const linkData = {
+        tour_id: currentTourDetail.id,
+        title: document.getElementById('linkTitle').value,
+        category: document.getElementById('linkCategory').value,
+        url: document.getElementById('linkUrl').value,
+        description: document.getElementById('linkDescription').value || null
+    };
+
+    try {
+        if (currentLinkEdit && currentLinkEdit.id) {
+            // Update existing link
+            const { error } = await supabaseClient
+                .from('tour_links')
+                .update(linkData)
+                .eq('id', currentLinkEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new link
+            const { error } = await supabaseClient
+                .from('tour_links')
+                .insert([linkData]);
+
+            if (error) throw error;
+        }
+
+        if (linkModal) linkModal.classList.remove('active');
+
+        loadLinks();
+
+    } catch (error) {
+        console.error('Save link error:', error);
+        showLinkError(error.message || 'Errore salvataggio link');
+    }
+}
+
+async function deleteLink(linkId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo link?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_links')
+            .delete()
+            .eq('id', linkId);
+
+        if (error) throw error;
+
+        loadLinks();
+
+    } catch (error) {
+        console.error('Delete link error:', error);
+        alert('❌ Errore eliminazione link:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showLinkError(message) {
+    if (linkError) {
+        linkError.textContent = message;
+        linkError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideLinkError() {
+    if (linkError) {
+        linkError.classList.remove('show');
     }
 }
 

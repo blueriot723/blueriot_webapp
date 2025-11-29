@@ -75,6 +75,42 @@ body {
     color: var(--text-secondary);
 }
 
+/* Language Selector */
+.language-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.language-selector button {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.language-selector button:hover {
+    border-color: var(--primary-blue);
+    background: var(--dark-bg);
+}
+
+.language-selector button.active {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: #000;
+    font-weight: 600;
+}
+
 .login-form {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -662,33 +698,43 @@ body {
 <body>
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="screen active">
+        <!-- Language Selector -->
+        <div class="language-selector">
+            <button onclick="setLanguage('it')" id="langBtnIt" class="active">
+                🇮🇹 IT
+            </button>
+            <button onclick="setLanguage('en')" id="langBtnEn">
+                🇬🇧 EN
+            </button>
+        </div>
+
         <div class="login-container">
             <div class="login-header">
                 <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="logo">
-                <h1>Tour Leader Dashboard</h1>
-                <p>Accedi con le tue credenziali BlueRiot Syndicate</p>
+                <h1 data-i18n="login.title">Tour Leader Dashboard</h1>
+                <p data-i18n="login.subtitle">Accedi con le tue credenziali BlueRiot Syndicate</p>
             </div>
 
             <form id="loginForm" class="login-form">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required placeholder="tuo@email.com">
+                    <label for="email" data-i18n="login.email">Email</label>
+                    <input type="email" id="email" required data-i18n-placeholder="login.emailPlaceholder">
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password" data-i18n="login.password">Password</label>
                     <input type="password" id="password" required placeholder="••••••••">
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="loginBtn">
-                    <span class="btn-text">Accedi</span>
+                    <span class="btn-text" data-i18n="login.loginButton">Accedi</span>
                 </button>
 
                 <div id="loginError" class="error-message"></div>
             </form>
 
             <div class="login-footer">
-                <p>Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
+                <p data-i18n="login.footer">Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
             </div>
         </div>
     </div>
@@ -698,38 +744,38 @@ body {
         <div class="ecosystem-container">
             <div class="ecosystem-nav">
                 <span id="ecosystemUserEmail" class="user-email"></span>
-                <button id="ecosystemLogoutBtn" class="btn btn-secondary">Logout</button>
+                <button id="ecosystemLogoutBtn" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
 
             <div class="ecosystem-header">
                 <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="logo" style="width: 160px; margin-bottom: 30px; filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.4));">
                 <h1>BlueRiot Ecosystem</h1>
-                <p>Seleziona un servizio per iniziare</p>
+                <p data-i18n="ecosystem.subtitle">Seleziona un servizio per iniziare</p>
             </div>
 
             <div class="ecosystem-cards">
                 <div class="ecosystem-card" onclick="navigateToSection('tastes')">
                     <span class="ecosystem-card-icon">🍽️</span>
                     <h2>TASTES</h2>
-                    <p>Database completo di ristoranti, bar, gelaterie e locali testati. Gestisci recensioni, vantaggi TL e info utili.</p>
+                    <p data-i18n="ecosystem.tastesDesc">Database completo di ristoranti, bar, gelaterie e locali testati. Gestisci recensioni, vantaggi TL e info utili.</p>
                 </div>
 
                 <div class="ecosystem-card" onclick="navigateToSection('routes')">
                     <span class="ecosystem-card-icon">🚌</span>
                     <h2>ROUTES</h2>
-                    <p>Database trasporti: bus, treni (AV, IC, R), ferry, taxi, NCC. Info su orari, prezzi e affidabilità.</p>
+                    <p data-i18n="ecosystem.routesDesc">Database trasporti: bus, treni (AV, IC, R), ferry, taxi, NCC. Info su orari, prezzi e affidabilità.</p>
                 </div>
 
                 <div class="ecosystem-card" onclick="navigateToSection('stay')">
                     <span class="ecosystem-card-icon">🏨</span>
                     <h2>STAY</h2>
-                    <p>Database hotel alternativi, B&B e strutture consigliate. Prezzi, contatti e recensioni personali.</p>
+                    <p data-i18n="ecosystem.stayDesc">Database hotel alternativi, B&B e strutture consigliate. Prezzi, contatti e recensioni personali.</p>
                 </div>
 
                 <div class="ecosystem-card ecosystem-card-wide" onclick="navigateToSection('hub')">
                     <span class="ecosystem-card-icon">⚡</span>
                     <h2>BLUERIOT WEBAPP HUB</h2>
-                    <p>Gestione tour completa: programma, ristoranti, hotel, emergenze, documenti, templates, eTickets e mini-site builder.</p>
+                    <p data-i18n="ecosystem.hubDesc">Gestione tour completa: programma, ristoranti, hotel, emergenze, documenti, templates, eTickets e mini-site builder.</p>
                 </div>
             </div>
         </div>
@@ -743,9 +789,9 @@ body {
                 <span>BlueRiot Syndicate</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail" class="user-email"></span>
-                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -769,9 +815,9 @@ body {
                 <span>BlueRiot TASTES</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn2" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn2" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail2" class="user-email"></span>
-                <button id="logoutBtn2" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn2" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -823,9 +869,9 @@ body {
                 <span>BlueRiot ROUTES</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn3" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn3" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail3" class="user-email"></span>
-                <button id="logoutBtn3" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn3" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -879,9 +925,9 @@ body {
                 <span>BlueRiot STAY</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn4" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn4" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail4" class="user-email"></span>
-                <button id="logoutBtn4" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn4" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -2034,6 +2080,140 @@ const { createClient } = supabase;
 const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2b214dHpjbmN6dmJjc2N5YmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTIwOTMsImV4cCI6MjA3OTA2ODA5M30.2fd-urmPrcuWrDdZtR6lNaRsfyNQW64fwEvJv2KI9AE';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ===== MULTI-LANGUAGE SYSTEM =====
+const translations = {
+    it: {
+        // Login
+        login: {
+            title: "Tour Leader Dashboard",
+            subtitle: "Accedi con le tue credenziali BlueRiot Syndicate",
+            email: "Email",
+            emailPlaceholder: "tuo@email.com",
+            password: "Password",
+            loginButton: "Accedi",
+            footer: "Problemi di accesso? Contatta @blueriot"
+        },
+        // Ecosystem Home
+        ecosystem: {
+            subtitle: "Seleziona un servizio per iniziare",
+            tastesDesc: "Database completo di ristoranti, bar, gelaterie e locali testati. Gestisci recensioni, vantaggi TL e info utili.",
+            routesDesc: "Database trasporti: bus, treni (AV, IC, R), ferry, taxi, NCC. Info su orari, prezzi e affidabilità.",
+            stayDesc: "Database hotel alternativi, B&B e strutture consigliate. Prezzi, contatti e recensioni personali.",
+            hubDesc: "Gestione tour completa: programma, ristoranti, hotel, emergenze, documenti, templates, eTickets e mini-site builder."
+        },
+        // Common
+        common: {
+            logout: "Logout",
+            backToEcosystem: "← Ecosystem",
+            save: "Salva",
+            cancel: "Annulla",
+            close: "Chiudi",
+            delete: "Elimina",
+            edit: "Modifica",
+            add: "Aggiungi",
+            search: "Cerca",
+            loading: "Caricamento...",
+            noData: "Nessun dato disponibile"
+        }
+    },
+    en: {
+        // Login
+        login: {
+            title: "Tour Leader Dashboard",
+            subtitle: "Sign in with your BlueRiot Syndicate credentials",
+            email: "Email",
+            emailPlaceholder: "your@email.com",
+            password: "Password",
+            loginButton: "Sign In",
+            footer: "Having issues? Contact @blueriot"
+        },
+        // Ecosystem Home
+        ecosystem: {
+            subtitle: "Select a service to get started",
+            tastesDesc: "Complete database of restaurants, bars, gelaterias and tested venues. Manage reviews, TL benefits and useful info.",
+            routesDesc: "Transport database: buses, trains (AV, IC, R), ferries, taxis, NCC. Info on schedules, prices and reliability.",
+            stayDesc: "Alternative hotels, B&Bs and recommended properties database. Prices, contacts and personal reviews.",
+            hubDesc: "Complete tour management: schedule, restaurants, hotels, emergencies, documents, templates, eTickets and mini-site builder."
+        },
+        // Common
+        common: {
+            logout: "Logout",
+            backToEcosystem: "← Ecosystem",
+            save: "Save",
+            cancel: "Cancel",
+            close: "Close",
+            delete: "Delete",
+            edit: "Edit",
+            add: "Add",
+            search: "Search",
+            loading: "Loading...",
+            noData: "No data available"
+        }
+    }
+};
+
+// Current language (default: Italian)
+let currentLanguage = localStorage.getItem('blueriot_language') || 'it';
+
+// Set language and apply translations
+function setLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('blueriot_language', lang);
+
+    // Update active button
+    document.getElementById('langBtnIt').classList.toggle('active', lang === 'it');
+    document.getElementById('langBtnEn').classList.toggle('active', lang === 'en');
+
+    // Apply translations
+    applyTranslations();
+}
+
+// Apply translations to all elements with data-i18n
+function applyTranslations() {
+    const elements = document.querySelectorAll('[data-i18n]');
+
+    elements.forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = getTranslation(key);
+
+        if (translation) {
+            element.textContent = translation;
+        }
+    });
+
+    // Handle placeholders
+    const placeholderElements = document.querySelectorAll('[data-i18n-placeholder]');
+    placeholderElements.forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        const translation = getTranslation(key);
+
+        if (translation) {
+            element.placeholder = translation;
+        }
+    });
+}
+
+// Get nested translation by key (e.g., "login.title")
+function getTranslation(key) {
+    const keys = key.split('.');
+    let translation = translations[currentLanguage];
+
+    for (const k of keys) {
+        if (translation && translation[k]) {
+            translation = translation[k];
+        } else {
+            return null;
+        }
+    }
+
+    return translation;
+}
+
+// Initialize language on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setLanguage(currentLanguage);
+});
 
 // Global state
 let currentUser = null;

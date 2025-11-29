@@ -1183,6 +1183,55 @@ body {
         </div>
     </div>
 
+    <!-- FILE MODAL -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="fileModalTitle">Aggiungi Documento</h2>
+                <button class="modal-close" id="closeFileModal">&times;</button>
+            </div>
+
+            <form id="fileForm">
+                <div class="form-group">
+                    <label for="fileName">Nome File *</label>
+                    <input type="text" id="fileName" required placeholder="es. Itinerario Completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="fileType">Tipo Documento *</label>
+                    <select id="fileType" required>
+                        <option value="">Seleziona tipo...</option>
+                        <option value="itinerary">📅 Itinerario</option>
+                        <option value="voucher">🎫 Voucher</option>
+                        <option value="contract">📋 Contratto</option>
+                        <option value="insurance">🛡️ Assicurazione</option>
+                        <option value="passport">🛂 Documento Identità</option>
+                        <option value="map">🗺️ Mappa</option>
+                        <option value="other">📄 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileUrl">Link al File *</label>
+                    <input type="url" id="fileUrl" required placeholder="https://...">
+                    <small style="color: var(--text-secondary); font-size: 12px;">Inserisci un link a Google Drive, Dropbox, o altro servizio</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileNotes">Note</label>
+                    <input type="text" id="fileNotes" placeholder="Note aggiuntive...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelFile">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="fileError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -1199,6 +1248,7 @@ let currentTourDetail = null;
 let currentRestaurantEdit = null;
 let currentHotelEdit = null;
 let currentEmergencyEdit = null;
+let currentFileEdit = null;
 
 // DOM elements
 let loginScreen, dashboardScreen, restaurantDatabaseScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
@@ -1211,6 +1261,7 @@ let restaurantSearchModal, closeRestaurantSearchModal, searchRestaurantsBtn, sea
 let ratingModal, ratingForm, closeRatingModal, cancelRating, ratingError;
 let hotelModal, hotelForm, closeHotelModal, cancelHotel, hotelError;
 let emergencyModal, emergencyForm, closeEmergencyModal, cancelEmergency, emergencyError;
+let fileModal, fileForm, closeFileModal, cancelFile, fileError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -1284,6 +1335,13 @@ function init() {
     closeEmergencyModal = document.getElementById('closeEmergencyModal');
     cancelEmergency = document.getElementById('cancelEmergency');
     emergencyError = document.getElementById('emergencyError');
+
+    // File modal elements
+    fileModal = document.getElementById('fileModal');
+    fileForm = document.getElementById('fileForm');
+    closeFileModal = document.getElementById('closeFileModal');
+    cancelFile = document.getElementById('cancelFile');
+    fileError = document.getElementById('fileError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -1552,6 +1610,31 @@ function setupEventListeners() {
 
     if (emergencyForm) {
         emergencyForm.addEventListener('submit', handleSaveEmergency);
+    }
+
+    // File modal
+    if (closeFileModal) {
+        closeFileModal.addEventListener('click', () => {
+            if (fileModal) fileModal.classList.remove('active');
+        });
+    }
+
+    if (cancelFile) {
+        cancelFile.addEventListener('click', () => {
+            if (fileModal) fileModal.classList.remove('active');
+        });
+    }
+
+    if (fileModal) {
+        fileModal.addEventListener('click', (e) => {
+            if (e.target === fileModal) {
+                fileModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (fileForm) {
+        fileForm.addEventListener('submit', handleSaveFile);
     }
 
     // Add shared restaurant button
@@ -1854,6 +1937,8 @@ function switchTab(tabName) {
         loadHotels();
     } else if (tabName === 'emergenze') {
         loadEmergencyContacts();
+    } else if (tabName === 'file') {
+        loadFiles();
     }
 }
 
@@ -1939,7 +2024,7 @@ function setupModalButtons() {
     // Add file button
     const addFileBtn = document.getElementById('addFileBtn');
     if (addFileBtn) {
-        addFileBtn.onclick = () => alert('🚧 Aggiungi file in arrivo!');
+        addFileBtn.onclick = openAddFileForm;
     }
 
     // Add link button
@@ -2759,6 +2844,210 @@ function showEmergencyError(message) {
 function hideEmergencyError() {
     if (emergencyError) {
         emergencyError.classList.remove('show');
+    }
+}
+
+// ===== FILE FUNCTIONS =====
+
+const fileTypeIcons = {
+    itinerary: '📅',
+    voucher: '🎫',
+    contract: '📋',
+    insurance: '🛡️',
+    passport: '🛂',
+    map: '🗺️',
+    other: '📄'
+};
+
+const fileTypeNames = {
+    itinerary: 'Itinerario',
+    voucher: 'Voucher',
+    contract: 'Contratto',
+    insurance: 'Assicurazione',
+    passport: 'Documento Identità',
+    map: 'Mappa',
+    other: 'Altro'
+};
+
+async function loadFiles() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const filesList = document.getElementById('filesList');
+    if (!filesList) return;
+
+    try {
+        filesList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: files, error } = await supabaseClient
+            .from('tour_files')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!files || files.length === 0) {
+            filesList.innerHTML = '<p class="loading">Nessun file ancora</p>';
+        } else {
+            displayFiles(files);
+        }
+    } catch (error) {
+        console.error('Load files error:', error);
+        filesList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento file:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayFiles(files) {
+    const filesList = document.getElementById('filesList');
+    if (!filesList) return;
+
+    filesList.innerHTML = files.map(file => `
+        <div class="data-card" style="margin-bottom: 12px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 20px;">${fileTypeIcons[file.file_type] || '📄'}</span>
+                        <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${file.name}</h4>
+                        <span style="font-size: 13px; color: var(--text-secondary);">(${fileTypeNames[file.file_type] || file.file_type})</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <a href="${file.url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-blue); text-decoration: none; font-size: 14px;">
+                            🔗 Apri documento →
+                        </a>
+                    </div>
+                    ${file.notes ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${file.notes}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 8px; margin-left: 12px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditFileForm(${file.id})">✏️</button>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteFile(${file.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAddFileForm() {
+    currentFileEdit = null;
+
+    if (fileForm) fileForm.reset();
+
+    document.getElementById('fileModalTitle').textContent = 'Aggiungi Documento';
+
+    hideFileError();
+
+    if (fileModal) fileModal.classList.add('active');
+}
+
+async function openEditFileForm(fileId) {
+    try {
+        const { data: file, error } = await supabaseClient
+            .from('tour_files')
+            .select('*')
+            .eq('id', fileId)
+            .single();
+
+        if (error) throw error;
+        if (!file) throw new Error('File non trovato');
+
+        currentFileEdit = file;
+
+        // Fill form
+        document.getElementById('fileName').value = file.name;
+        document.getElementById('fileType').value = file.file_type;
+        document.getElementById('fileUrl').value = file.url;
+        document.getElementById('fileNotes').value = file.notes || '';
+
+        document.getElementById('fileModalTitle').textContent = 'Modifica Documento';
+
+        hideFileError();
+
+        if (fileModal) fileModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load file error:', error);
+        alert('❌ Errore caricamento file:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveFile(e) {
+    e.preventDefault();
+    hideFileError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showFileError('Tour non selezionato');
+        return;
+    }
+
+    const fileData = {
+        tour_id: currentTourDetail.id,
+        name: document.getElementById('fileName').value,
+        file_type: document.getElementById('fileType').value,
+        url: document.getElementById('fileUrl').value,
+        notes: document.getElementById('fileNotes').value || null
+    };
+
+    try {
+        if (currentFileEdit && currentFileEdit.id) {
+            // Update existing file
+            const { error } = await supabaseClient
+                .from('tour_files')
+                .update(fileData)
+                .eq('id', currentFileEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new file
+            const { error } = await supabaseClient
+                .from('tour_files')
+                .insert([fileData]);
+
+            if (error) throw error;
+        }
+
+        if (fileModal) fileModal.classList.remove('active');
+
+        loadFiles();
+
+    } catch (error) {
+        console.error('Save file error:', error);
+        showFileError(error.message || 'Errore salvataggio file');
+    }
+}
+
+async function deleteFile(fileId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo file?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_files')
+            .delete()
+            .eq('id', fileId);
+
+        if (error) throw error;
+
+        loadFiles();
+
+    } catch (error) {
+        console.error('Delete file error:', error);
+        alert('❌ Errore eliminazione file:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showFileError(message) {
+    if (fileError) {
+        fileError.textContent = message;
+        fileError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideFileError() {
+    if (fileError) {
+        fileError.classList.remove('show');
     }
 }
 

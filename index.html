@@ -4819,29 +4819,55 @@ async function handleSaveSharedRestaurant(e) {
         return;
     }
 
-    const restaurantData = {
-        restaurant_name: document.getElementById('sharedRestaurantName').value,
-        city: document.getElementById('sharedRestaurantCity').value,
-        address: document.getElementById('sharedRestaurantAddress').value || null,
-        phone: document.getElementById('sharedRestaurantPhone').value || null,
-        cuisine_type: document.getElementById('sharedCuisineType').value || null,
+    // Parse tours_relevant from comma-separated string to array
+    const toursRelevantStr = document.getElementById('sharedToursRelevant').value || '';
+    const toursRelevantArray = toursRelevantStr ? toursRelevantStr.split(',').map(t => t.trim()).filter(t => t) : null;
+
+    const tastesData = {
+        // Basic info
+        name: document.getElementById('sharedRestaurantName').value,
+        type: document.getElementById('sharedType').value,
+        cuisine: document.getElementById('sharedCuisineType').value || null,
         price_range: document.getElementById('sharedPriceRange').value || null,
-        tl_free: document.getElementById('sharedTlFree').checked,
-        has_commission: document.getElementById('sharedHasCommission').checked,
-        commission_percentage: document.getElementById('sharedCommissionPerc').value ? parseInt(document.getElementById('sharedCommissionPerc').value) : null,
+
+        // TL benefits
+        gratuity: document.getElementById('sharedTlFree').checked,
+        commission: document.getElementById('sharedHasCommission').checked,
+        discount: document.getElementById('sharedHasDiscount').checked,
         discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
+
+        // Location
+        location: document.getElementById('sharedRestaurantCity').value,
+        address: document.getElementById('sharedRestaurantAddress').value || null,
+        google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
+
+        // Hours
+        opening_hours: document.getElementById('sharedOpeningHours').value || null,
+        booking_needed: document.getElementById('sharedBookingNeeded').checked,
+
+        // Group suitability
+        suitable_for_groups: document.getElementById('sharedSuitableForGroups').checked,
+        min_group_size: document.getElementById('sharedMinGroupSize').value ? parseInt(document.getElementById('sharedMinGroupSize').value) : null,
+        max_group_size: document.getElementById('sharedMaxGroupSize').value ? parseInt(document.getElementById('sharedMaxGroupSize').value) : null,
+
+        // Tours & testing
+        tours_relevant: toursRelevantArray,
+        tested_by: document.getElementById('sharedTestedBy').value || null,
+        tested_date: document.getElementById('sharedTestedDate').value || null,
         notes: document.getElementById('sharedNotes').value || null,
-        added_by_tl_id: currentTL.id
+
+        // System
+        added_by: currentTL.id
     };
 
     try {
         const { error } = await supabaseClient
-            .from('shared_restaurants')
-            .insert([restaurantData]);
+            .from('blueriot_tastes')
+            .insert([tastesData]);
 
         if (error) throw error;
 
-        alert('✅ Ristorante aggiunto al database condiviso!');
+        alert('✅ Locale aggiunto al database TASTES!');
 
         if (sharedRestaurantModal) sharedRestaurantModal.classList.remove('active');
         if (sharedRestaurantForm) sharedRestaurantForm.reset();
@@ -4849,7 +4875,7 @@ async function handleSaveSharedRestaurant(e) {
         loadSharedRestaurants();
 
     } catch (error) {
-        console.error('Save shared restaurant error:', error);
+        console.error('Save TASTES error:', error);
         alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
@@ -5065,6 +5091,158 @@ async function loadStayOptions() {
     } catch (error) {
         console.error('Load stay error:', error);
         stayList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+    }
+}
+
+// ===== ROUTES CRUD FUNCTIONS =====
+
+async function handleSaveRoute(e) {
+    e.preventDefault();
+
+    if (!currentTL || !currentTL.id) {
+        alert('❌ Errore: TL non identificato');
+        return;
+    }
+
+    const routeData = {
+        // Transport type
+        transport_type: document.getElementById('routeTransportType').value,
+        train_category: document.getElementById('routeTrainCategory').value || null,
+
+        // Operator
+        operator_name: document.getElementById('routeOperatorName').value,
+
+        // Route
+        area_served: document.getElementById('routeAreaServed').value || null,
+        start_point: document.getElementById('routeStartPoint').value || null,
+        end_point: document.getElementById('routeEndPoint').value || null,
+
+        // Timing
+        frequency: document.getElementById('routeFrequency').value || null,
+        duration: document.getElementById('routeDuration').value || null,
+        price: document.getElementById('routePrice').value || null,
+        ticket_info: document.getElementById('routeTicketInfo').value || null,
+
+        // Reliability
+        reliability: document.getElementById('routeReliability').value || null,
+        reliability_notes: document.getElementById('routeReliabilityNotes').value || null,
+
+        // Contacts
+        contacts: document.getElementById('routeContacts').value || null,
+        website: document.getElementById('routeWebsite').value || null,
+        booking_url: document.getElementById('routeBookingUrl').value || null,
+        maps_link: document.getElementById('routeMapsLink').value || null,
+
+        // Additional
+        notes: document.getElementById('routeNotes').value || null,
+        tips: document.getElementById('routeTips').value || null,
+
+        // System
+        added_by: currentTL.id
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('blueriot_routes')
+            .insert([routeData]);
+
+        if (error) throw error;
+
+        alert('✅ Trasporto aggiunto al database ROUTES!');
+
+        const routesModal = document.getElementById('routesModal');
+        const routesForm = document.getElementById('routesForm');
+
+        if (routesModal) routesModal.classList.remove('active');
+        if (routesForm) routesForm.reset();
+
+        loadRoutes();
+
+    } catch (error) {
+        console.error('Save ROUTES error:', error);
+        alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+// ===== STAY CRUD FUNCTIONS =====
+
+async function handleSaveStay(e) {
+    e.preventDefault();
+
+    if (!currentTL || !currentTL.id) {
+        alert('❌ Errore: TL non identificato');
+        return;
+    }
+
+    // Parse facilities from comma-separated string to array
+    const facilitiesStr = document.getElementById('stayFacilities').value || '';
+    const facilitiesArray = facilitiesStr ? facilitiesStr.split(',').map(f => f.trim()).filter(f => f) : null;
+
+    const stayData = {
+        // Basic info
+        name: document.getElementById('stayName').value,
+        type: document.getElementById('stayType').value,
+
+        // Location
+        location: document.getElementById('stayLocation').value,
+        address: document.getElementById('stayAddress').value || null,
+        google_maps_link: document.getElementById('stayGoogleMaps').value || null,
+        distance_from_center: document.getElementById('stayDistanceCenter').value || null,
+
+        // Pricing
+        price_range: document.getElementById('stayPriceRange').value || null,
+
+        // Contacts
+        contact: document.getElementById('stayContact').value || null,
+        phone: document.getElementById('stayPhone').value || null,
+        website: document.getElementById('stayWebsite').value || null,
+        booking_url: document.getElementById('stayBookingUrl').value || null,
+
+        // Suitability
+        suitable_for_families: document.getElementById('staySuitableFamilies').checked,
+        suitable_for_groups: document.getElementById('staySuitableGroups').checked,
+        max_guests: document.getElementById('stayMaxGuests').value ? parseInt(document.getElementById('stayMaxGuests').value) : null,
+
+        // Facilities
+        facilities: facilitiesStr || null,
+        facilities_array: facilitiesArray,
+
+        // TL benefits
+        commission: document.getElementById('stayCommission').checked,
+        commission_percentage: document.getElementById('stayCommissionPerc').value ? parseInt(document.getElementById('stayCommissionPerc').value) : null,
+        special_tl_rate: document.getElementById('staySpecialRate').checked,
+        special_rate_details: document.getElementById('staySpecialRateDetails').value || null,
+
+        // Testing & notes
+        tested_by: document.getElementById('stayTestedBy').value || null,
+        tested_date: document.getElementById('stayTestedDate').value || null,
+        recommended_for: document.getElementById('stayRecommendedFor').value || null,
+        notes: document.getElementById('stayNotes').value || null,
+
+        // System
+        added_by: currentTL.id
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('blueriot_stay')
+            .insert([stayData]);
+
+        if (error) throw error;
+
+        alert('✅ Struttura aggiunta al database STAY!');
+
+        const stayModal = document.getElementById('stayModal');
+        const stayForm = document.getElementById('stayForm');
+
+        if (stayModal) stayModal.classList.remove('active');
+        if (stayForm) stayForm.reset();
+
+        loadStayOptions();
+
+    } catch (error) {
+        console.error('Save STAY error:', error);
+        alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
     </script>

@@ -1072,6 +1072,60 @@ body {
         </div>
     </div>
 
+    <!-- HOTEL MODAL -->
+    <div id="hotelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="hotelModalTitle">Aggiungi Hotel</h2>
+                <button class="modal-close" id="closeHotelModal">&times;</button>
+            </div>
+
+            <form id="hotelForm">
+                <div class="form-group">
+                    <label for="hotelDay">Giorno Tour *</label>
+                    <input type="number" id="hotelDay" required min="1" max="30" placeholder="es. 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelName">Nome Hotel *</label>
+                    <input type="text" id="hotelName" required placeholder="es. Hotel Colosseo">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelCity">Città *</label>
+                    <input type="text" id="hotelCity" required placeholder="es. Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelAddress">Indirizzo</label>
+                    <input type="text" id="hotelAddress" placeholder="es. Via del Corso 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelPhone">Telefono</label>
+                    <input type="tel" id="hotelPhone" placeholder="es. +39 06 1234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelWifiPassword">🔐 Password WiFi</label>
+                    <input type="text" id="hotelWifiPassword" placeholder="es. GuestWiFi2024">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelNotes">Note</label>
+                    <input type="text" id="hotelNotes" placeholder="Note aggiuntive...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelHotel">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="hotelError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -1086,6 +1140,7 @@ let currentUser = null;
 let currentTL = null;
 let currentTourDetail = null;
 let currentRestaurantEdit = null;
+let currentHotelEdit = null;
 
 // DOM elements
 let loginScreen, dashboardScreen, restaurantDatabaseScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
@@ -1096,6 +1151,7 @@ let restaurantModal, restaurantForm, closeRestaurantModal, cancelRestaurant, res
 let sharedRestaurantModal, sharedRestaurantForm, closeSharedRestaurantModal, cancelSharedRestaurant, sharedRestaurantError;
 let restaurantSearchModal, closeRestaurantSearchModal, searchRestaurantsBtn, searchResultsList;
 let ratingModal, ratingForm, closeRatingModal, cancelRating, ratingError;
+let hotelModal, hotelForm, closeHotelModal, cancelHotel, hotelError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -1155,6 +1211,13 @@ function init() {
     closeRatingModal = document.getElementById('closeRatingModal');
     cancelRating = document.getElementById('cancelRating');
     ratingError = document.getElementById('ratingError');
+
+    // Hotel modal elements
+    hotelModal = document.getElementById('hotelModal');
+    hotelForm = document.getElementById('hotelForm');
+    closeHotelModal = document.getElementById('closeHotelModal');
+    cancelHotel = document.getElementById('cancelHotel');
+    hotelError = document.getElementById('hotelError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -1374,6 +1437,31 @@ function setupEventListeners() {
             });
         });
     });
+
+    // Hotel modal
+    if (closeHotelModal) {
+        closeHotelModal.addEventListener('click', () => {
+            if (hotelModal) hotelModal.classList.remove('active');
+        });
+    }
+
+    if (cancelHotel) {
+        cancelHotel.addEventListener('click', () => {
+            if (hotelModal) hotelModal.classList.remove('active');
+        });
+    }
+
+    if (hotelModal) {
+        hotelModal.addEventListener('click', (e) => {
+            if (e.target === hotelModal) {
+                hotelModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (hotelForm) {
+        hotelForm.addEventListener('submit', handleSaveHotel);
+    }
 
     // Add shared restaurant button
     const addSharedRestaurantBtn = document.getElementById('addSharedRestaurantBtn');
@@ -1671,6 +1759,8 @@ function switchTab(tabName) {
     // Load data when switching to tabs
     if (tabName === 'ristoranti') {
         loadRestaurants();
+    } else if (tabName === 'hotel') {
+        loadHotels();
     }
 }
 
@@ -1738,7 +1828,7 @@ function setupModalButtons() {
     // Add hotel button
     const addHotelBtn = document.getElementById('addHotelBtn');
     if (addHotelBtn) {
-        addHotelBtn.onclick = () => alert('🚧 Aggiungi hotel in arrivo!');
+        addHotelBtn.onclick = openAddHotelForm;
     }
 
     // Generate days button
@@ -2163,6 +2253,200 @@ function showRestaurantError(message) {
 function hideRestaurantError() {
     if (restaurantError) {
         restaurantError.classList.remove('show');
+    }
+}
+
+// ===== HOTEL FUNCTIONS =====
+
+async function loadHotels() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const hotelsList = document.getElementById('hotelsList');
+    if (!hotelsList) return;
+
+    try {
+        hotelsList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: hotels, error } = await supabaseClient
+            .from('tour_hotels')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('day_number', { ascending: true });
+
+        if (error) throw error;
+
+        if (!hotels || hotels.length === 0) {
+            hotelsList.innerHTML = '<p class="loading">Nessun hotel ancora</p>';
+        } else {
+            displayHotels(hotels);
+        }
+    } catch (error) {
+        console.error('Load hotels error:', error);
+        hotelsList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento hotel:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayHotels(hotels) {
+    const hotelsList = document.getElementById('hotelsList');
+    if (!hotelsList) return;
+
+    hotelsList.innerHTML = hotels.map(hotel => `
+        <div class="data-card" style="margin-bottom: 12px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 14px; font-weight: 600; color: var(--primary-blue);">Giorno ${hotel.day_number}</span>
+                        <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${hotel.name}</h4>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                        📍 ${hotel.city}
+                        ${hotel.address ? `<br>📧 ${hotel.address}` : ''}
+                        ${hotel.phone ? `<br>📞 ${hotel.phone}` : ''}
+                    </div>
+                    ${hotel.wifi_password ? `
+                        <div style="margin-top: 8px; padding: 8px 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary-blue); border-radius: 6px;">
+                            <span style="font-weight: 600; color: var(--primary-blue);">🔐 WiFi:</span> ${hotel.wifi_password}
+                        </div>
+                    ` : ''}
+                    ${hotel.notes ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${hotel.notes}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 8px; margin-left: 12px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditHotelForm(${hotel.id})">✏️</button>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteHotel(${hotel.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAddHotelForm() {
+    currentHotelEdit = null;
+
+    if (hotelForm) hotelForm.reset();
+
+    document.getElementById('hotelModalTitle').textContent = 'Aggiungi Hotel';
+
+    hideHotelError();
+
+    if (hotelModal) hotelModal.classList.add('active');
+}
+
+async function openEditHotelForm(hotelId) {
+    try {
+        const { data: hotel, error } = await supabaseClient
+            .from('tour_hotels')
+            .select('*')
+            .eq('id', hotelId)
+            .single();
+
+        if (error) throw error;
+        if (!hotel) throw new Error('Hotel non trovato');
+
+        currentHotelEdit = hotel;
+
+        // Fill form
+        document.getElementById('hotelDay').value = hotel.day_number;
+        document.getElementById('hotelName').value = hotel.name;
+        document.getElementById('hotelCity').value = hotel.city;
+        document.getElementById('hotelAddress').value = hotel.address || '';
+        document.getElementById('hotelPhone').value = hotel.phone || '';
+        document.getElementById('hotelWifiPassword').value = hotel.wifi_password || '';
+        document.getElementById('hotelNotes').value = hotel.notes || '';
+
+        document.getElementById('hotelModalTitle').textContent = 'Modifica Hotel';
+
+        hideHotelError();
+
+        if (hotelModal) hotelModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load hotel error:', error);
+        alert('❌ Errore caricamento hotel:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveHotel(e) {
+    e.preventDefault();
+    hideHotelError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showHotelError('Tour non selezionato');
+        return;
+    }
+
+    const hotelData = {
+        tour_id: currentTourDetail.id,
+        day_number: parseInt(document.getElementById('hotelDay').value),
+        name: document.getElementById('hotelName').value,
+        city: document.getElementById('hotelCity').value,
+        address: document.getElementById('hotelAddress').value || null,
+        phone: document.getElementById('hotelPhone').value || null,
+        wifi_password: document.getElementById('hotelWifiPassword').value || null,
+        notes: document.getElementById('hotelNotes').value || null
+    };
+
+    try {
+        if (currentHotelEdit && currentHotelEdit.id) {
+            // Update existing hotel
+            const { error } = await supabaseClient
+                .from('tour_hotels')
+                .update(hotelData)
+                .eq('id', currentHotelEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new hotel
+            const { error } = await supabaseClient
+                .from('tour_hotels')
+                .insert([hotelData]);
+
+            if (error) throw error;
+        }
+
+        if (hotelModal) hotelModal.classList.remove('active');
+
+        loadHotels();
+
+    } catch (error) {
+        console.error('Save hotel error:', error);
+        showHotelError(error.message || 'Errore salvataggio hotel');
+    }
+}
+
+async function deleteHotel(hotelId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo hotel?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_hotels')
+            .delete()
+            .eq('id', hotelId);
+
+        if (error) throw error;
+
+        loadHotels();
+
+    } catch (error) {
+        console.error('Delete hotel error:', error);
+        alert('❌ Errore eliminazione hotel:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showHotelError(message) {
+    if (hotelError) {
+        hotelError.textContent = message;
+        hotelError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideHotelError() {
+    if (hotelError) {
+        hotelError.classList.remove('show');
     }
 }
 

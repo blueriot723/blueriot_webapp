@@ -2113,6 +2113,8 @@ function switchTab(tabName) {
         loadLinks();
     } else if (tabName === 'programma') {
         loadProgram();
+    } else if (tabName === 'templates') {
+        loadTemplates();
     }
 }
 
@@ -2210,7 +2212,7 @@ function setupModalButtons() {
     // Save template button
     const saveTemplateBtn = document.getElementById('saveTemplateBtn');
     if (saveTemplateBtn) {
-        saveTemplateBtn.onclick = () => alert('🚧 Salva template in arrivo!');
+        saveTemplateBtn.onclick = saveAsTemplate;
     }
 
     // Total passengers input
@@ -3738,6 +3740,250 @@ function showActivityError(message) {
 function hideActivityError() {
     if (activityError) {
         activityError.classList.remove('show');
+    }
+}
+
+// ===== TEMPLATES FUNCTIONS =====
+
+async function loadTemplates() {
+    if (!currentTL || !currentTL.id) return;
+
+    const templatesList = document.getElementById('templatesList');
+    if (!templatesList) return;
+
+    try {
+        templatesList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: templates, error } = await supabaseClient
+            .from('tour_templates')
+            .select('*')
+            .eq('tl_id', currentTL.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!templates || templates.length === 0) {
+            templatesList.innerHTML = '<p class="loading">Nessun template disponibile</p>';
+        } else {
+            displayTemplates(templates);
+        }
+    } catch (error) {
+        console.error('Load templates error:', error);
+        templatesList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento templates:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayTemplates(templates) {
+    const templatesList = document.getElementById('templatesList');
+    if (!templatesList) return;
+
+    templatesList.innerHTML = templates.map(template => `
+        <div class="data-card" style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1;">
+                    <h4 style="font-size: 16px; font-weight: 700; margin: 0 0 4px 0;">${template.name}</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+                        Creato: ${new Date(template.created_at).toLocaleDateString('it-IT')}
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="loadTemplate(${template.id})">📋 Carica</button>
+                    <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteTemplate(${template.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function saveAsTemplate() {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Nessun tour aperto');
+        return;
+    }
+
+    const templateNameInput = document.getElementById('templateName');
+    const templateName = templateNameInput ? templateNameInput.value.trim() : '';
+
+    if (!templateName) {
+        alert('❌ Inserisci un nome per il template');
+        return;
+    }
+
+    try {
+        // Load all tour data
+        const [
+            { data: restaurants },
+            { data: hotels },
+            { data: emergencyContacts },
+            { data: files },
+            { data: links },
+            { data: days },
+            { data: activities }
+        ] = await Promise.all([
+            supabaseClient.from('tour_restaurants').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_hotels').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_emergency_contacts').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_files').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_links').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_days').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_activities').select('*').eq('tour_id', currentTourDetail.id)
+        ]);
+
+        // Create template object
+        const templateData = {
+            tl_id: currentTL.id,
+            name: templateName,
+            data: {
+                restaurants: restaurants || [],
+                hotels: hotels || [],
+                emergencyContacts: emergencyContacts || [],
+                files: files || [],
+                links: links || [],
+                days: days || [],
+                activities: activities || []
+            }
+        };
+
+        // Save template
+        const { error } = await supabaseClient
+            .from('tour_templates')
+            .insert([templateData]);
+
+        if (error) throw error;
+
+        alert(`✅ Template "${templateName}" salvato con successo!`);
+        if (templateNameInput) templateNameInput.value = '';
+        loadTemplates();
+
+    } catch (error) {
+        console.error('Save template error:', error);
+        alert('❌ Errore salvataggio template:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function loadTemplate(templateId) {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Nessun tour aperto');
+        return;
+    }
+
+    if (!confirm('⚠️ Caricare questo template? Questo aggiungerà i dati del template al tour corrente (non sovrascriverà i dati esistenti).')) {
+        return;
+    }
+
+    try {
+        // Load template
+        const { data: template, error } = await supabaseClient
+            .from('tour_templates')
+            .select('*')
+            .eq('id', templateId)
+            .single();
+
+        if (error) throw error;
+        if (!template || !template.data) {
+            alert('❌ Template non valido');
+            return;
+        }
+
+        const templateData = template.data;
+
+        // Insert restaurants (remove id and tour_id fields)
+        if (templateData.restaurants && templateData.restaurants.length > 0) {
+            const restaurants = templateData.restaurants.map(r => {
+                const { id, tour_id, created_at, ...rest } = r;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_restaurants').insert(restaurants);
+        }
+
+        // Insert hotels
+        if (templateData.hotels && templateData.hotels.length > 0) {
+            const hotels = templateData.hotels.map(h => {
+                const { id, tour_id, created_at, ...rest } = h;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_hotels').insert(hotels);
+        }
+
+        // Insert emergency contacts
+        if (templateData.emergencyContacts && templateData.emergencyContacts.length > 0) {
+            const contacts = templateData.emergencyContacts.map(c => {
+                const { id, tour_id, created_at, ...rest } = c;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_emergency_contacts').insert(contacts);
+        }
+
+        // Insert files
+        if (templateData.files && templateData.files.length > 0) {
+            const files = templateData.files.map(f => {
+                const { id, tour_id, created_at, ...rest } = f;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_files').insert(files);
+        }
+
+        // Insert links
+        if (templateData.links && templateData.links.length > 0) {
+            const links = templateData.links.map(l => {
+                const { id, tour_id, created_at, ...rest } = l;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_links').insert(links);
+        }
+
+        // Insert days and activities
+        if (templateData.days && templateData.days.length > 0) {
+            const days = templateData.days.map(d => {
+                const { id, tour_id, created_at, ...rest } = d;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_days').insert(days);
+
+            if (templateData.activities && templateData.activities.length > 0) {
+                const activities = templateData.activities.map(a => {
+                    const { id, tour_id, created_at, ...rest } = a;
+                    return { ...rest, tour_id: currentTourDetail.id };
+                });
+                await supabaseClient.from('tour_activities').insert(activities);
+            }
+        }
+
+        alert(`✅ Template "${template.name}" caricato con successo!`);
+
+        // Reload current tab
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) {
+            const tabName = activeTab.dataset.tab;
+            switchTab(tabName);
+        }
+
+    } catch (error) {
+        console.error('Load template error:', error);
+        alert('❌ Errore caricamento template:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function deleteTemplate(templateId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo template?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_templates')
+            .delete()
+            .eq('id', templateId);
+
+        if (error) throw error;
+
+        alert('✅ Template eliminato');
+        loadTemplates();
+
+    } catch (error) {
+        console.error('Delete template error:', error);
+        alert('❌ Errore eliminazione template:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
 

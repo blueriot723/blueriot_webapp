@@ -1072,6 +1072,268 @@ body {
         </div>
     </div>
 
+    <!-- HOTEL MODAL -->
+    <div id="hotelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="hotelModalTitle">Aggiungi Hotel</h2>
+                <button class="modal-close" id="closeHotelModal">&times;</button>
+            </div>
+
+            <form id="hotelForm">
+                <div class="form-group">
+                    <label for="hotelDay">Giorno Tour *</label>
+                    <input type="number" id="hotelDay" required min="1" max="30" placeholder="es. 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelName">Nome Hotel *</label>
+                    <input type="text" id="hotelName" required placeholder="es. Hotel Colosseo">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelCity">Città *</label>
+                    <input type="text" id="hotelCity" required placeholder="es. Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelAddress">Indirizzo</label>
+                    <input type="text" id="hotelAddress" placeholder="es. Via del Corso 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelPhone">Telefono</label>
+                    <input type="tel" id="hotelPhone" placeholder="es. +39 06 1234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelWifiPassword">🔐 Password WiFi</label>
+                    <input type="text" id="hotelWifiPassword" placeholder="es. GuestWiFi2024">
+                </div>
+
+                <div class="form-group">
+                    <label for="hotelNotes">Note</label>
+                    <input type="text" id="hotelNotes" placeholder="Note aggiuntive...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelHotel">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="hotelError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EMERGENCY CONTACT MODAL -->
+    <div id="emergencyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="emergencyModalTitle">Aggiungi Contatto di Emergenza</h2>
+                <button class="modal-close" id="closeEmergencyModal">&times;</button>
+            </div>
+
+            <form id="emergencyForm">
+                <div class="form-group">
+                    <label for="emergencyCity">Città *</label>
+                    <input type="text" id="emergencyCity" required placeholder="es. Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyType">Tipo Contatto *</label>
+                    <select id="emergencyType" required>
+                        <option value="">Seleziona tipo...</option>
+                        <option value="police">🚓 Polizia</option>
+                        <option value="hospital">🏥 Ospedale</option>
+                        <option value="embassy">🏛️ Ambasciata/Consolato</option>
+                        <option value="fire">🚒 Vigili del Fuoco</option>
+                        <option value="taxi">🚕 Taxi</option>
+                        <option value="other">📞 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyName">Nome/Organizzazione *</label>
+                    <input type="text" id="emergencyName" required placeholder="es. Ospedale Santo Spirito">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyPhone">Telefono *</label>
+                    <input type="tel" id="emergencyPhone" required placeholder="es. +39 06 1234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyAddress">Indirizzo</label>
+                    <input type="text" id="emergencyAddress" placeholder="es. Via Roma 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyNotes">Note</label>
+                    <input type="text" id="emergencyNotes" placeholder="Note aggiuntive...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelEmergency">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="emergencyError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FILE MODAL -->
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="fileModalTitle">Aggiungi Documento</h2>
+                <button class="modal-close" id="closeFileModal">&times;</button>
+            </div>
+
+            <form id="fileForm">
+                <div class="form-group">
+                    <label for="fileName">Nome File *</label>
+                    <input type="text" id="fileName" required placeholder="es. Itinerario Completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="fileType">Tipo Documento *</label>
+                    <select id="fileType" required>
+                        <option value="">Seleziona tipo...</option>
+                        <option value="itinerary">📅 Itinerario</option>
+                        <option value="voucher">🎫 Voucher</option>
+                        <option value="contract">📋 Contratto</option>
+                        <option value="insurance">🛡️ Assicurazione</option>
+                        <option value="passport">🛂 Documento Identità</option>
+                        <option value="map">🗺️ Mappa</option>
+                        <option value="other">📄 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileUrl">Link al File *</label>
+                    <input type="url" id="fileUrl" required placeholder="https://...">
+                    <small style="color: var(--text-secondary); font-size: 12px;">Inserisci un link a Google Drive, Dropbox, o altro servizio</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileNotes">Note</label>
+                    <input type="text" id="fileNotes" placeholder="Note aggiuntive...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelFile">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="fileError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LINK MODAL -->
+    <div id="linkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="linkModalTitle">Aggiungi Link Utile</h2>
+                <button class="modal-close" id="closeLinkModal">&times;</button>
+            </div>
+
+            <form id="linkForm">
+                <div class="form-group">
+                    <label for="linkTitle">Titolo *</label>
+                    <input type="text" id="linkTitle" required placeholder="es. Meteo Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="linkCategory">Categoria *</label>
+                    <select id="linkCategory" required>
+                        <option value="">Seleziona categoria...</option>
+                        <option value="weather">🌤️ Meteo</option>
+                        <option value="transport">🚇 Trasporti</option>
+                        <option value="restaurant">🍽️ Ristoranti</option>
+                        <option value="attraction">🏛️ Attrazioni</option>
+                        <option value="booking">🏨 Prenotazioni</option>
+                        <option value="map">🗺️ Mappe</option>
+                        <option value="other">🔗 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="linkUrl">URL *</label>
+                    <input type="url" id="linkUrl" required placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="linkDescription">Descrizione</label>
+                    <input type="text" id="linkDescription" placeholder="Breve descrizione...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelLink">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="linkError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ACTIVITY MODAL -->
+    <div id="activityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="activityModalTitle">Aggiungi Attività</h2>
+                <button class="modal-close" id="closeActivityModal">&times;</button>
+            </div>
+
+            <form id="activityForm">
+                <input type="hidden" id="activityDayNumber">
+
+                <div class="form-group">
+                    <label for="activityTime">Orario *</label>
+                    <input type="time" id="activityTime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="activityTitle">Titolo *</label>
+                    <input type="text" id="activityTitle" required placeholder="es. Visita Colosseo">
+                </div>
+
+                <div class="form-group">
+                    <label for="activityType">Tipo *</label>
+                    <select id="activityType" required>
+                        <option value="">Seleziona tipo...</option>
+                        <option value="tour">🏛️ Tour</option>
+                        <option value="meal">🍽️ Pasto</option>
+                        <option value="transport">🚇 Trasporto</option>
+                        <option value="free_time">⏰ Tempo Libero</option>
+                        <option value="accommodation">🏨 Sistemazione</option>
+                        <option value="other">📌 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="activityDescription">Descrizione</label>
+                    <textarea id="activityDescription" rows="3" placeholder="Dettagli dell'attività..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="activityLocation">Luogo</label>
+                    <input type="text" id="activityLocation" placeholder="es. Piazza del Colosseo">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelActivity">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="activityError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -1086,6 +1348,11 @@ let currentUser = null;
 let currentTL = null;
 let currentTourDetail = null;
 let currentRestaurantEdit = null;
+let currentHotelEdit = null;
+let currentEmergencyEdit = null;
+let currentFileEdit = null;
+let currentLinkEdit = null;
+let currentActivityEdit = null;
 
 // DOM elements
 let loginScreen, dashboardScreen, restaurantDatabaseScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
@@ -1096,6 +1363,11 @@ let restaurantModal, restaurantForm, closeRestaurantModal, cancelRestaurant, res
 let sharedRestaurantModal, sharedRestaurantForm, closeSharedRestaurantModal, cancelSharedRestaurant, sharedRestaurantError;
 let restaurantSearchModal, closeRestaurantSearchModal, searchRestaurantsBtn, searchResultsList;
 let ratingModal, ratingForm, closeRatingModal, cancelRating, ratingError;
+let hotelModal, hotelForm, closeHotelModal, cancelHotel, hotelError;
+let emergencyModal, emergencyForm, closeEmergencyModal, cancelEmergency, emergencyError;
+let fileModal, fileForm, closeFileModal, cancelFile, fileError;
+let linkModal, linkForm, closeLinkModal, cancelLink, linkError;
+let activityModal, activityForm, closeActivityModal, cancelActivity, activityError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -1155,6 +1427,41 @@ function init() {
     closeRatingModal = document.getElementById('closeRatingModal');
     cancelRating = document.getElementById('cancelRating');
     ratingError = document.getElementById('ratingError');
+
+    // Hotel modal elements
+    hotelModal = document.getElementById('hotelModal');
+    hotelForm = document.getElementById('hotelForm');
+    closeHotelModal = document.getElementById('closeHotelModal');
+    cancelHotel = document.getElementById('cancelHotel');
+    hotelError = document.getElementById('hotelError');
+
+    // Emergency modal elements
+    emergencyModal = document.getElementById('emergencyModal');
+    emergencyForm = document.getElementById('emergencyForm');
+    closeEmergencyModal = document.getElementById('closeEmergencyModal');
+    cancelEmergency = document.getElementById('cancelEmergency');
+    emergencyError = document.getElementById('emergencyError');
+
+    // File modal elements
+    fileModal = document.getElementById('fileModal');
+    fileForm = document.getElementById('fileForm');
+    closeFileModal = document.getElementById('closeFileModal');
+    cancelFile = document.getElementById('cancelFile');
+    fileError = document.getElementById('fileError');
+
+    // Link modal elements
+    linkModal = document.getElementById('linkModal');
+    linkForm = document.getElementById('linkForm');
+    closeLinkModal = document.getElementById('closeLinkModal');
+    cancelLink = document.getElementById('cancelLink');
+    linkError = document.getElementById('linkError');
+
+    // Activity modal elements
+    activityModal = document.getElementById('activityModal');
+    activityForm = document.getElementById('activityForm');
+    closeActivityModal = document.getElementById('closeActivityModal');
+    cancelActivity = document.getElementById('cancelActivity');
+    activityError = document.getElementById('activityError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -1374,6 +1681,131 @@ function setupEventListeners() {
             });
         });
     });
+
+    // Hotel modal
+    if (closeHotelModal) {
+        closeHotelModal.addEventListener('click', () => {
+            if (hotelModal) hotelModal.classList.remove('active');
+        });
+    }
+
+    if (cancelHotel) {
+        cancelHotel.addEventListener('click', () => {
+            if (hotelModal) hotelModal.classList.remove('active');
+        });
+    }
+
+    if (hotelModal) {
+        hotelModal.addEventListener('click', (e) => {
+            if (e.target === hotelModal) {
+                hotelModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (hotelForm) {
+        hotelForm.addEventListener('submit', handleSaveHotel);
+    }
+
+    // Emergency contact modal
+    if (closeEmergencyModal) {
+        closeEmergencyModal.addEventListener('click', () => {
+            if (emergencyModal) emergencyModal.classList.remove('active');
+        });
+    }
+
+    if (cancelEmergency) {
+        cancelEmergency.addEventListener('click', () => {
+            if (emergencyModal) emergencyModal.classList.remove('active');
+        });
+    }
+
+    if (emergencyModal) {
+        emergencyModal.addEventListener('click', (e) => {
+            if (e.target === emergencyModal) {
+                emergencyModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (emergencyForm) {
+        emergencyForm.addEventListener('submit', handleSaveEmergency);
+    }
+
+    // File modal
+    if (closeFileModal) {
+        closeFileModal.addEventListener('click', () => {
+            if (fileModal) fileModal.classList.remove('active');
+        });
+    }
+
+    if (cancelFile) {
+        cancelFile.addEventListener('click', () => {
+            if (fileModal) fileModal.classList.remove('active');
+        });
+    }
+
+    if (fileModal) {
+        fileModal.addEventListener('click', (e) => {
+            if (e.target === fileModal) {
+                fileModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (fileForm) {
+        fileForm.addEventListener('submit', handleSaveFile);
+    }
+
+    // Link modal
+    if (closeLinkModal) {
+        closeLinkModal.addEventListener('click', () => {
+            if (linkModal) linkModal.classList.remove('active');
+        });
+    }
+
+    if (cancelLink) {
+        cancelLink.addEventListener('click', () => {
+            if (linkModal) linkModal.classList.remove('active');
+        });
+    }
+
+    if (linkModal) {
+        linkModal.addEventListener('click', (e) => {
+            if (e.target === linkModal) {
+                linkModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (linkForm) {
+        linkForm.addEventListener('submit', handleSaveLink);
+    }
+
+    // Activity modal
+    if (closeActivityModal) {
+        closeActivityModal.addEventListener('click', () => {
+            if (activityModal) activityModal.classList.remove('active');
+        });
+    }
+
+    if (cancelActivity) {
+        cancelActivity.addEventListener('click', () => {
+            if (activityModal) activityModal.classList.remove('active');
+        });
+    }
+
+    if (activityModal) {
+        activityModal.addEventListener('click', (e) => {
+            if (e.target === activityModal) {
+                activityModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (activityForm) {
+        activityForm.addEventListener('submit', handleSaveActivity);
+    }
 
     // Add shared restaurant button
     const addSharedRestaurantBtn = document.getElementById('addSharedRestaurantBtn');
@@ -1671,6 +2103,18 @@ function switchTab(tabName) {
     // Load data when switching to tabs
     if (tabName === 'ristoranti') {
         loadRestaurants();
+    } else if (tabName === 'hotel') {
+        loadHotels();
+    } else if (tabName === 'emergenze') {
+        loadEmergencyContacts();
+    } else if (tabName === 'file') {
+        loadFiles();
+    } else if (tabName === 'link') {
+        loadLinks();
+    } else if (tabName === 'programma') {
+        loadProgram();
+    } else if (tabName === 'templates') {
+        loadTemplates();
     }
 }
 
@@ -1738,37 +2182,37 @@ function setupModalButtons() {
     // Add hotel button
     const addHotelBtn = document.getElementById('addHotelBtn');
     if (addHotelBtn) {
-        addHotelBtn.onclick = () => alert('🚧 Aggiungi hotel in arrivo!');
+        addHotelBtn.onclick = openAddHotelForm;
     }
 
     // Generate days button
     const generateDaysBtn = document.getElementById('generateDaysBtn');
     if (generateDaysBtn) {
-        generateDaysBtn.onclick = () => alert('🚧 Genera giorni in arrivo!');
+        generateDaysBtn.onclick = generateDays;
     }
 
     // Add emergency button
     const addEmergencyBtn = document.getElementById('addEmergencyBtn');
     if (addEmergencyBtn) {
-        addEmergencyBtn.onclick = () => alert('🚧 Aggiungi emergenza in arrivo!');
+        addEmergencyBtn.onclick = openAddEmergencyForm;
     }
 
     // Add file button
     const addFileBtn = document.getElementById('addFileBtn');
     if (addFileBtn) {
-        addFileBtn.onclick = () => alert('🚧 Aggiungi file in arrivo!');
+        addFileBtn.onclick = openAddFileForm;
     }
 
     // Add link button
     const addLinkBtn = document.getElementById('addLinkBtn');
     if (addLinkBtn) {
-        addLinkBtn.onclick = () => alert('🚧 Aggiungi link in arrivo!');
+        addLinkBtn.onclick = openAddLinkForm;
     }
 
     // Save template button
     const saveTemplateBtn = document.getElementById('saveTemplateBtn');
     if (saveTemplateBtn) {
-        saveTemplateBtn.onclick = () => alert('🚧 Salva template in arrivo!');
+        saveTemplateBtn.onclick = saveAsTemplate;
     }
 
     // Total passengers input
@@ -2163,6 +2607,1383 @@ function showRestaurantError(message) {
 function hideRestaurantError() {
     if (restaurantError) {
         restaurantError.classList.remove('show');
+    }
+}
+
+// ===== HOTEL FUNCTIONS =====
+
+async function loadHotels() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const hotelsList = document.getElementById('hotelsList');
+    if (!hotelsList) return;
+
+    try {
+        hotelsList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: hotels, error } = await supabaseClient
+            .from('tour_hotels')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('day_number', { ascending: true });
+
+        if (error) throw error;
+
+        if (!hotels || hotels.length === 0) {
+            hotelsList.innerHTML = '<p class="loading">Nessun hotel ancora</p>';
+        } else {
+            displayHotels(hotels);
+        }
+    } catch (error) {
+        console.error('Load hotels error:', error);
+        hotelsList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento hotel:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayHotels(hotels) {
+    const hotelsList = document.getElementById('hotelsList');
+    if (!hotelsList) return;
+
+    hotelsList.innerHTML = hotels.map(hotel => `
+        <div class="data-card" style="margin-bottom: 12px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 14px; font-weight: 600; color: var(--primary-blue);">Giorno ${hotel.day_number}</span>
+                        <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${hotel.name}</h4>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                        📍 ${hotel.city}
+                        ${hotel.address ? `<br>📧 ${hotel.address}` : ''}
+                        ${hotel.phone ? `<br>📞 ${hotel.phone}` : ''}
+                    </div>
+                    ${hotel.wifi_password ? `
+                        <div style="margin-top: 8px; padding: 8px 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--primary-blue); border-radius: 6px;">
+                            <span style="font-weight: 600; color: var(--primary-blue);">🔐 WiFi:</span> ${hotel.wifi_password}
+                        </div>
+                    ` : ''}
+                    ${hotel.notes ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${hotel.notes}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 8px; margin-left: 12px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditHotelForm(${hotel.id})">✏️</button>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteHotel(${hotel.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAddHotelForm() {
+    currentHotelEdit = null;
+
+    if (hotelForm) hotelForm.reset();
+
+    document.getElementById('hotelModalTitle').textContent = 'Aggiungi Hotel';
+
+    hideHotelError();
+
+    if (hotelModal) hotelModal.classList.add('active');
+}
+
+async function openEditHotelForm(hotelId) {
+    try {
+        const { data: hotel, error } = await supabaseClient
+            .from('tour_hotels')
+            .select('*')
+            .eq('id', hotelId)
+            .single();
+
+        if (error) throw error;
+        if (!hotel) throw new Error('Hotel non trovato');
+
+        currentHotelEdit = hotel;
+
+        // Fill form
+        document.getElementById('hotelDay').value = hotel.day_number;
+        document.getElementById('hotelName').value = hotel.name;
+        document.getElementById('hotelCity').value = hotel.city;
+        document.getElementById('hotelAddress').value = hotel.address || '';
+        document.getElementById('hotelPhone').value = hotel.phone || '';
+        document.getElementById('hotelWifiPassword').value = hotel.wifi_password || '';
+        document.getElementById('hotelNotes').value = hotel.notes || '';
+
+        document.getElementById('hotelModalTitle').textContent = 'Modifica Hotel';
+
+        hideHotelError();
+
+        if (hotelModal) hotelModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load hotel error:', error);
+        alert('❌ Errore caricamento hotel:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveHotel(e) {
+    e.preventDefault();
+    hideHotelError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showHotelError('Tour non selezionato');
+        return;
+    }
+
+    const hotelData = {
+        tour_id: currentTourDetail.id,
+        day_number: parseInt(document.getElementById('hotelDay').value),
+        name: document.getElementById('hotelName').value,
+        city: document.getElementById('hotelCity').value,
+        address: document.getElementById('hotelAddress').value || null,
+        phone: document.getElementById('hotelPhone').value || null,
+        wifi_password: document.getElementById('hotelWifiPassword').value || null,
+        notes: document.getElementById('hotelNotes').value || null
+    };
+
+    try {
+        if (currentHotelEdit && currentHotelEdit.id) {
+            // Update existing hotel
+            const { error } = await supabaseClient
+                .from('tour_hotels')
+                .update(hotelData)
+                .eq('id', currentHotelEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new hotel
+            const { error } = await supabaseClient
+                .from('tour_hotels')
+                .insert([hotelData]);
+
+            if (error) throw error;
+        }
+
+        if (hotelModal) hotelModal.classList.remove('active');
+
+        loadHotels();
+
+    } catch (error) {
+        console.error('Save hotel error:', error);
+        showHotelError(error.message || 'Errore salvataggio hotel');
+    }
+}
+
+async function deleteHotel(hotelId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo hotel?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_hotels')
+            .delete()
+            .eq('id', hotelId);
+
+        if (error) throw error;
+
+        loadHotels();
+
+    } catch (error) {
+        console.error('Delete hotel error:', error);
+        alert('❌ Errore eliminazione hotel:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showHotelError(message) {
+    if (hotelError) {
+        hotelError.textContent = message;
+        hotelError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideHotelError() {
+    if (hotelError) {
+        hotelError.classList.remove('show');
+    }
+}
+
+// ===== EMERGENCY CONTACT FUNCTIONS =====
+
+const emergencyTypeIcons = {
+    police: '🚓',
+    hospital: '🏥',
+    embassy: '🏛️',
+    fire: '🚒',
+    taxi: '🚕',
+    other: '📞'
+};
+
+const emergencyTypeNames = {
+    police: 'Polizia',
+    hospital: 'Ospedale',
+    embassy: 'Ambasciata/Consolato',
+    fire: 'Vigili del Fuoco',
+    taxi: 'Taxi',
+    other: 'Altro'
+};
+
+async function loadEmergencyContacts() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const emergencyList = document.getElementById('emergencyList');
+    if (!emergencyList) return;
+
+    try {
+        emergencyList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: contacts, error } = await supabaseClient
+            .from('tour_emergency_contacts')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('city', { ascending: true });
+
+        if (error) throw error;
+
+        if (!contacts || contacts.length === 0) {
+            emergencyList.innerHTML = '<p class="loading">Nessun contatto ancora</p>';
+        } else {
+            displayEmergencyContacts(contacts);
+        }
+    } catch (error) {
+        console.error('Load emergency contacts error:', error);
+        emergencyList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento contatti emergenza:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayEmergencyContacts(contacts) {
+    const emergencyList = document.getElementById('emergencyList');
+    if (!emergencyList) return;
+
+    // Group contacts by city
+    const contactsByCity = contacts.reduce((acc, contact) => {
+        if (!acc[contact.city]) {
+            acc[contact.city] = [];
+        }
+        acc[contact.city].push(contact);
+        return acc;
+    }, {});
+
+    emergencyList.innerHTML = Object.keys(contactsByCity).sort().map(city => `
+        <div style="margin-bottom: 24px;">
+            <h4 style="font-size: 18px; font-weight: 700; color: var(--primary-blue); margin-bottom: 12px;">📍 ${city}</h4>
+            ${contactsByCity[city].map(contact => `
+                <div class="data-card" style="margin-bottom: 12px; position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <span style="font-size: 20px;">${emergencyTypeIcons[contact.contact_type] || '📞'}</span>
+                                <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${contact.name}</h4>
+                                <span style="font-size: 13px; color: var(--text-secondary);">(${emergencyTypeNames[contact.contact_type] || contact.contact_type})</span>
+                            </div>
+                            <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                                📞 <a href="tel:${contact.phone}" style="color: var(--primary-blue); text-decoration: none;">${contact.phone}</a>
+                                ${contact.address ? `<br>📧 ${contact.address}` : ''}
+                            </div>
+                            ${contact.notes ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${contact.notes}</div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-left: 12px;">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditEmergencyForm(${contact.id})">✏️</button>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteEmergencyContact(${contact.id})">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
+}
+
+function openAddEmergencyForm() {
+    currentEmergencyEdit = null;
+
+    if (emergencyForm) emergencyForm.reset();
+
+    document.getElementById('emergencyModalTitle').textContent = 'Aggiungi Contatto di Emergenza';
+
+    hideEmergencyError();
+
+    if (emergencyModal) emergencyModal.classList.add('active');
+}
+
+async function openEditEmergencyForm(contactId) {
+    try {
+        const { data: contact, error } = await supabaseClient
+            .from('tour_emergency_contacts')
+            .select('*')
+            .eq('id', contactId)
+            .single();
+
+        if (error) throw error;
+        if (!contact) throw new Error('Contatto non trovato');
+
+        currentEmergencyEdit = contact;
+
+        // Fill form
+        document.getElementById('emergencyCity').value = contact.city;
+        document.getElementById('emergencyType').value = contact.contact_type;
+        document.getElementById('emergencyName').value = contact.name;
+        document.getElementById('emergencyPhone').value = contact.phone;
+        document.getElementById('emergencyAddress').value = contact.address || '';
+        document.getElementById('emergencyNotes').value = contact.notes || '';
+
+        document.getElementById('emergencyModalTitle').textContent = 'Modifica Contatto di Emergenza';
+
+        hideEmergencyError();
+
+        if (emergencyModal) emergencyModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load emergency contact error:', error);
+        alert('❌ Errore caricamento contatto:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveEmergency(e) {
+    e.preventDefault();
+    hideEmergencyError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showEmergencyError('Tour non selezionato');
+        return;
+    }
+
+    const contactData = {
+        tour_id: currentTourDetail.id,
+        city: document.getElementById('emergencyCity').value,
+        contact_type: document.getElementById('emergencyType').value,
+        name: document.getElementById('emergencyName').value,
+        phone: document.getElementById('emergencyPhone').value,
+        address: document.getElementById('emergencyAddress').value || null,
+        notes: document.getElementById('emergencyNotes').value || null
+    };
+
+    try {
+        if (currentEmergencyEdit && currentEmergencyEdit.id) {
+            // Update existing contact
+            const { error } = await supabaseClient
+                .from('tour_emergency_contacts')
+                .update(contactData)
+                .eq('id', currentEmergencyEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new contact
+            const { error } = await supabaseClient
+                .from('tour_emergency_contacts')
+                .insert([contactData]);
+
+            if (error) throw error;
+        }
+
+        if (emergencyModal) emergencyModal.classList.remove('active');
+
+        loadEmergencyContacts();
+
+    } catch (error) {
+        console.error('Save emergency contact error:', error);
+        showEmergencyError(error.message || 'Errore salvataggio contatto');
+    }
+}
+
+async function deleteEmergencyContact(contactId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo contatto?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_emergency_contacts')
+            .delete()
+            .eq('id', contactId);
+
+        if (error) throw error;
+
+        loadEmergencyContacts();
+
+    } catch (error) {
+        console.error('Delete emergency contact error:', error);
+        alert('❌ Errore eliminazione contatto:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showEmergencyError(message) {
+    if (emergencyError) {
+        emergencyError.textContent = message;
+        emergencyError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideEmergencyError() {
+    if (emergencyError) {
+        emergencyError.classList.remove('show');
+    }
+}
+
+// ===== FILE FUNCTIONS =====
+
+const fileTypeIcons = {
+    itinerary: '📅',
+    voucher: '🎫',
+    contract: '📋',
+    insurance: '🛡️',
+    passport: '🛂',
+    map: '🗺️',
+    other: '📄'
+};
+
+const fileTypeNames = {
+    itinerary: 'Itinerario',
+    voucher: 'Voucher',
+    contract: 'Contratto',
+    insurance: 'Assicurazione',
+    passport: 'Documento Identità',
+    map: 'Mappa',
+    other: 'Altro'
+};
+
+async function loadFiles() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const filesList = document.getElementById('filesList');
+    if (!filesList) return;
+
+    try {
+        filesList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: files, error } = await supabaseClient
+            .from('tour_files')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!files || files.length === 0) {
+            filesList.innerHTML = '<p class="loading">Nessun file ancora</p>';
+        } else {
+            displayFiles(files);
+        }
+    } catch (error) {
+        console.error('Load files error:', error);
+        filesList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento file:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayFiles(files) {
+    const filesList = document.getElementById('filesList');
+    if (!filesList) return;
+
+    filesList.innerHTML = files.map(file => `
+        <div class="data-card" style="margin-bottom: 12px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 20px;">${fileTypeIcons[file.file_type] || '📄'}</span>
+                        <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${file.name}</h4>
+                        <span style="font-size: 13px; color: var(--text-secondary);">(${fileTypeNames[file.file_type] || file.file_type})</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <a href="${file.url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-blue); text-decoration: none; font-size: 14px;">
+                            🔗 Apri documento →
+                        </a>
+                    </div>
+                    ${file.notes ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${file.notes}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 8px; margin-left: 12px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditFileForm(${file.id})">✏️</button>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteFile(${file.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAddFileForm() {
+    currentFileEdit = null;
+
+    if (fileForm) fileForm.reset();
+
+    document.getElementById('fileModalTitle').textContent = 'Aggiungi Documento';
+
+    hideFileError();
+
+    if (fileModal) fileModal.classList.add('active');
+}
+
+async function openEditFileForm(fileId) {
+    try {
+        const { data: file, error } = await supabaseClient
+            .from('tour_files')
+            .select('*')
+            .eq('id', fileId)
+            .single();
+
+        if (error) throw error;
+        if (!file) throw new Error('File non trovato');
+
+        currentFileEdit = file;
+
+        // Fill form
+        document.getElementById('fileName').value = file.name;
+        document.getElementById('fileType').value = file.file_type;
+        document.getElementById('fileUrl').value = file.url;
+        document.getElementById('fileNotes').value = file.notes || '';
+
+        document.getElementById('fileModalTitle').textContent = 'Modifica Documento';
+
+        hideFileError();
+
+        if (fileModal) fileModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load file error:', error);
+        alert('❌ Errore caricamento file:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveFile(e) {
+    e.preventDefault();
+    hideFileError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showFileError('Tour non selezionato');
+        return;
+    }
+
+    const fileData = {
+        tour_id: currentTourDetail.id,
+        name: document.getElementById('fileName').value,
+        file_type: document.getElementById('fileType').value,
+        url: document.getElementById('fileUrl').value,
+        notes: document.getElementById('fileNotes').value || null
+    };
+
+    try {
+        if (currentFileEdit && currentFileEdit.id) {
+            // Update existing file
+            const { error } = await supabaseClient
+                .from('tour_files')
+                .update(fileData)
+                .eq('id', currentFileEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new file
+            const { error } = await supabaseClient
+                .from('tour_files')
+                .insert([fileData]);
+
+            if (error) throw error;
+        }
+
+        if (fileModal) fileModal.classList.remove('active');
+
+        loadFiles();
+
+    } catch (error) {
+        console.error('Save file error:', error);
+        showFileError(error.message || 'Errore salvataggio file');
+    }
+}
+
+async function deleteFile(fileId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo file?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_files')
+            .delete()
+            .eq('id', fileId);
+
+        if (error) throw error;
+
+        loadFiles();
+
+    } catch (error) {
+        console.error('Delete file error:', error);
+        alert('❌ Errore eliminazione file:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showFileError(message) {
+    if (fileError) {
+        fileError.textContent = message;
+        fileError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideFileError() {
+    if (fileError) {
+        fileError.classList.remove('show');
+    }
+}
+
+// ===== LINK FUNCTIONS =====
+
+const linkCategoryIcons = {
+    weather: '🌤️',
+    transport: '🚇',
+    restaurant: '🍽️',
+    attraction: '🏛️',
+    booking: '🏨',
+    map: '🗺️',
+    other: '🔗'
+};
+
+const linkCategoryNames = {
+    weather: 'Meteo',
+    transport: 'Trasporti',
+    restaurant: 'Ristoranti',
+    attraction: 'Attrazioni',
+    booking: 'Prenotazioni',
+    map: 'Mappe',
+    other: 'Altro'
+};
+
+async function loadLinks() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const linksList = document.getElementById('linksList');
+    if (!linksList) return;
+
+    try {
+        linksList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: links, error } = await supabaseClient
+            .from('tour_links')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!links || links.length === 0) {
+            linksList.innerHTML = '<p class="loading">Nessun link ancora</p>';
+        } else {
+            displayLinks(links);
+        }
+    } catch (error) {
+        console.error('Load links error:', error);
+        linksList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento link:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayLinks(links) {
+    const linksList = document.getElementById('linksList');
+    if (!linksList) return;
+
+    linksList.innerHTML = links.map(link => `
+        <div class="data-card" style="margin-bottom: 12px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <span style="font-size: 20px;">${linkCategoryIcons[link.category] || '🔗'}</span>
+                        <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${link.title}</h4>
+                        <span style="font-size: 13px; color: var(--text-secondary);">(${linkCategoryNames[link.category] || link.category})</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <a href="${link.url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary-blue); text-decoration: none; font-size: 14px;">
+                            🔗 Apri link →
+                        </a>
+                    </div>
+                    ${link.description ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${link.description}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 8px; margin-left: 12px;">
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditLinkForm(${link.id})">✏️</button>
+                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteLink(${link.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function openAddLinkForm() {
+    currentLinkEdit = null;
+
+    if (linkForm) linkForm.reset();
+
+    document.getElementById('linkModalTitle').textContent = 'Aggiungi Link Utile';
+
+    hideLinkError();
+
+    if (linkModal) linkModal.classList.add('active');
+}
+
+async function openEditLinkForm(linkId) {
+    try {
+        const { data: link, error } = await supabaseClient
+            .from('tour_links')
+            .select('*')
+            .eq('id', linkId)
+            .single();
+
+        if (error) throw error;
+        if (!link) throw new Error('Link non trovato');
+
+        currentLinkEdit = link;
+
+        // Fill form
+        document.getElementById('linkTitle').value = link.title;
+        document.getElementById('linkCategory').value = link.category;
+        document.getElementById('linkUrl').value = link.url;
+        document.getElementById('linkDescription').value = link.description || '';
+
+        document.getElementById('linkModalTitle').textContent = 'Modifica Link';
+
+        hideLinkError();
+
+        if (linkModal) linkModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load link error:', error);
+        alert('❌ Errore caricamento link:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveLink(e) {
+    e.preventDefault();
+    hideLinkError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showLinkError('Tour non selezionato');
+        return;
+    }
+
+    const linkData = {
+        tour_id: currentTourDetail.id,
+        title: document.getElementById('linkTitle').value,
+        category: document.getElementById('linkCategory').value,
+        url: document.getElementById('linkUrl').value,
+        description: document.getElementById('linkDescription').value || null
+    };
+
+    try {
+        if (currentLinkEdit && currentLinkEdit.id) {
+            // Update existing link
+            const { error } = await supabaseClient
+                .from('tour_links')
+                .update(linkData)
+                .eq('id', currentLinkEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new link
+            const { error } = await supabaseClient
+                .from('tour_links')
+                .insert([linkData]);
+
+            if (error) throw error;
+        }
+
+        if (linkModal) linkModal.classList.remove('active');
+
+        loadLinks();
+
+    } catch (error) {
+        console.error('Save link error:', error);
+        showLinkError(error.message || 'Errore salvataggio link');
+    }
+}
+
+async function deleteLink(linkId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo link?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_links')
+            .delete()
+            .eq('id', linkId);
+
+        if (error) throw error;
+
+        loadLinks();
+
+    } catch (error) {
+        console.error('Delete link error:', error);
+        alert('❌ Errore eliminazione link:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showLinkError(message) {
+    if (linkError) {
+        linkError.textContent = message;
+        linkError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideLinkError() {
+    if (linkError) {
+        linkError.classList.remove('show');
+    }
+}
+
+// ===== PROGRAMMA (DAILY PROGRAM) FUNCTIONS =====
+
+const activityTypeIcons = {
+    tour: '🏛️',
+    meal: '🍽️',
+    transport: '🚇',
+    free_time: '⏰',
+    accommodation: '🏨',
+    other: '📌'
+};
+
+const activityTypeNames = {
+    tour: 'Tour',
+    meal: 'Pasto',
+    transport: 'Trasporto',
+    free_time: 'Tempo Libero',
+    accommodation: 'Sistemazione',
+    other: 'Altro'
+};
+
+async function loadProgram() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const daysList = document.getElementById('daysList');
+    if (!daysList) return;
+
+    try {
+        daysList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        // Check if days are already generated
+        const { data: days, error } = await supabaseClient
+            .from('tour_days')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('day_number', { ascending: true });
+
+        if (error) throw error;
+
+        if (!days || days.length === 0) {
+            daysList.innerHTML = '<p class="loading">Clicca "Genera Giorni" per creare il programma</p>';
+        } else {
+            await displayProgram(days);
+        }
+    } catch (error) {
+        console.error('Load program error:', error);
+        daysList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento programma:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function displayProgram(days) {
+    const daysList = document.getElementById('daysList');
+    if (!daysList) return;
+
+    // Load all activities for these days
+    const { data: activities, error } = await supabaseClient
+        .from('tour_activities')
+        .select('*')
+        .eq('tour_id', currentTourDetail.id)
+        .order('time', { ascending: true });
+
+    if (error) {
+        console.error('Load activities error:', error);
+        return;
+    }
+
+    // Group activities by day
+    const activitiesByDay = {};
+    if (activities) {
+        activities.forEach(activity => {
+            if (!activitiesByDay[activity.day_number]) {
+                activitiesByDay[activity.day_number] = [];
+            }
+            activitiesByDay[activity.day_number].push(activity);
+        });
+    }
+
+    daysList.innerHTML = days.map(day => `
+        <div class="data-card" style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; color: var(--primary-blue); margin: 0;">Giorno ${day.day_number}</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin: 4px 0 0 0;">${formatDate(day.date)}</p>
+                </div>
+                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="openAddActivityForm(${day.day_number})">+ Aggiungi Attività</button>
+            </div>
+
+            ${activitiesByDay[day.day_number] && activitiesByDay[day.day_number].length > 0 ? `
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    ${activitiesByDay[day.day_number].map(activity => `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; background: rgba(0, 240, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <span style="font-size: 16px;">${activityTypeIcons[activity.activity_type] || '📌'}</span>
+                                    <span style="font-weight: 600; color: var(--text-secondary); font-size: 14px;">${activity.time}</span>
+                                    <span style="font-weight: 700; font-size: 16px;">${activity.title}</span>
+                                </div>
+                                ${activity.location ? `<div style="font-size: 13px; color: var(--text-secondary); margin-left: 24px;">📍 ${activity.location}</div>` : ''}
+                                ${activity.description ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; margin-left: 24px;">${activity.description}</div>` : ''}
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-left: 12px;">
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditActivityForm(${activity.id})">✏️</button>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteActivity(${activity.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : `
+                <p style="color: var(--text-secondary); font-size: 14px; text-align: center; padding: 20px;">Nessuna attività ancora. Clicca "+ Aggiungi Attività"</p>
+            `}
+        </div>
+    `).join('');
+}
+
+async function generateDays() {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Tour non selezionato');
+        return;
+    }
+
+    if (!currentTourDetail.start_date || !currentTourDetail.end_date) {
+        alert('❌ Date del tour non impostate');
+        return;
+    }
+
+    try {
+        // Check if days already exist
+        const { data: existingDays, error: checkError } = await supabaseClient
+            .from('tour_days')
+            .select('id')
+            .eq('tour_id', currentTourDetail.id)
+            .limit(1);
+
+        if (checkError) throw checkError;
+
+        if (existingDays && existingDays.length > 0) {
+            if (!confirm('⚠️ I giorni sono già stati generati. Vuoi rigenerarli? Questo eliminerà tutte le attività esistenti!')) {
+                return;
+            }
+
+            // Delete existing days and activities
+            await supabaseClient
+                .from('tour_activities')
+                .delete()
+                .eq('tour_id', currentTourDetail.id);
+
+            await supabaseClient
+                .from('tour_days')
+                .delete()
+                .eq('tour_id', currentTourDetail.id);
+        }
+
+        // Generate days between start and end date
+        const startDate = new Date(currentTourDetail.start_date);
+        const endDate = new Date(currentTourDetail.end_date);
+        const days = [];
+        let dayNumber = 1;
+
+        for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+            days.push({
+                tour_id: currentTourDetail.id,
+                day_number: dayNumber,
+                date: date.toISOString().split('T')[0]
+            });
+            dayNumber++;
+        }
+
+        // Insert days
+        const { error: insertError } = await supabaseClient
+            .from('tour_days')
+            .insert(days);
+
+        if (insertError) throw insertError;
+
+        alert(`✅ Generati ${days.length} giorni con successo!`);
+        loadProgram();
+
+    } catch (error) {
+        console.error('Generate days error:', error);
+        alert('❌ Errore generazione giorni:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function openAddActivityForm(dayNumber) {
+    currentActivityEdit = null;
+
+    if (activityForm) activityForm.reset();
+
+    document.getElementById('activityDayNumber').value = dayNumber;
+    document.getElementById('activityModalTitle').textContent = `Aggiungi Attività - Giorno ${dayNumber}`;
+
+    hideActivityError();
+
+    if (activityModal) activityModal.classList.add('active');
+}
+
+async function openEditActivityForm(activityId) {
+    try {
+        const { data: activity, error } = await supabaseClient
+            .from('tour_activities')
+            .select('*')
+            .eq('id', activityId)
+            .single();
+
+        if (error) throw error;
+        if (!activity) throw new Error('Attività non trovata');
+
+        currentActivityEdit = activity;
+
+        // Fill form
+        document.getElementById('activityDayNumber').value = activity.day_number;
+        document.getElementById('activityTime').value = activity.time;
+        document.getElementById('activityTitle').value = activity.title;
+        document.getElementById('activityType').value = activity.activity_type;
+        document.getElementById('activityDescription').value = activity.description || '';
+        document.getElementById('activityLocation').value = activity.location || '';
+
+        document.getElementById('activityModalTitle').textContent = `Modifica Attività - Giorno ${activity.day_number}`;
+
+        hideActivityError();
+
+        if (activityModal) activityModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load activity error:', error);
+        alert('❌ Errore caricamento attività:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveActivity(e) {
+    e.preventDefault();
+    hideActivityError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showActivityError('Tour non selezionato');
+        return;
+    }
+
+    const activityData = {
+        tour_id: currentTourDetail.id,
+        day_number: parseInt(document.getElementById('activityDayNumber').value),
+        time: document.getElementById('activityTime').value,
+        title: document.getElementById('activityTitle').value,
+        activity_type: document.getElementById('activityType').value,
+        description: document.getElementById('activityDescription').value || null,
+        location: document.getElementById('activityLocation').value || null
+    };
+
+    try {
+        if (currentActivityEdit && currentActivityEdit.id) {
+            // Update existing activity
+            const { error } = await supabaseClient
+                .from('tour_activities')
+                .update(activityData)
+                .eq('id', currentActivityEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new activity
+            const { error } = await supabaseClient
+                .from('tour_activities')
+                .insert([activityData]);
+
+            if (error) throw error;
+        }
+
+        if (activityModal) activityModal.classList.remove('active');
+
+        loadProgram();
+
+    } catch (error) {
+        console.error('Save activity error:', error);
+        showActivityError(error.message || 'Errore salvataggio attività');
+    }
+}
+
+async function deleteActivity(activityId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questa attività?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_activities')
+            .delete()
+            .eq('id', activityId);
+
+        if (error) throw error;
+
+        loadProgram();
+
+    } catch (error) {
+        console.error('Delete activity error:', error);
+        alert('❌ Errore eliminazione attività:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showActivityError(message) {
+    if (activityError) {
+        activityError.textContent = message;
+        activityError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideActivityError() {
+    if (activityError) {
+        activityError.classList.remove('show');
+    }
+}
+
+// ===== TEMPLATES FUNCTIONS =====
+
+async function loadTemplates() {
+    if (!currentTL || !currentTL.id) return;
+
+    const templatesList = document.getElementById('templatesList');
+    if (!templatesList) return;
+
+    try {
+        templatesList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: templates, error } = await supabaseClient
+            .from('tour_templates')
+            .select('*')
+            .eq('tl_id', currentTL.id)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!templates || templates.length === 0) {
+            templatesList.innerHTML = '<p class="loading">Nessun template disponibile</p>';
+        } else {
+            displayTemplates(templates);
+        }
+    } catch (error) {
+        console.error('Load templates error:', error);
+        templatesList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento templates:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayTemplates(templates) {
+    const templatesList = document.getElementById('templatesList');
+    if (!templatesList) return;
+
+    templatesList.innerHTML = templates.map(template => `
+        <div class="data-card" style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1;">
+                    <h4 style="font-size: 16px; font-weight: 700; margin: 0 0 4px 0;">${template.name}</h4>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
+                        Creato: ${new Date(template.created_at).toLocaleDateString('it-IT')}
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="loadTemplate(${template.id})">📋 Carica</button>
+                    <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteTemplate(${template.id})">🗑️</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function saveAsTemplate() {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Nessun tour aperto');
+        return;
+    }
+
+    const templateNameInput = document.getElementById('templateName');
+    const templateName = templateNameInput ? templateNameInput.value.trim() : '';
+
+    if (!templateName) {
+        alert('❌ Inserisci un nome per il template');
+        return;
+    }
+
+    try {
+        // Load all tour data
+        const [
+            { data: restaurants },
+            { data: hotels },
+            { data: emergencyContacts },
+            { data: files },
+            { data: links },
+            { data: days },
+            { data: activities }
+        ] = await Promise.all([
+            supabaseClient.from('tour_restaurants').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_hotels').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_emergency_contacts').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_files').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_links').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_days').select('*').eq('tour_id', currentTourDetail.id),
+            supabaseClient.from('tour_activities').select('*').eq('tour_id', currentTourDetail.id)
+        ]);
+
+        // Create template object
+        const templateData = {
+            tl_id: currentTL.id,
+            name: templateName,
+            data: {
+                restaurants: restaurants || [],
+                hotels: hotels || [],
+                emergencyContacts: emergencyContacts || [],
+                files: files || [],
+                links: links || [],
+                days: days || [],
+                activities: activities || []
+            }
+        };
+
+        // Save template
+        const { error } = await supabaseClient
+            .from('tour_templates')
+            .insert([templateData]);
+
+        if (error) throw error;
+
+        alert(`✅ Template "${templateName}" salvato con successo!`);
+        if (templateNameInput) templateNameInput.value = '';
+        loadTemplates();
+
+    } catch (error) {
+        console.error('Save template error:', error);
+        alert('❌ Errore salvataggio template:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function loadTemplate(templateId) {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Nessun tour aperto');
+        return;
+    }
+
+    if (!confirm('⚠️ Caricare questo template? Questo aggiungerà i dati del template al tour corrente (non sovrascriverà i dati esistenti).')) {
+        return;
+    }
+
+    try {
+        // Load template
+        const { data: template, error } = await supabaseClient
+            .from('tour_templates')
+            .select('*')
+            .eq('id', templateId)
+            .single();
+
+        if (error) throw error;
+        if (!template || !template.data) {
+            alert('❌ Template non valido');
+            return;
+        }
+
+        const templateData = template.data;
+
+        // Insert restaurants (remove id and tour_id fields)
+        if (templateData.restaurants && templateData.restaurants.length > 0) {
+            const restaurants = templateData.restaurants.map(r => {
+                const { id, tour_id, created_at, ...rest } = r;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_restaurants').insert(restaurants);
+        }
+
+        // Insert hotels
+        if (templateData.hotels && templateData.hotels.length > 0) {
+            const hotels = templateData.hotels.map(h => {
+                const { id, tour_id, created_at, ...rest } = h;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_hotels').insert(hotels);
+        }
+
+        // Insert emergency contacts
+        if (templateData.emergencyContacts && templateData.emergencyContacts.length > 0) {
+            const contacts = templateData.emergencyContacts.map(c => {
+                const { id, tour_id, created_at, ...rest } = c;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_emergency_contacts').insert(contacts);
+        }
+
+        // Insert files
+        if (templateData.files && templateData.files.length > 0) {
+            const files = templateData.files.map(f => {
+                const { id, tour_id, created_at, ...rest } = f;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_files').insert(files);
+        }
+
+        // Insert links
+        if (templateData.links && templateData.links.length > 0) {
+            const links = templateData.links.map(l => {
+                const { id, tour_id, created_at, ...rest } = l;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_links').insert(links);
+        }
+
+        // Insert days and activities
+        if (templateData.days && templateData.days.length > 0) {
+            const days = templateData.days.map(d => {
+                const { id, tour_id, created_at, ...rest } = d;
+                return { ...rest, tour_id: currentTourDetail.id };
+            });
+            await supabaseClient.from('tour_days').insert(days);
+
+            if (templateData.activities && templateData.activities.length > 0) {
+                const activities = templateData.activities.map(a => {
+                    const { id, tour_id, created_at, ...rest } = a;
+                    return { ...rest, tour_id: currentTourDetail.id };
+                });
+                await supabaseClient.from('tour_activities').insert(activities);
+            }
+        }
+
+        alert(`✅ Template "${template.name}" caricato con successo!`);
+
+        // Reload current tab
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) {
+            const tabName = activeTab.dataset.tab;
+            switchTab(tabName);
+        }
+
+    } catch (error) {
+        console.error('Load template error:', error);
+        alert('❌ Errore caricamento template:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function deleteTemplate(templateId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo template?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_templates')
+            .delete()
+            .eq('id', templateId);
+
+        if (error) throw error;
+
+        alert('✅ Template eliminato');
+        loadTemplates();
+
+    } catch (error) {
+        console.error('Delete template error:', error);
+        alert('❌ Errore eliminazione template:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
 

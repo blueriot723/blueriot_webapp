@@ -536,6 +536,127 @@ body {
         max-width: 100%;
     }
 }
+
+/* ===== ECOSYSTEM HOME ===== */
+.ecosystem-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #000000 0%, #0A0E27 100%);
+    padding: 40px 20px;
+}
+
+.ecosystem-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.ecosystem-header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 16px;
+    text-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+}
+
+.ecosystem-header p {
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.ecosystem-nav {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ecosystem-cards {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.ecosystem-card-wide {
+    grid-column: 1 / -1;
+}
+
+.ecosystem-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    padding: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ecosystem-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ecosystem-card:hover {
+    border-color: var(--primary-blue);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 240, 255, 0.3);
+}
+
+.ecosystem-card:hover::before {
+    opacity: 1;
+}
+
+.ecosystem-card-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.ecosystem-card h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.ecosystem-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .ecosystem-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .ecosystem-card-wide {
+        grid-column: 1;
+    }
+
+    .ecosystem-header h1 {
+        font-size: 28px;
+    }
+
+    .ecosystem-nav {
+        position: relative;
+        top: auto;
+        right: auto;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+}
     </style>
 </head>
 <body>
@@ -572,6 +693,48 @@ body {
         </div>
     </div>
 
+    <!-- ECOSYSTEM HOME SCREEN -->
+    <div id="ecosystemHomeScreen" class="screen">
+        <div class="ecosystem-container">
+            <div class="ecosystem-nav">
+                <span id="ecosystemUserEmail" class="user-email"></span>
+                <button id="ecosystemLogoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+
+            <div class="ecosystem-header">
+                <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="logo" style="width: 160px; margin-bottom: 30px; filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.4));">
+                <h1>BlueRiot Ecosystem</h1>
+                <p>Seleziona un servizio per iniziare</p>
+            </div>
+
+            <div class="ecosystem-cards">
+                <div class="ecosystem-card" onclick="navigateToSection('tastes')">
+                    <span class="ecosystem-card-icon">🍽️</span>
+                    <h2>TASTES</h2>
+                    <p>Database completo di ristoranti, bar, gelaterie e locali testati. Gestisci recensioni, vantaggi TL e info utili.</p>
+                </div>
+
+                <div class="ecosystem-card" onclick="navigateToSection('routes')">
+                    <span class="ecosystem-card-icon">🚌</span>
+                    <h2>ROUTES</h2>
+                    <p>Database trasporti: bus, treni (AV, IC, R), ferry, taxi, NCC. Info su orari, prezzi e affidabilità.</p>
+                </div>
+
+                <div class="ecosystem-card" onclick="navigateToSection('stay')">
+                    <span class="ecosystem-card-icon">🏨</span>
+                    <h2>STAY</h2>
+                    <p>Database hotel alternativi, B&B e strutture consigliate. Prezzi, contatti e recensioni personali.</p>
+                </div>
+
+                <div class="ecosystem-card ecosystem-card-wide" onclick="navigateToSection('hub')">
+                    <span class="ecosystem-card-icon">⚡</span>
+                    <h2>BLUERIOT WEBAPP HUB</h2>
+                    <p>Gestione tour completa: programma, ristoranti, hotel, emergenze, documenti, templates, eTickets e mini-site builder.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- DASHBOARD SCREEN -->
     <div id="dashboardScreen" class="screen">
         <nav class="navbar">
@@ -580,8 +743,7 @@ body {
                 <span>BlueRiot Syndicate</span>
             </div>
             <div class="navbar-menu">
-                <button id="myToursBtn" class="btn btn-secondary">I Miei Tour</button>
-                <button id="restaurantDbBtn" class="btn btn-secondary">🍽️ Database Ristoranti</button>
+                <button id="backToEcosystemBtn" class="btn btn-secondary">← Ecosystem</button>
                 <span id="userEmail" class="user-email"></span>
                 <button id="logoutBtn" class="btn btn-secondary">Logout</button>
             </div>
@@ -599,16 +761,15 @@ body {
         </div>
     </div>
 
-    <!-- RESTAURANT DATABASE SCREEN -->
+    <!-- TASTES SCREEN (Restaurant Database) -->
     <div id="restaurantDatabaseScreen" class="screen">
         <nav class="navbar">
             <div class="navbar-brand">
                 <img src="blueriot-logo.png" alt="BlueRiot" class="navbar-logo">
-                <span>BlueRiot Syndicate</span>
+                <span>BlueRiot TASTES</span>
             </div>
             <div class="navbar-menu">
-                <button id="myToursBtn2" class="btn btn-secondary">I Miei Tour</button>
-                <button id="restaurantDbBtn2" class="btn btn-secondary">🍽️ Database Ristoranti</button>
+                <button id="backToEcosystemBtn2" class="btn btn-secondary">← Ecosystem</button>
                 <span id="userEmail2" class="user-email"></span>
                 <button id="logoutBtn2" class="btn btn-secondary">Logout</button>
             </div>
@@ -616,8 +777,8 @@ body {
 
         <div class="dashboard-container">
             <div class="dashboard-header">
-                <h1>🍽️ Database Ristoranti Condiviso</h1>
-                <button id="addSharedRestaurantBtn" class="btn btn-primary">+ Aggiungi Ristorante</button>
+                <h1>🍽️ TASTES - Database Locali</h1>
+                <button id="addSharedRestaurantBtn" class="btn btn-primary">+ Aggiungi Locale</button>
             </div>
 
             <!-- FILTERS -->
@@ -649,6 +810,113 @@ body {
 
             <!-- SHARED RESTAURANTS LIST -->
             <div id="sharedRestaurantsList">
+                <p class="loading">Caricamento...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROUTES SCREEN (Transport Database) -->
+    <div id="routesScreen" class="screen">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <img src="blueriot-logo.png" alt="BlueRiot" class="navbar-logo">
+                <span>BlueRiot ROUTES</span>
+            </div>
+            <div class="navbar-menu">
+                <button id="backToEcosystemBtn3" class="btn btn-secondary">← Ecosystem</button>
+                <span id="userEmail3" class="user-email"></span>
+                <button id="logoutBtn3" class="btn btn-secondary">Logout</button>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>🚌 ROUTES - Database Trasporti</h1>
+                <button id="addRouteBtn" class="btn btn-primary">+ Aggiungi Trasporto</button>
+            </div>
+
+            <!-- FILTERS -->
+            <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin-bottom: 16px;">Filtri</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div class="form-group" style="margin: 0;">
+                        <label for="filterTransportType">Tipo Trasporto</label>
+                        <select id="filterTransportType">
+                            <option value="">Tutti</option>
+                            <option value="bus">Bus</option>
+                            <option value="ferry">Ferry</option>
+                            <option value="taxi">Taxi</option>
+                            <option value="ncc">NCC</option>
+                            <option value="train_av">Treno AV</option>
+                            <option value="train_ic">Treno IC</option>
+                            <option value="train_ec">Treno EC</option>
+                            <option value="train_r">Treno R</option>
+                            <option value="train_rv">Treno RV</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label for="filterRouteArea">Area</label>
+                        <input type="text" id="filterRouteArea" placeholder="es. Toscana">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button id="applyRouteFiltersBtn" class="btn btn-primary" style="width: 100%;">🔍 Cerca</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROUTES LIST -->
+            <div id="routesList">
+                <p class="loading">Caricamento...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAY SCREEN (Alternative Hotels Database) -->
+    <div id="stayScreen" class="screen">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <img src="blueriot-logo.png" alt="BlueRiot" class="navbar-logo">
+                <span>BlueRiot STAY</span>
+            </div>
+            <div class="navbar-menu">
+                <button id="backToEcosystemBtn4" class="btn btn-secondary">← Ecosystem</button>
+                <span id="userEmail4" class="user-email"></span>
+                <button id="logoutBtn4" class="btn btn-secondary">Logout</button>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>🏨 STAY - Database Hotel Alternativi</h1>
+                <button id="addStayBtn" class="btn btn-primary">+ Aggiungi Struttura</button>
+            </div>
+
+            <!-- FILTERS -->
+            <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="margin-bottom: 16px;">Filtri</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div class="form-group" style="margin: 0;">
+                        <label for="filterStayCity">Città</label>
+                        <input type="text" id="filterStayCity" placeholder="es. Firenze">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label for="filterStayType">Tipo</label>
+                        <select id="filterStayType">
+                            <option value="">Tutti</option>
+                            <option value="hotel">Hotel</option>
+                            <option value="bb">B&B</option>
+                            <option value="guesthouse">Guesthouse</option>
+                            <option value="boutique">Boutique Hotel</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button id="applyStayFiltersBtn" class="btn btn-primary" style="width: 100%;">🔍 Cerca</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STAY LIST -->
+            <div id="stayList">
                 <p class="loading">Caricamento...</p>
             </div>
         </div>
@@ -1573,22 +1841,31 @@ function setupEventListeners() {
     }
 
     // Navigation buttons
-    const myToursBtn = document.getElementById('myToursBtn');
-    const myToursBtn2 = document.getElementById('myToursBtn2');
-    const restaurantDbBtn = document.getElementById('restaurantDbBtn');
-    const restaurantDbBtn2 = document.getElementById('restaurantDbBtn2');
+    const backToEcosystemBtn = document.getElementById('backToEcosystemBtn');
+    const backToEcosystemBtn2 = document.getElementById('backToEcosystemBtn2');
+    const backToEcosystemBtn3 = document.getElementById('backToEcosystemBtn3');
+    const backToEcosystemBtn4 = document.getElementById('backToEcosystemBtn4');
+    const ecosystemLogoutBtn = document.getElementById('ecosystemLogoutBtn');
     const logoutBtn2 = document.getElementById('logoutBtn2');
+    const logoutBtn3 = document.getElementById('logoutBtn3');
+    const logoutBtn4 = document.getElementById('logoutBtn4');
 
-    if (myToursBtn) myToursBtn.addEventListener('click', () => showScreen('dashboard'));
-    if (myToursBtn2) myToursBtn2.addEventListener('click', () => showScreen('dashboard'));
-    if (restaurantDbBtn) restaurantDbBtn.addEventListener('click', () => showScreen('restaurantDatabase'));
-    if (restaurantDbBtn2) restaurantDbBtn2.addEventListener('click', () => showScreen('restaurantDatabase'));
-    if (logoutBtn2) {
-        logoutBtn2.addEventListener('click', async () => {
-            await supabaseClient.auth.signOut();
-            location.reload();
-        });
-    }
+    // Back to ecosystem buttons
+    if (backToEcosystemBtn) backToEcosystemBtn.addEventListener('click', backToEcosystem);
+    if (backToEcosystemBtn2) backToEcosystemBtn2.addEventListener('click', backToEcosystem);
+    if (backToEcosystemBtn3) backToEcosystemBtn3.addEventListener('click', backToEcosystem);
+    if (backToEcosystemBtn4) backToEcosystemBtn4.addEventListener('click', backToEcosystem);
+
+    // Logout buttons
+    const logoutButtons = [ecosystemLogoutBtn, logoutBtn2, logoutBtn3, logoutBtn4];
+    logoutButtons.forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                location.reload();
+            });
+        }
+    });
 
     // Search database button in restaurant form
     const searchDatabaseBtn = document.getElementById('searchDatabaseBtn');
@@ -1916,8 +2193,10 @@ async function handleLogin(e) {
 }
 
 function showDashboard(user, tlData) {
-    if (!loginScreen || !dashboardScreen) {
-        alert('Errore: impossibile mostrare dashboard');
+    const ecosystemHomeScreen = document.getElementById('ecosystemHomeScreen');
+
+    if (!loginScreen || !ecosystemHomeScreen) {
+        alert('Errore: impossibile mostrare ecosystem');
         return;
     }
 
@@ -1925,13 +2204,24 @@ function showDashboard(user, tlData) {
     currentTL = tlData;
 
     loginScreen.classList.remove('active');
-    dashboardScreen.classList.add('active');
+    ecosystemHomeScreen.classList.add('active');
 
-    if (userEmail) {
-        userEmail.textContent = user.email;
+    // Set user email in ecosystem nav
+    const ecosystemUserEmail = document.getElementById('ecosystemUserEmail');
+    if (ecosystemUserEmail) {
+        ecosystemUserEmail.textContent = user.email;
     }
 
-    loadTours();
+    // Set user email in all other screens
+    const userEmails = [
+        document.getElementById('userEmail'),
+        document.getElementById('userEmail2'),
+        document.getElementById('userEmail3'),
+        document.getElementById('userEmail4')
+    ];
+    userEmails.forEach(el => {
+        if (el) el.textContent = user.email;
+    });
 }
 
 async function loadTours() {
@@ -3990,15 +4280,52 @@ async function deleteTemplate(templateId) {
 // ===== SCREEN NAVIGATION =====
 
 function showScreen(screenName) {
-    if (screenName === 'dashboard') {
-        dashboardScreen.classList.add('active');
-        restaurantDatabaseScreen.classList.remove('active');
-        loadTours();
-    } else if (screenName === 'restaurantDatabase') {
-        dashboardScreen.classList.remove('active');
-        restaurantDatabaseScreen.classList.add('active');
-        loadSharedRestaurants();
+    const screens = {
+        ecosystem: document.getElementById('ecosystemHomeScreen'),
+        dashboard: document.getElementById('dashboardScreen'),
+        tastes: document.getElementById('restaurantDatabaseScreen'),
+        routes: document.getElementById('routesScreen'),
+        stay: document.getElementById('stayScreen')
+    };
+
+    // Hide all screens
+    Object.values(screens).forEach(screen => {
+        if (screen) screen.classList.remove('active');
+    });
+
+    // Show selected screen
+    if (screens[screenName]) {
+        screens[screenName].classList.add('active');
+
+        // Load data for specific screens
+        if (screenName === 'dashboard') {
+            loadTours();
+        } else if (screenName === 'tastes') {
+            loadSharedRestaurants();
+        } else if (screenName === 'routes') {
+            loadRoutes();
+        } else if (screenName === 'stay') {
+            loadStayOptions();
+        }
     }
+}
+
+// Navigate from ecosystem cards to sections
+function navigateToSection(section) {
+    if (section === 'hub') {
+        showScreen('dashboard');
+    } else if (section === 'tastes') {
+        showScreen('tastes');
+    } else if (section === 'routes') {
+        showScreen('routes');
+    } else if (section === 'stay') {
+        showScreen('stay');
+    }
+}
+
+// Navigate back to ecosystem home
+function backToEcosystem() {
+    showScreen('ecosystem');
 }
 
 // ===== SHARED RESTAURANT DATABASE FUNCTIONS =====
@@ -4232,6 +4559,88 @@ async function handleSubmitRating(e) {
     } catch (error) {
         console.error('Rating error:', error);
         alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+// ===== ROUTES DATABASE FUNCTIONS (Placeholder) =====
+
+async function loadRoutes() {
+    const routesList = document.getElementById('routesList');
+    if (!routesList) return;
+
+    try {
+        routesList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: routes, error } = await supabaseClient
+            .from('blueriot_routes')
+            .select('*')
+            .order('area_served', { ascending: true });
+
+        if (error) {
+            // Table might not exist yet
+            console.log('Routes table not created yet:', error);
+            routesList.innerHTML = '<p class="loading">🚧 Database ROUTES in costruzione. Funzionalità disponibile a breve!</p>';
+            return;
+        }
+
+        if (!routes || routes.length === 0) {
+            routesList.innerHTML = '<p class="loading">Nessun trasporto nel database. Aggiungi il primo!</p>';
+        } else {
+            // Display routes (to be implemented)
+            routesList.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">` +
+                routes.map(route => `
+                    <div class="data-card">
+                        <h4 style="margin: 0 0 8px 0;">${route.operator_name}</h4>
+                        <div class="meta">🚌 ${route.transport_type}</div>
+                        <div class="meta">📍 ${route.area_served}</div>
+                        ${route.price ? `<div class="meta">💰 ${route.price}</div>` : ''}
+                    </div>
+                `).join('') + '</div>';
+        }
+    } catch (error) {
+        console.error('Load routes error:', error);
+        routesList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+    }
+}
+
+// ===== STAY DATABASE FUNCTIONS (Placeholder) =====
+
+async function loadStayOptions() {
+    const stayList = document.getElementById('stayList');
+    if (!stayList) return;
+
+    try {
+        stayList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: stays, error } = await supabaseClient
+            .from('blueriot_stay')
+            .select('*')
+            .order('location', { ascending: true });
+
+        if (error) {
+            // Table might not exist yet
+            console.log('Stay table not created yet:', error);
+            stayList.innerHTML = '<p class="loading">🚧 Database STAY in costruzione. Funzionalità disponibile a breve!</p>';
+            return;
+        }
+
+        if (!stays || stays.length === 0) {
+            stayList.innerHTML = '<p class="loading">Nessuna struttura nel database. Aggiungi la prima!</p>';
+        } else {
+            // Display stays (to be implemented)
+            stayList.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">` +
+                stays.map(stay => `
+                    <div class="data-card">
+                        <h4 style="margin: 0 0 8px 0;">${stay.name}</h4>
+                        <div class="meta">🏨 ${stay.type}</div>
+                        <div class="meta">📍 ${stay.location}</div>
+                        ${stay.price_range ? `<div class="meta">${stay.price_range}</div>` : ''}
+                    </div>
+                `).join('') + '</div>';
+        }
+    } catch (error) {
+        console.error('Load stay error:', error);
+        stayList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
     }
 }
     </script>

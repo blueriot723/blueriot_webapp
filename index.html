@@ -1126,6 +1126,63 @@ body {
         </div>
     </div>
 
+    <!-- EMERGENCY CONTACT MODAL -->
+    <div id="emergencyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="emergencyModalTitle">Aggiungi Contatto di Emergenza</h2>
+                <button class="modal-close" id="closeEmergencyModal">&times;</button>
+            </div>
+
+            <form id="emergencyForm">
+                <div class="form-group">
+                    <label for="emergencyCity">Città *</label>
+                    <input type="text" id="emergencyCity" required placeholder="es. Roma">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyType">Tipo Contatto *</label>
+                    <select id="emergencyType" required>
+                        <option value="">Seleziona tipo...</option>
+                        <option value="police">🚓 Polizia</option>
+                        <option value="hospital">🏥 Ospedale</option>
+                        <option value="embassy">🏛️ Ambasciata/Consolato</option>
+                        <option value="fire">🚒 Vigili del Fuoco</option>
+                        <option value="taxi">🚕 Taxi</option>
+                        <option value="other">📞 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyName">Nome/Organizzazione *</label>
+                    <input type="text" id="emergencyName" required placeholder="es. Ospedale Santo Spirito">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyPhone">Telefono *</label>
+                    <input type="tel" id="emergencyPhone" required placeholder="es. +39 06 1234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyAddress">Indirizzo</label>
+                    <input type="text" id="emergencyAddress" placeholder="es. Via Roma 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="emergencyNotes">Note</label>
+                    <input type="text" id="emergencyNotes" placeholder="Note aggiuntive...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelEmergency">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="emergencyError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -1141,6 +1198,7 @@ let currentTL = null;
 let currentTourDetail = null;
 let currentRestaurantEdit = null;
 let currentHotelEdit = null;
+let currentEmergencyEdit = null;
 
 // DOM elements
 let loginScreen, dashboardScreen, restaurantDatabaseScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
@@ -1152,6 +1210,7 @@ let sharedRestaurantModal, sharedRestaurantForm, closeSharedRestaurantModal, can
 let restaurantSearchModal, closeRestaurantSearchModal, searchRestaurantsBtn, searchResultsList;
 let ratingModal, ratingForm, closeRatingModal, cancelRating, ratingError;
 let hotelModal, hotelForm, closeHotelModal, cancelHotel, hotelError;
+let emergencyModal, emergencyForm, closeEmergencyModal, cancelEmergency, emergencyError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -1218,6 +1277,13 @@ function init() {
     closeHotelModal = document.getElementById('closeHotelModal');
     cancelHotel = document.getElementById('cancelHotel');
     hotelError = document.getElementById('hotelError');
+
+    // Emergency modal elements
+    emergencyModal = document.getElementById('emergencyModal');
+    emergencyForm = document.getElementById('emergencyForm');
+    closeEmergencyModal = document.getElementById('closeEmergencyModal');
+    cancelEmergency = document.getElementById('cancelEmergency');
+    emergencyError = document.getElementById('emergencyError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -1461,6 +1527,31 @@ function setupEventListeners() {
 
     if (hotelForm) {
         hotelForm.addEventListener('submit', handleSaveHotel);
+    }
+
+    // Emergency contact modal
+    if (closeEmergencyModal) {
+        closeEmergencyModal.addEventListener('click', () => {
+            if (emergencyModal) emergencyModal.classList.remove('active');
+        });
+    }
+
+    if (cancelEmergency) {
+        cancelEmergency.addEventListener('click', () => {
+            if (emergencyModal) emergencyModal.classList.remove('active');
+        });
+    }
+
+    if (emergencyModal) {
+        emergencyModal.addEventListener('click', (e) => {
+            if (e.target === emergencyModal) {
+                emergencyModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (emergencyForm) {
+        emergencyForm.addEventListener('submit', handleSaveEmergency);
     }
 
     // Add shared restaurant button
@@ -1761,6 +1852,8 @@ function switchTab(tabName) {
         loadRestaurants();
     } else if (tabName === 'hotel') {
         loadHotels();
+    } else if (tabName === 'emergenze') {
+        loadEmergencyContacts();
     }
 }
 
@@ -1840,7 +1933,7 @@ function setupModalButtons() {
     // Add emergency button
     const addEmergencyBtn = document.getElementById('addEmergencyBtn');
     if (addEmergencyBtn) {
-        addEmergencyBtn.onclick = () => alert('🚧 Aggiungi emergenza in arrivo!');
+        addEmergencyBtn.onclick = openAddEmergencyForm;
     }
 
     // Add file button
@@ -2447,6 +2540,225 @@ function showHotelError(message) {
 function hideHotelError() {
     if (hotelError) {
         hotelError.classList.remove('show');
+    }
+}
+
+// ===== EMERGENCY CONTACT FUNCTIONS =====
+
+const emergencyTypeIcons = {
+    police: '🚓',
+    hospital: '🏥',
+    embassy: '🏛️',
+    fire: '🚒',
+    taxi: '🚕',
+    other: '📞'
+};
+
+const emergencyTypeNames = {
+    police: 'Polizia',
+    hospital: 'Ospedale',
+    embassy: 'Ambasciata/Consolato',
+    fire: 'Vigili del Fuoco',
+    taxi: 'Taxi',
+    other: 'Altro'
+};
+
+async function loadEmergencyContacts() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const emergencyList = document.getElementById('emergencyList');
+    if (!emergencyList) return;
+
+    try {
+        emergencyList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        const { data: contacts, error } = await supabaseClient
+            .from('tour_emergency_contacts')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('city', { ascending: true });
+
+        if (error) throw error;
+
+        if (!contacts || contacts.length === 0) {
+            emergencyList.innerHTML = '<p class="loading">Nessun contatto ancora</p>';
+        } else {
+            displayEmergencyContacts(contacts);
+        }
+    } catch (error) {
+        console.error('Load emergency contacts error:', error);
+        emergencyList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento contatti emergenza:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function displayEmergencyContacts(contacts) {
+    const emergencyList = document.getElementById('emergencyList');
+    if (!emergencyList) return;
+
+    // Group contacts by city
+    const contactsByCity = contacts.reduce((acc, contact) => {
+        if (!acc[contact.city]) {
+            acc[contact.city] = [];
+        }
+        acc[contact.city].push(contact);
+        return acc;
+    }, {});
+
+    emergencyList.innerHTML = Object.keys(contactsByCity).sort().map(city => `
+        <div style="margin-bottom: 24px;">
+            <h4 style="font-size: 18px; font-weight: 700; color: var(--primary-blue); margin-bottom: 12px;">📍 ${city}</h4>
+            ${contactsByCity[city].map(contact => `
+                <div class="data-card" style="margin-bottom: 12px; position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <span style="font-size: 20px;">${emergencyTypeIcons[contact.contact_type] || '📞'}</span>
+                                <h4 style="font-size: 16px; font-weight: 700; margin: 0;">${contact.name}</h4>
+                                <span style="font-size: 13px; color: var(--text-secondary);">(${emergencyTypeNames[contact.contact_type] || contact.contact_type})</span>
+                            </div>
+                            <div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">
+                                📞 <a href="tel:${contact.phone}" style="color: var(--primary-blue); text-decoration: none;">${contact.phone}</a>
+                                ${contact.address ? `<br>📧 ${contact.address}` : ''}
+                            </div>
+                            ${contact.notes ? `<div style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">📝 ${contact.notes}</div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-left: 12px;">
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditEmergencyForm(${contact.id})">✏️</button>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteEmergencyContact(${contact.id})">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
+}
+
+function openAddEmergencyForm() {
+    currentEmergencyEdit = null;
+
+    if (emergencyForm) emergencyForm.reset();
+
+    document.getElementById('emergencyModalTitle').textContent = 'Aggiungi Contatto di Emergenza';
+
+    hideEmergencyError();
+
+    if (emergencyModal) emergencyModal.classList.add('active');
+}
+
+async function openEditEmergencyForm(contactId) {
+    try {
+        const { data: contact, error } = await supabaseClient
+            .from('tour_emergency_contacts')
+            .select('*')
+            .eq('id', contactId)
+            .single();
+
+        if (error) throw error;
+        if (!contact) throw new Error('Contatto non trovato');
+
+        currentEmergencyEdit = contact;
+
+        // Fill form
+        document.getElementById('emergencyCity').value = contact.city;
+        document.getElementById('emergencyType').value = contact.contact_type;
+        document.getElementById('emergencyName').value = contact.name;
+        document.getElementById('emergencyPhone').value = contact.phone;
+        document.getElementById('emergencyAddress').value = contact.address || '';
+        document.getElementById('emergencyNotes').value = contact.notes || '';
+
+        document.getElementById('emergencyModalTitle').textContent = 'Modifica Contatto di Emergenza';
+
+        hideEmergencyError();
+
+        if (emergencyModal) emergencyModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load emergency contact error:', error);
+        alert('❌ Errore caricamento contatto:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveEmergency(e) {
+    e.preventDefault();
+    hideEmergencyError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showEmergencyError('Tour non selezionato');
+        return;
+    }
+
+    const contactData = {
+        tour_id: currentTourDetail.id,
+        city: document.getElementById('emergencyCity').value,
+        contact_type: document.getElementById('emergencyType').value,
+        name: document.getElementById('emergencyName').value,
+        phone: document.getElementById('emergencyPhone').value,
+        address: document.getElementById('emergencyAddress').value || null,
+        notes: document.getElementById('emergencyNotes').value || null
+    };
+
+    try {
+        if (currentEmergencyEdit && currentEmergencyEdit.id) {
+            // Update existing contact
+            const { error } = await supabaseClient
+                .from('tour_emergency_contacts')
+                .update(contactData)
+                .eq('id', currentEmergencyEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new contact
+            const { error } = await supabaseClient
+                .from('tour_emergency_contacts')
+                .insert([contactData]);
+
+            if (error) throw error;
+        }
+
+        if (emergencyModal) emergencyModal.classList.remove('active');
+
+        loadEmergencyContacts();
+
+    } catch (error) {
+        console.error('Save emergency contact error:', error);
+        showEmergencyError(error.message || 'Errore salvataggio contatto');
+    }
+}
+
+async function deleteEmergencyContact(contactId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo contatto?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_emergency_contacts')
+            .delete()
+            .eq('id', contactId);
+
+        if (error) throw error;
+
+        loadEmergencyContacts();
+
+    } catch (error) {
+        console.error('Delete emergency contact error:', error);
+        alert('❌ Errore eliminazione contatto:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showEmergencyError(message) {
+    if (emergencyError) {
+        emergencyError.textContent = message;
+        emergencyError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideEmergencyError() {
+    if (emergencyError) {
+        emergencyError.classList.remove('show');
     }
 }
 

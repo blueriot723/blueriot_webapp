@@ -1280,6 +1280,60 @@ body {
         </div>
     </div>
 
+    <!-- ACTIVITY MODAL -->
+    <div id="activityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="activityModalTitle">Aggiungi Attività</h2>
+                <button class="modal-close" id="closeActivityModal">&times;</button>
+            </div>
+
+            <form id="activityForm">
+                <input type="hidden" id="activityDayNumber">
+
+                <div class="form-group">
+                    <label for="activityTime">Orario *</label>
+                    <input type="time" id="activityTime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="activityTitle">Titolo *</label>
+                    <input type="text" id="activityTitle" required placeholder="es. Visita Colosseo">
+                </div>
+
+                <div class="form-group">
+                    <label for="activityType">Tipo *</label>
+                    <select id="activityType" required>
+                        <option value="">Seleziona tipo...</option>
+                        <option value="tour">🏛️ Tour</option>
+                        <option value="meal">🍽️ Pasto</option>
+                        <option value="transport">🚇 Trasporto</option>
+                        <option value="free_time">⏰ Tempo Libero</option>
+                        <option value="accommodation">🏨 Sistemazione</option>
+                        <option value="other">📌 Altro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="activityDescription">Descrizione</label>
+                    <textarea id="activityDescription" rows="3" placeholder="Dettagli dell'attività..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="activityLocation">Luogo</label>
+                    <input type="text" id="activityLocation" placeholder="es. Piazza del Colosseo">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelActivity">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+
+                <div id="activityError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
 // ===== SUPABASE SETUP =====
@@ -1298,6 +1352,7 @@ let currentHotelEdit = null;
 let currentEmergencyEdit = null;
 let currentFileEdit = null;
 let currentLinkEdit = null;
+let currentActivityEdit = null;
 
 // DOM elements
 let loginScreen, dashboardScreen, restaurantDatabaseScreen, loginForm, loginError, loginBtn, logoutBtn, userEmail;
@@ -1312,6 +1367,7 @@ let hotelModal, hotelForm, closeHotelModal, cancelHotel, hotelError;
 let emergencyModal, emergencyForm, closeEmergencyModal, cancelEmergency, emergencyError;
 let fileModal, fileForm, closeFileModal, cancelFile, fileError;
 let linkModal, linkForm, closeLinkModal, cancelLink, linkError;
+let activityModal, activityForm, closeActivityModal, cancelActivity, activityError;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', init);
@@ -1399,6 +1455,13 @@ function init() {
     closeLinkModal = document.getElementById('closeLinkModal');
     cancelLink = document.getElementById('cancelLink');
     linkError = document.getElementById('linkError');
+
+    // Activity modal elements
+    activityModal = document.getElementById('activityModal');
+    activityForm = document.getElementById('activityForm');
+    closeActivityModal = document.getElementById('closeActivityModal');
+    cancelActivity = document.getElementById('cancelActivity');
+    activityError = document.getElementById('activityError');
 
     // Check for missing elements
     if (!loginScreen || !dashboardScreen || !loginForm) {
@@ -1719,6 +1782,31 @@ function setupEventListeners() {
         linkForm.addEventListener('submit', handleSaveLink);
     }
 
+    // Activity modal
+    if (closeActivityModal) {
+        closeActivityModal.addEventListener('click', () => {
+            if (activityModal) activityModal.classList.remove('active');
+        });
+    }
+
+    if (cancelActivity) {
+        cancelActivity.addEventListener('click', () => {
+            if (activityModal) activityModal.classList.remove('active');
+        });
+    }
+
+    if (activityModal) {
+        activityModal.addEventListener('click', (e) => {
+            if (e.target === activityModal) {
+                activityModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (activityForm) {
+        activityForm.addEventListener('submit', handleSaveActivity);
+    }
+
     // Add shared restaurant button
     const addSharedRestaurantBtn = document.getElementById('addSharedRestaurantBtn');
     if (addSharedRestaurantBtn) {
@@ -2023,6 +2111,8 @@ function switchTab(tabName) {
         loadFiles();
     } else if (tabName === 'link') {
         loadLinks();
+    } else if (tabName === 'programma') {
+        loadProgram();
     }
 }
 
@@ -2096,7 +2186,7 @@ function setupModalButtons() {
     // Generate days button
     const generateDaysBtn = document.getElementById('generateDaysBtn');
     if (generateDaysBtn) {
-        generateDaysBtn.onclick = () => alert('🚧 Genera giorni in arrivo!');
+        generateDaysBtn.onclick = generateDays;
     }
 
     // Add emergency button
@@ -3336,6 +3426,318 @@ function showLinkError(message) {
 function hideLinkError() {
     if (linkError) {
         linkError.classList.remove('show');
+    }
+}
+
+// ===== PROGRAMMA (DAILY PROGRAM) FUNCTIONS =====
+
+const activityTypeIcons = {
+    tour: '🏛️',
+    meal: '🍽️',
+    transport: '🚇',
+    free_time: '⏰',
+    accommodation: '🏨',
+    other: '📌'
+};
+
+const activityTypeNames = {
+    tour: 'Tour',
+    meal: 'Pasto',
+    transport: 'Trasporto',
+    free_time: 'Tempo Libero',
+    accommodation: 'Sistemazione',
+    other: 'Altro'
+};
+
+async function loadProgram() {
+    if (!currentTourDetail || !currentTourDetail.id) return;
+
+    const daysList = document.getElementById('daysList');
+    if (!daysList) return;
+
+    try {
+        daysList.innerHTML = '<p class="loading">Caricamento...</p>';
+
+        // Check if days are already generated
+        const { data: days, error } = await supabaseClient
+            .from('tour_days')
+            .select('*')
+            .eq('tour_id', currentTourDetail.id)
+            .order('day_number', { ascending: true });
+
+        if (error) throw error;
+
+        if (!days || days.length === 0) {
+            daysList.innerHTML = '<p class="loading">Clicca "Genera Giorni" per creare il programma</p>';
+        } else {
+            await displayProgram(days);
+        }
+    } catch (error) {
+        console.error('Load program error:', error);
+        daysList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+        alert('❌ Errore caricamento programma:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function displayProgram(days) {
+    const daysList = document.getElementById('daysList');
+    if (!daysList) return;
+
+    // Load all activities for these days
+    const { data: activities, error } = await supabaseClient
+        .from('tour_activities')
+        .select('*')
+        .eq('tour_id', currentTourDetail.id)
+        .order('time', { ascending: true });
+
+    if (error) {
+        console.error('Load activities error:', error);
+        return;
+    }
+
+    // Group activities by day
+    const activitiesByDay = {};
+    if (activities) {
+        activities.forEach(activity => {
+            if (!activitiesByDay[activity.day_number]) {
+                activitiesByDay[activity.day_number] = [];
+            }
+            activitiesByDay[activity.day_number].push(activity);
+        });
+    }
+
+    daysList.innerHTML = days.map(day => `
+        <div class="data-card" style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <h3 style="font-size: 20px; font-weight: 700; color: var(--primary-blue); margin: 0;">Giorno ${day.day_number}</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin: 4px 0 0 0;">${formatDate(day.date)}</p>
+                </div>
+                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="openAddActivityForm(${day.day_number})">+ Aggiungi Attività</button>
+            </div>
+
+            ${activitiesByDay[day.day_number] && activitiesByDay[day.day_number].length > 0 ? `
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    ${activitiesByDay[day.day_number].map(activity => `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; background: rgba(0, 240, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <span style="font-size: 16px;">${activityTypeIcons[activity.activity_type] || '📌'}</span>
+                                    <span style="font-weight: 600; color: var(--text-secondary); font-size: 14px;">${activity.time}</span>
+                                    <span style="font-weight: 700; font-size: 16px;">${activity.title}</span>
+                                </div>
+                                ${activity.location ? `<div style="font-size: 13px; color: var(--text-secondary); margin-left: 24px;">📍 ${activity.location}</div>` : ''}
+                                ${activity.description ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; margin-left: 24px;">${activity.description}</div>` : ''}
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-left: 12px;">
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditActivityForm(${activity.id})">✏️</button>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteActivity(${activity.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : `
+                <p style="color: var(--text-secondary); font-size: 14px; text-align: center; padding: 20px;">Nessuna attività ancora. Clicca "+ Aggiungi Attività"</p>
+            `}
+        </div>
+    `).join('');
+}
+
+async function generateDays() {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Tour non selezionato');
+        return;
+    }
+
+    if (!currentTourDetail.start_date || !currentTourDetail.end_date) {
+        alert('❌ Date del tour non impostate');
+        return;
+    }
+
+    try {
+        // Check if days already exist
+        const { data: existingDays, error: checkError } = await supabaseClient
+            .from('tour_days')
+            .select('id')
+            .eq('tour_id', currentTourDetail.id)
+            .limit(1);
+
+        if (checkError) throw checkError;
+
+        if (existingDays && existingDays.length > 0) {
+            if (!confirm('⚠️ I giorni sono già stati generati. Vuoi rigenerarli? Questo eliminerà tutte le attività esistenti!')) {
+                return;
+            }
+
+            // Delete existing days and activities
+            await supabaseClient
+                .from('tour_activities')
+                .delete()
+                .eq('tour_id', currentTourDetail.id);
+
+            await supabaseClient
+                .from('tour_days')
+                .delete()
+                .eq('tour_id', currentTourDetail.id);
+        }
+
+        // Generate days between start and end date
+        const startDate = new Date(currentTourDetail.start_date);
+        const endDate = new Date(currentTourDetail.end_date);
+        const days = [];
+        let dayNumber = 1;
+
+        for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+            days.push({
+                tour_id: currentTourDetail.id,
+                day_number: dayNumber,
+                date: date.toISOString().split('T')[0]
+            });
+            dayNumber++;
+        }
+
+        // Insert days
+        const { error: insertError } = await supabaseClient
+            .from('tour_days')
+            .insert(days);
+
+        if (insertError) throw insertError;
+
+        alert(`✅ Generati ${days.length} giorni con successo!`);
+        loadProgram();
+
+    } catch (error) {
+        console.error('Generate days error:', error);
+        alert('❌ Errore generazione giorni:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function openAddActivityForm(dayNumber) {
+    currentActivityEdit = null;
+
+    if (activityForm) activityForm.reset();
+
+    document.getElementById('activityDayNumber').value = dayNumber;
+    document.getElementById('activityModalTitle').textContent = `Aggiungi Attività - Giorno ${dayNumber}`;
+
+    hideActivityError();
+
+    if (activityModal) activityModal.classList.add('active');
+}
+
+async function openEditActivityForm(activityId) {
+    try {
+        const { data: activity, error } = await supabaseClient
+            .from('tour_activities')
+            .select('*')
+            .eq('id', activityId)
+            .single();
+
+        if (error) throw error;
+        if (!activity) throw new Error('Attività non trovata');
+
+        currentActivityEdit = activity;
+
+        // Fill form
+        document.getElementById('activityDayNumber').value = activity.day_number;
+        document.getElementById('activityTime').value = activity.time;
+        document.getElementById('activityTitle').value = activity.title;
+        document.getElementById('activityType').value = activity.activity_type;
+        document.getElementById('activityDescription').value = activity.description || '';
+        document.getElementById('activityLocation').value = activity.location || '';
+
+        document.getElementById('activityModalTitle').textContent = `Modifica Attività - Giorno ${activity.day_number}`;
+
+        hideActivityError();
+
+        if (activityModal) activityModal.classList.add('active');
+
+    } catch (error) {
+        console.error('Load activity error:', error);
+        alert('❌ Errore caricamento attività:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+async function handleSaveActivity(e) {
+    e.preventDefault();
+    hideActivityError();
+
+    if (!currentTourDetail || !currentTourDetail.id) {
+        showActivityError('Tour non selezionato');
+        return;
+    }
+
+    const activityData = {
+        tour_id: currentTourDetail.id,
+        day_number: parseInt(document.getElementById('activityDayNumber').value),
+        time: document.getElementById('activityTime').value,
+        title: document.getElementById('activityTitle').value,
+        activity_type: document.getElementById('activityType').value,
+        description: document.getElementById('activityDescription').value || null,
+        location: document.getElementById('activityLocation').value || null
+    };
+
+    try {
+        if (currentActivityEdit && currentActivityEdit.id) {
+            // Update existing activity
+            const { error } = await supabaseClient
+                .from('tour_activities')
+                .update(activityData)
+                .eq('id', currentActivityEdit.id);
+
+            if (error) throw error;
+        } else {
+            // Create new activity
+            const { error } = await supabaseClient
+                .from('tour_activities')
+                .insert([activityData]);
+
+            if (error) throw error;
+        }
+
+        if (activityModal) activityModal.classList.remove('active');
+
+        loadProgram();
+
+    } catch (error) {
+        console.error('Save activity error:', error);
+        showActivityError(error.message || 'Errore salvataggio attività');
+    }
+}
+
+async function deleteActivity(activityId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questa attività?')) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_activities')
+            .delete()
+            .eq('id', activityId);
+
+        if (error) throw error;
+
+        loadProgram();
+
+    } catch (error) {
+        console.error('Delete activity error:', error);
+        alert('❌ Errore eliminazione attività:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+function showActivityError(message) {
+    if (activityError) {
+        activityError.textContent = message;
+        activityError.classList.add('show');
+    } else {
+        alert('Errore: ' + message);
+    }
+}
+
+function hideActivityError() {
+    if (activityError) {
+        activityError.classList.remove('show');
     }
 }
 

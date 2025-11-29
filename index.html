@@ -1201,68 +1201,160 @@ body {
     </div>
 
     <!-- SHARED RESTAURANT FORM MODAL -->
+    <!-- TASTES DATABASE MODAL (Complete Form) -->
     <div id="sharedRestaurantModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h2>Aggiungi al Database Condiviso</h2>
+                <h2 id="tastesModalTitle">Aggiungi a TASTES Database</h2>
                 <button class="modal-close" id="closeSharedRestaurantModal">&times;</button>
             </div>
 
             <form id="sharedRestaurantForm">
+                <!-- BASIC INFO -->
+                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">📋 Info Base</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedRestaurantName">Nome Locale *</label>
+                        <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedType">Tipo *</label>
+                        <select id="sharedType" required>
+                            <option value="">Seleziona...</option>
+                            <option value="restaurant">🍝 Restaurant</option>
+                            <option value="bar">🍷 Bar</option>
+                            <option value="bakery">🥖 Bakery</option>
+                            <option value="quick_bite">🥪 Quick Bite</option>
+                            <option value="gelateria">🍨 Gelateria</option>
+                            <option value="aperitivo">🍹 Aperitivo</option>
+                            <option value="caffetteria">☕ Caffetteria</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedCuisineType">Tipo Cucina</label>
+                        <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedPriceRange">Fascia Prezzo</label>
+                        <select id="sharedPriceRange">
+                            <option value="">Seleziona...</option>
+                            <option value="€">€ - Economico</option>
+                            <option value="€€">€€ - Medio</option>
+                            <option value="€€€">€€€ - Alto</option>
+                            <option value="€€€€">€€€€ - Lusso</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- LOCATION -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Posizione</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedRestaurantCity">Città *</label>
+                        <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedRestaurantAddress">Indirizzo</label>
+                        <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedGoogleMaps">Link Google Maps</label>
+                        <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedRestaurantPhone">Telefono</label>
+                        <input type="tel" id="sharedRestaurantPhone" placeholder="es. +39 06 1234567">
+                    </div>
+                </div>
+
+                <!-- OPENING HOURS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🕐 Orari</h3>
+
                 <div class="form-group">
-                    <label for="sharedRestaurantName">Nome Ristorante *</label>
-                    <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
+                    <label for="sharedOpeningHours">Orari di Apertura</label>
+                    <input type="text" id="sharedOpeningHours" placeholder="es. Lun-Ven 12:00-23:00, Sab-Dom 11:00-00:00">
                 </div>
 
                 <div class="form-group">
-                    <label for="sharedRestaurantCity">Città *</label>
-                    <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma">
+                    <label>
+                        <input type="checkbox" id="sharedBookingNeeded">
+                        <span>📅 Prenotazione Necessaria</span>
+                    </label>
                 </div>
 
+                <!-- TL BENEFITS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
+
                 <div class="form-group">
-                    <label for="sharedRestaurantAddress">Indirizzo</label>
-                    <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="sharedTlFree">
+                        <span>🎁 Gratuity (TL Free)</span>
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="sharedHasCommission">
+                        <span>💰 Commission</span>
+                    </label>
+                    <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="sharedHasDiscount">
+                        <span>🏷️ Discount</span>
+                    </label>
+                    <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% sconto" style="margin-left: 24px; width: calc(100% - 24px);">
                 </div>
 
+                <!-- GROUP SUITABILITY -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">👥 Idoneità Gruppi</h3>
+
                 <div class="form-group">
-                    <label for="sharedRestaurantPhone">Telefono</label>
-                    <input type="tel" id="sharedRestaurantPhone" placeholder="es. +39 06 1234567">
+                    <label>
+                        <input type="checkbox" id="sharedSuitableForGroups" checked>
+                        <span>Adatto ai Gruppi</span>
+                    </label>
                 </div>
 
-                <div class="form-group">
-                    <label for="sharedCuisineType">Tipo Cucina</label>
-                    <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedMinGroupSize">Min Persone Gruppo</label>
+                        <input type="number" id="sharedMinGroupSize" min="1" placeholder="es. 10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedMaxGroupSize">Max Persone Gruppo</label>
+                        <input type="number" id="sharedMaxGroupSize" min="1" placeholder="es. 50">
+                    </div>
                 </div>
 
+                <!-- TOURS & TESTING -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🗺️ Info Aggiuntive</h3>
+
                 <div class="form-group">
-                    <label for="sharedPriceRange">Fascia Prezzo</label>
-                    <select id="sharedPriceRange">
-                        <option value="">Seleziona...</option>
-                        <option value="€">€ - Economico</option>
-                        <option value="€€">€€ - Medio</option>
-                        <option value="€€€">€€€ - Alto</option>
-                    </select>
+                    <label for="sharedToursRelevant">Tour Rilevanti (separati da virgola)</label>
+                    <input type="text" id="sharedToursRelevant" placeholder="es. ZMXI, ZXXI, ZMXD">
                 </div>
 
-                <div class="form-group">
-                    <label>Vantaggi TL</label>
-                    <div style="margin-top: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <input type="checkbox" id="sharedTlFree">
-                            <span>🎁 TL Free</span>
-                        </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedTestedBy">Testato da (TL)</label>
+                        <input type="text" id="sharedTestedBy" placeholder="es. Marco Rossi">
+                    </div>
 
-                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <input type="checkbox" id="sharedHasCommission">
-                            <span>💰 Commission</span>
-                        </label>
-                        <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
-
-                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <input type="checkbox" id="sharedHasDiscount">
-                            <span>🏷️ Discount</span>
-                        </label>
-                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% sconto" style="margin-left: 24px; width: calc(100% - 24px);">
+                    <div class="form-group">
+                        <label for="sharedTestedDate">Data Test</label>
+                        <input type="date" id="sharedTestedDate">
                     </div>
                 </div>
 
@@ -1273,7 +1365,7 @@ body {
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="cancelSharedRestaurant">Annulla</button>
-                    <button type="submit" class="btn btn-primary">💾 Aggiungi al Database</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
                 </div>
 
                 <div id="sharedRestaurantError" class="error-message"></div>
@@ -1336,6 +1428,338 @@ body {
                 </div>
 
                 <div id="ratingError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ROUTES DATABASE MODAL -->
+    <div id="routesModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="routesModalTitle">Aggiungi a ROUTES Database</h2>
+                <button class="modal-close" id="closeRoutesModal">&times;</button>
+            </div>
+
+            <form id="routesForm">
+                <!-- TRANSPORT TYPE -->
+                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">🚌 Tipo Trasporto</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeTransportType">Tipo Trasporto *</label>
+                        <select id="routeTransportType" required>
+                            <option value="">Seleziona...</option>
+                            <option value="bus">🚌 Bus</option>
+                            <option value="ferry">⛴️ Ferry</option>
+                            <option value="taxi">🚕 Taxi</option>
+                            <option value="ncc">🚗 NCC</option>
+                            <option value="train">🚂 Train</option>
+                            <option value="private">🚙 Private Transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeTrainCategory">Categoria Treno (se train)</label>
+                        <select id="routeTrainCategory">
+                            <option value="">N/A</option>
+                            <option value="AV">⚡ AV - Alta Velocità</option>
+                            <option value="IC">🚄 IC - Intercity</option>
+                            <option value="EC">🚆 EC - EuroCity</option>
+                            <option value="R">🚂 R - Regionale</option>
+                            <option value="RV">🚃 RV - Regionale Veloce</option>
+                            <option value="S">🚇 S - Suburbano</option>
+                            <option value="RE">🚊 RE - Regionale Espresso</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- OPERATOR INFO -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🏢 Operatore</h3>
+
+                <div class="form-group">
+                    <label for="routeOperatorName">Nome Operatore *</label>
+                    <input type="text" id="routeOperatorName" required placeholder="es. Trenitalia, Flixbus, Bluestar Ferries">
+                </div>
+
+                <!-- ROUTE INFO -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Tratta</h3>
+
+                <div class="form-group">
+                    <label for="routeAreaServed">Area Servita</label>
+                    <input type="text" id="routeAreaServed" placeholder="es. Toscana, Costa Amalfitana">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeStartPoint">Partenza</label>
+                        <input type="text" id="routeStartPoint" placeholder="es. Roma Termini">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeEndPoint">Arrivo</label>
+                        <input type="text" id="routeEndPoint" placeholder="es. Firenze SMN">
+                    </div>
+                </div>
+
+                <!-- TIMING & PRICING -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">⏱️ Orari e Prezzi</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeFrequency">Frequenza</label>
+                        <input type="text" id="routeFrequency" placeholder="es. Ogni 30 min, 3x al giorno">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeDuration">Durata</label>
+                        <input type="text" id="routeDuration" placeholder="es. 1h 30min, 45 min">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="routePrice">Prezzo</label>
+                    <input type="text" id="routePrice" placeholder="es. €25-45, €15 fisso">
+                </div>
+
+                <div class="form-group">
+                    <label for="routeTicketInfo">Info Biglietti</label>
+                    <textarea id="routeTicketInfo" rows="2" placeholder="Come acquistare, dove comprare, validità..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <!-- RELIABILITY -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">⭐ Affidabilità</h3>
+
+                <div class="form-group">
+                    <label for="routeReliability">Livello Affidabilità</label>
+                    <select id="routeReliability">
+                        <option value="">Seleziona...</option>
+                        <option value="high">✅ Alta - Molto affidabile</option>
+                        <option value="medium">⚠️ Media - Generalmente ok</option>
+                        <option value="low">❌ Bassa - Ritardi frequenti</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="routeReliabilityNotes">Note Affidabilità</label>
+                    <textarea id="routeReliabilityNotes" rows="2" placeholder="Esperienza personale, problemi noti..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <!-- CONTACTS & LINKS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📞 Contatti e Link</h3>
+
+                <div class="form-group">
+                    <label for="routeContacts">Contatti</label>
+                    <input type="text" id="routeContacts" placeholder="Telefono, email, WhatsApp...">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeWebsite">Sito Web</label>
+                        <input type="url" id="routeWebsite" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeBookingUrl">Link Prenotazione</label>
+                        <input type="url" id="routeBookingUrl" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="routeMapsLink">Link Google Maps / Mappa Tratta</label>
+                    <input type="url" id="routeMapsLink" placeholder="https://maps.google.com/...">
+                </div>
+
+                <!-- ADDITIONAL INFO -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📝 Info Aggiuntive</h3>
+
+                <div class="form-group">
+                    <label for="routeNotes">Note</label>
+                    <textarea id="routeNotes" rows="2" placeholder="Informazioni utili..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="routeTips">Tips per TL</label>
+                    <textarea id="routeTips" rows="2" placeholder="Consigli pratici..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelRoute">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
+                </div>
+
+                <div id="routesError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- STAY DATABASE MODAL -->
+    <div id="stayModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="stayModalTitle">Aggiungi a STAY Database</h2>
+                <button class="modal-close" id="closeStayModal">&times;</button>
+            </div>
+
+            <form id="stayForm">
+                <!-- BASIC INFO -->
+                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">🏨 Info Base</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayName">Nome Struttura *</label>
+                        <input type="text" id="stayName" required placeholder="es. Hotel Bella Vista">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayType">Tipo *</label>
+                        <select id="stayType" required>
+                            <option value="">Seleziona...</option>
+                            <option value="hotel">🏨 Hotel</option>
+                            <option value="bnb">🏡 B&B</option>
+                            <option value="guesthouse">🏠 Guesthouse</option>
+                            <option value="boutique">✨ Boutique Hotel</option>
+                            <option value="hostel">🛏️ Hostel</option>
+                            <option value="apartment">🏢 Apartment</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- LOCATION -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Posizione</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayLocation">Città *</label>
+                        <input type="text" id="stayLocation" required placeholder="es. Firenze">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayDistanceCenter">Distanza dal Centro</label>
+                        <input type="text" id="stayDistanceCenter" placeholder="es. 10 min a piedi, 2 km">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="stayAddress">Indirizzo</label>
+                    <input type="text" id="stayAddress" placeholder="es. Via Roma 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="stayGoogleMaps">Link Google Maps</label>
+                    <input type="url" id="stayGoogleMaps" placeholder="https://maps.google.com/...">
+                </div>
+
+                <!-- PRICING -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">💰 Prezzi</h3>
+
+                <div class="form-group">
+                    <label for="stayPriceRange">Fascia di Prezzo</label>
+                    <input type="text" id="stayPriceRange" placeholder="es. €50-80/notte, €100-150/camera">
+                </div>
+
+                <!-- CONTACTS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📞 Contatti e Booking</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayContact">Contatto</label>
+                        <input type="text" id="stayContact" placeholder="Nome referente">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayPhone">Telefono</label>
+                        <input type="tel" id="stayPhone" placeholder="+39 ...">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayWebsite">Sito Web</label>
+                        <input type="url" id="stayWebsite" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayBookingUrl">Link Booking</label>
+                        <input type="url" id="stayBookingUrl" placeholder="https://booking.com/...">
+                    </div>
+                </div>
+
+                <!-- SUITABILITY -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">👥 Idoneità</h3>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="staySuitableFamilies">
+                        <span>👨‍👩‍👧‍👦 Adatto a Famiglie</span>
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="staySuitableGroups">
+                        <span>👥 Adatto a Gruppi</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="stayMaxGuests">Max Ospiti</label>
+                    <input type="number" id="stayMaxGuests" min="1" placeholder="es. 30">
+                </div>
+
+                <!-- FACILITIES -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">✨ Servizi</h3>
+
+                <div class="form-group">
+                    <label for="stayFacilities">Servizi (separati da virgola)</label>
+                    <textarea id="stayFacilities" rows="2" placeholder="es. WiFi, Colazione, Parcheggio, AC, Piscina, Palestra..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <!-- TL BENEFITS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="stayCommission">
+                        <span>💰 Commission</span>
+                    </label>
+                    <input type="number" id="stayCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
+
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="staySpecialRate">
+                        <span>🏷️ Tariffa Speciale TL</span>
+                    </label>
+                    <input type="text" id="staySpecialRateDetails" placeholder="Dettagli tariffa speciale..." style="margin-left: 24px; width: calc(100% - 24px);">
+                </div>
+
+                <!-- TESTING & NOTES -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📝 Info Aggiuntive</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayTestedBy">Testato da (TL)</label>
+                        <input type="text" id="stayTestedBy" placeholder="Nome TL">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayTestedDate">Data Test</label>
+                        <input type="date" id="stayTestedDate">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="stayRecommendedFor">Consigliato per</label>
+                    <input type="text" id="stayRecommendedFor" placeholder="es. Famiglie con bambini, Coppie, Backpackers">
+                </div>
+
+                <div class="form-group">
+                    <label for="stayNotes">Note</label>
+                    <textarea id="stayNotes" rows="3" placeholder="Note utili per altri TL..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelStay">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
+                </div>
+
+                <div id="stayError" class="error-message"></div>
             </form>
         </div>
     </div>

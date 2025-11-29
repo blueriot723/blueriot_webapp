@@ -2523,6 +2523,82 @@ function setupEventListeners() {
         applyFiltersBtn.addEventListener('click', loadSharedRestaurants);
     }
 
+    // ROUTES modal
+    const addRouteBtn = document.getElementById('addRouteBtn');
+    const closeRoutesModal = document.getElementById('closeRoutesModal');
+    const cancelRoute = document.getElementById('cancelRoute');
+    const routesForm = document.getElementById('routesForm');
+    const routesModal = document.getElementById('routesModal');
+
+    if (addRouteBtn) {
+        addRouteBtn.addEventListener('click', () => {
+            if (routesForm) routesForm.reset();
+            if (routesModal) routesModal.classList.add('active');
+        });
+    }
+
+    if (closeRoutesModal) {
+        closeRoutesModal.addEventListener('click', () => {
+            if (routesModal) routesModal.classList.remove('active');
+        });
+    }
+
+    if (cancelRoute) {
+        cancelRoute.addEventListener('click', () => {
+            if (routesModal) routesModal.classList.remove('active');
+        });
+    }
+
+    if (routesModal) {
+        routesModal.addEventListener('click', (e) => {
+            if (e.target === routesModal) {
+                routesModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (routesForm) {
+        routesForm.addEventListener('submit', handleSaveRoute);
+    }
+
+    // STAY modal
+    const addStayBtn = document.getElementById('addStayBtn');
+    const closeStayModal = document.getElementById('closeStayModal');
+    const cancelStay = document.getElementById('cancelStay');
+    const stayForm = document.getElementById('stayForm');
+    const stayModal = document.getElementById('stayModal');
+
+    if (addStayBtn) {
+        addStayBtn.addEventListener('click', () => {
+            if (stayForm) stayForm.reset();
+            if (stayModal) stayModal.classList.add('active');
+        });
+    }
+
+    if (closeStayModal) {
+        closeStayModal.addEventListener('click', () => {
+            if (stayModal) stayModal.classList.remove('active');
+        });
+    }
+
+    if (cancelStay) {
+        cancelStay.addEventListener('click', () => {
+            if (stayModal) stayModal.classList.remove('active');
+        });
+    }
+
+    if (stayModal) {
+        stayModal.addEventListener('click', (e) => {
+            if (e.target === stayModal) {
+                stayModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (stayForm) {
+        stayForm.addEventListener('submit', handleSaveStay);
+    }
+
     // Delete tour button (will be reattached when modal opens)
     // Other buttons will be handled in openTourDetail()
 }

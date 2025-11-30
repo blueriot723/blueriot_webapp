@@ -1,0 +1,40 @@
+{
+  "name": "blueriot-matrix",
+  "version": "1.0.0",
+  "description": "blueriot mαtrιχ - Multi-deployment monorepo for NODΞ backend, PWA frontend, and Supabase database",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "nodex/backend"
+  ],
+  "scripts": {
+    "backend:install": "cd nodex/backend && npm install",
+    "backend:dev": "cd nodex/backend && npm run dev",
+    "backend:start": "cd nodex/backend && npm start",
+    "backend:deploy": "echo 'Deploy to Render via Git push or render.yaml'",
+    "db:migrate": "echo 'Apply migrations to Supabase (see database/README.md)'",
+    "db:seed": "echo 'Seed database (see database/README.md)'",
+    "frontend:serve": "python3 -m http.server 8080",
+    "deploy:render": "git push render main",
+    "deploy:pages": "git push origin main",
+    "install:all": "npm run backend:install",
+    "dev": "npm run backend:dev",
+    "setup": "npm run install:all && echo 'Setup complete! See DEPLOYMENT.md for next steps'"
+  },
+  "keywords": [
+    "blueriot",
+    "matrix",
+    "nodex",
+    "tour-management",
+    "pwa"
+  ],
+  "author": "blueriot mαtrιχ",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blueriot723/blueriot_webapp.git"
+  }
+}

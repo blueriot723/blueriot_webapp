@@ -1,0 +1,33 @@
+# Render Blueprint for NODΞ Backend API
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # NODΞ Backend API
+  - type: web
+    name: blueriot-nodex-api
+    env: node
+    region: frankfurt  # Change to your preferred region
+    plan: free  # Change to 'starter' or higher for production
+    buildCommand: cd nodex/backend && npm install
+    startCommand: cd nodex/backend && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        sync: false  # Set in Render dashboard
+      - key: SUPABASE_SERVICE_KEY
+        sync: false  # Set in Render dashboard (use service role key)
+      - key: CORS_ORIGIN
+        value: https://blueriot723.github.io  # Your GitHub Pages URL
+    autoDeploy: true  # Auto-deploy on git push
+
+databases:
+  # Optional: If you want to use Render's PostgreSQL instead of Supabase
+  # Uncomment this section if migrating away from Supabase
+  # - name: blueriot-db
+  #   databaseName: blueriot_matrix
+  #   user: blueriot_user
+  #   plan: free

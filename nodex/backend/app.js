@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import nodexRoutes from './routes/nodex.routes.js';
 import ticketsRoutes from './routes/tickets.routes.js';
 import daysRoutes from './routes/days.routes.js';
+import dayItemsRoutes from './routes/day-items.routes.js';
 import weatherRoutes from './routes/weather.routes.js';
 import vcardRoutes from './routes/vcard.routes.js';
 import parserRoutes from './routes/parser.routes.js';
@@ -83,6 +84,7 @@ app.get('/version', (req, res) => {
 app.use('/api/nodex', nodexRoutes);
 app.use('/api/tickets', ticketsRoutes);
 app.use('/api/days', daysRoutes);
+app.use('/api/day-items', dayItemsRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/vcard', vcardRoutes);
 app.use('/api/parser', parserRoutes);

@@ -75,6 +75,42 @@ body {
     color: var(--text-secondary);
 }
 
+/* Language Selector */
+.language-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.language-selector button {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.language-selector button:hover {
+    border-color: var(--primary-blue);
+    background: var(--dark-bg);
+}
+
+.language-selector button.active {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: #000;
+    font-weight: 600;
+}
+
 .login-form {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -662,33 +698,43 @@ body {
 <body>
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="screen active">
+        <!-- Language Selector -->
+        <div class="language-selector">
+            <button onclick="setLanguage('it')" id="langBtnIt" class="active">
+                🇮🇹 IT
+            </button>
+            <button onclick="setLanguage('en')" id="langBtnEn">
+                🇬🇧 EN
+            </button>
+        </div>
+
         <div class="login-container">
             <div class="login-header">
                 <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="logo">
-                <h1>Tour Leader Dashboard</h1>
-                <p>Accedi con le tue credenziali BlueRiot Syndicate</p>
+                <h1 data-i18n="login.title">Tour Leader Dashboard</h1>
+                <p data-i18n="login.subtitle">Accedi con le tue credenziali BlueRiot Syndicate</p>
             </div>
 
             <form id="loginForm" class="login-form">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required placeholder="tuo@email.com">
+                    <label for="email" data-i18n="login.email">Email</label>
+                    <input type="email" id="email" required data-i18n-placeholder="login.emailPlaceholder">
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password" data-i18n="login.password">Password</label>
                     <input type="password" id="password" required placeholder="••••••••">
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="loginBtn">
-                    <span class="btn-text">Accedi</span>
+                    <span class="btn-text" data-i18n="login.loginButton">Accedi</span>
                 </button>
 
                 <div id="loginError" class="error-message"></div>
             </form>
 
             <div class="login-footer">
-                <p>Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
+                <p data-i18n="login.footer">Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
             </div>
         </div>
     </div>
@@ -698,38 +744,38 @@ body {
         <div class="ecosystem-container">
             <div class="ecosystem-nav">
                 <span id="ecosystemUserEmail" class="user-email"></span>
-                <button id="ecosystemLogoutBtn" class="btn btn-secondary">Logout</button>
+                <button id="ecosystemLogoutBtn" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
 
             <div class="ecosystem-header">
                 <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="logo" style="width: 160px; margin-bottom: 30px; filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.4));">
                 <h1>BlueRiot Ecosystem</h1>
-                <p>Seleziona un servizio per iniziare</p>
+                <p data-i18n="ecosystem.subtitle">Seleziona un servizio per iniziare</p>
             </div>
 
             <div class="ecosystem-cards">
                 <div class="ecosystem-card" onclick="navigateToSection('tastes')">
                     <span class="ecosystem-card-icon">🍽️</span>
                     <h2>TASTES</h2>
-                    <p>Database completo di ristoranti, bar, gelaterie e locali testati. Gestisci recensioni, vantaggi TL e info utili.</p>
+                    <p data-i18n="ecosystem.tastesDesc">Database completo di ristoranti, bar, gelaterie e locali testati. Gestisci recensioni, vantaggi TL e info utili.</p>
                 </div>
 
                 <div class="ecosystem-card" onclick="navigateToSection('routes')">
                     <span class="ecosystem-card-icon">🚌</span>
                     <h2>ROUTES</h2>
-                    <p>Database trasporti: bus, treni (AV, IC, R), ferry, taxi, NCC. Info su orari, prezzi e affidabilità.</p>
+                    <p data-i18n="ecosystem.routesDesc">Database trasporti: bus, treni (AV, IC, R), ferry, taxi, NCC. Info su orari, prezzi e affidabilità.</p>
                 </div>
 
                 <div class="ecosystem-card" onclick="navigateToSection('stay')">
                     <span class="ecosystem-card-icon">🏨</span>
                     <h2>STAY</h2>
-                    <p>Database hotel alternativi, B&B e strutture consigliate. Prezzi, contatti e recensioni personali.</p>
+                    <p data-i18n="ecosystem.stayDesc">Database hotel alternativi, B&B e strutture consigliate. Prezzi, contatti e recensioni personali.</p>
                 </div>
 
                 <div class="ecosystem-card ecosystem-card-wide" onclick="navigateToSection('hub')">
                     <span class="ecosystem-card-icon">⚡</span>
                     <h2>BLUERIOT WEBAPP HUB</h2>
-                    <p>Gestione tour completa: programma, ristoranti, hotel, emergenze, documenti, templates, eTickets e mini-site builder.</p>
+                    <p data-i18n="ecosystem.hubDesc">Gestione tour completa: programma, ristoranti, hotel, emergenze, documenti, templates, eTickets e mini-site builder.</p>
                 </div>
             </div>
         </div>
@@ -743,9 +789,9 @@ body {
                 <span>BlueRiot Syndicate</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail" class="user-email"></span>
-                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -769,9 +815,9 @@ body {
                 <span>BlueRiot TASTES</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn2" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn2" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail2" class="user-email"></span>
-                <button id="logoutBtn2" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn2" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -823,9 +869,9 @@ body {
                 <span>BlueRiot ROUTES</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn3" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn3" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail3" class="user-email"></span>
-                <button id="logoutBtn3" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn3" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -879,9 +925,9 @@ body {
                 <span>BlueRiot STAY</span>
             </div>
             <div class="navbar-menu">
-                <button id="backToEcosystemBtn4" class="btn btn-secondary">← Ecosystem</button>
+                <button id="backToEcosystemBtn4" class="btn btn-secondary" data-i18n="common.backToEcosystem">← Ecosystem</button>
                 <span id="userEmail4" class="user-email"></span>
-                <button id="logoutBtn4" class="btn btn-secondary">Logout</button>
+                <button id="logoutBtn4" class="btn btn-secondary" data-i18n="common.logout">Logout</button>
             </div>
         </nav>
 
@@ -1201,68 +1247,160 @@ body {
     </div>
 
     <!-- SHARED RESTAURANT FORM MODAL -->
+    <!-- TASTES DATABASE MODAL (Complete Form) -->
     <div id="sharedRestaurantModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h2>Aggiungi al Database Condiviso</h2>
+                <h2 id="tastesModalTitle">Aggiungi a TASTES Database</h2>
                 <button class="modal-close" id="closeSharedRestaurantModal">&times;</button>
             </div>
 
             <form id="sharedRestaurantForm">
+                <!-- BASIC INFO -->
+                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">📋 Info Base</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedRestaurantName">Nome Locale *</label>
+                        <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedType">Tipo *</label>
+                        <select id="sharedType" required>
+                            <option value="">Seleziona...</option>
+                            <option value="restaurant">🍝 Restaurant</option>
+                            <option value="bar">🍷 Bar</option>
+                            <option value="bakery">🥖 Bakery</option>
+                            <option value="quick_bite">🥪 Quick Bite</option>
+                            <option value="gelateria">🍨 Gelateria</option>
+                            <option value="aperitivo">🍹 Aperitivo</option>
+                            <option value="caffetteria">☕ Caffetteria</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedCuisineType">Tipo Cucina</label>
+                        <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedPriceRange">Fascia Prezzo</label>
+                        <select id="sharedPriceRange">
+                            <option value="">Seleziona...</option>
+                            <option value="€">€ - Economico</option>
+                            <option value="€€">€€ - Medio</option>
+                            <option value="€€€">€€€ - Alto</option>
+                            <option value="€€€€">€€€€ - Lusso</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- LOCATION -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Posizione</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedRestaurantCity">Città *</label>
+                        <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedRestaurantAddress">Indirizzo</label>
+                        <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedGoogleMaps">Link Google Maps</label>
+                        <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedRestaurantPhone">Telefono</label>
+                        <input type="tel" id="sharedRestaurantPhone" placeholder="es. +39 06 1234567">
+                    </div>
+                </div>
+
+                <!-- OPENING HOURS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🕐 Orari</h3>
+
                 <div class="form-group">
-                    <label for="sharedRestaurantName">Nome Ristorante *</label>
-                    <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
+                    <label for="sharedOpeningHours">Orari di Apertura</label>
+                    <input type="text" id="sharedOpeningHours" placeholder="es. Lun-Ven 12:00-23:00, Sab-Dom 11:00-00:00">
                 </div>
 
                 <div class="form-group">
-                    <label for="sharedRestaurantCity">Città *</label>
-                    <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma">
+                    <label>
+                        <input type="checkbox" id="sharedBookingNeeded">
+                        <span>📅 Prenotazione Necessaria</span>
+                    </label>
                 </div>
 
+                <!-- TL BENEFITS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
+
                 <div class="form-group">
-                    <label for="sharedRestaurantAddress">Indirizzo</label>
-                    <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="sharedTlFree">
+                        <span>🎁 Gratuity (TL Free)</span>
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="sharedHasCommission">
+                        <span>💰 Commission</span>
+                    </label>
+                    <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
+
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="sharedHasDiscount">
+                        <span>🏷️ Discount</span>
+                    </label>
+                    <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% sconto" style="margin-left: 24px; width: calc(100% - 24px);">
                 </div>
 
+                <!-- GROUP SUITABILITY -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">👥 Idoneità Gruppi</h3>
+
                 <div class="form-group">
-                    <label for="sharedRestaurantPhone">Telefono</label>
-                    <input type="tel" id="sharedRestaurantPhone" placeholder="es. +39 06 1234567">
+                    <label>
+                        <input type="checkbox" id="sharedSuitableForGroups" checked>
+                        <span>Adatto ai Gruppi</span>
+                    </label>
                 </div>
 
-                <div class="form-group">
-                    <label for="sharedCuisineType">Tipo Cucina</label>
-                    <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedMinGroupSize">Min Persone Gruppo</label>
+                        <input type="number" id="sharedMinGroupSize" min="1" placeholder="es. 10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedMaxGroupSize">Max Persone Gruppo</label>
+                        <input type="number" id="sharedMaxGroupSize" min="1" placeholder="es. 50">
+                    </div>
                 </div>
 
+                <!-- TOURS & TESTING -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🗺️ Info Aggiuntive</h3>
+
                 <div class="form-group">
-                    <label for="sharedPriceRange">Fascia Prezzo</label>
-                    <select id="sharedPriceRange">
-                        <option value="">Seleziona...</option>
-                        <option value="€">€ - Economico</option>
-                        <option value="€€">€€ - Medio</option>
-                        <option value="€€€">€€€ - Alto</option>
-                    </select>
+                    <label for="sharedToursRelevant">Tour Rilevanti (separati da virgola)</label>
+                    <input type="text" id="sharedToursRelevant" placeholder="es. ZMXI, ZXXI, ZMXD">
                 </div>
 
-                <div class="form-group">
-                    <label>Vantaggi TL</label>
-                    <div style="margin-top: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <input type="checkbox" id="sharedTlFree">
-                            <span>🎁 TL Free</span>
-                        </label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="sharedTestedBy">Testato da (TL)</label>
+                        <input type="text" id="sharedTestedBy" placeholder="es. Marco Rossi">
+                    </div>
 
-                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <input type="checkbox" id="sharedHasCommission">
-                            <span>💰 Commission</span>
-                        </label>
-                        <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
-
-                        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                            <input type="checkbox" id="sharedHasDiscount">
-                            <span>🏷️ Discount</span>
-                        </label>
-                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% sconto" style="margin-left: 24px; width: calc(100% - 24px);">
+                    <div class="form-group">
+                        <label for="sharedTestedDate">Data Test</label>
+                        <input type="date" id="sharedTestedDate">
                     </div>
                 </div>
 
@@ -1273,7 +1411,7 @@ body {
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="cancelSharedRestaurant">Annulla</button>
-                    <button type="submit" class="btn btn-primary">💾 Aggiungi al Database</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
                 </div>
 
                 <div id="sharedRestaurantError" class="error-message"></div>
@@ -1336,6 +1474,338 @@ body {
                 </div>
 
                 <div id="ratingError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ROUTES DATABASE MODAL -->
+    <div id="routesModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="routesModalTitle">Aggiungi a ROUTES Database</h2>
+                <button class="modal-close" id="closeRoutesModal">&times;</button>
+            </div>
+
+            <form id="routesForm">
+                <!-- TRANSPORT TYPE -->
+                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">🚌 Tipo Trasporto</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeTransportType">Tipo Trasporto *</label>
+                        <select id="routeTransportType" required>
+                            <option value="">Seleziona...</option>
+                            <option value="bus">🚌 Bus</option>
+                            <option value="ferry">⛴️ Ferry</option>
+                            <option value="taxi">🚕 Taxi</option>
+                            <option value="ncc">🚗 NCC</option>
+                            <option value="train">🚂 Train</option>
+                            <option value="private">🚙 Private Transfer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeTrainCategory">Categoria Treno (se train)</label>
+                        <select id="routeTrainCategory">
+                            <option value="">N/A</option>
+                            <option value="AV">⚡ AV - Alta Velocità</option>
+                            <option value="IC">🚄 IC - Intercity</option>
+                            <option value="EC">🚆 EC - EuroCity</option>
+                            <option value="R">🚂 R - Regionale</option>
+                            <option value="RV">🚃 RV - Regionale Veloce</option>
+                            <option value="S">🚇 S - Suburbano</option>
+                            <option value="RE">🚊 RE - Regionale Espresso</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- OPERATOR INFO -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🏢 Operatore</h3>
+
+                <div class="form-group">
+                    <label for="routeOperatorName">Nome Operatore *</label>
+                    <input type="text" id="routeOperatorName" required placeholder="es. Trenitalia, Flixbus, Bluestar Ferries">
+                </div>
+
+                <!-- ROUTE INFO -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Tratta</h3>
+
+                <div class="form-group">
+                    <label for="routeAreaServed">Area Servita</label>
+                    <input type="text" id="routeAreaServed" placeholder="es. Toscana, Costa Amalfitana">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeStartPoint">Partenza</label>
+                        <input type="text" id="routeStartPoint" placeholder="es. Roma Termini">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeEndPoint">Arrivo</label>
+                        <input type="text" id="routeEndPoint" placeholder="es. Firenze SMN">
+                    </div>
+                </div>
+
+                <!-- TIMING & PRICING -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">⏱️ Orari e Prezzi</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeFrequency">Frequenza</label>
+                        <input type="text" id="routeFrequency" placeholder="es. Ogni 30 min, 3x al giorno">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeDuration">Durata</label>
+                        <input type="text" id="routeDuration" placeholder="es. 1h 30min, 45 min">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="routePrice">Prezzo</label>
+                    <input type="text" id="routePrice" placeholder="es. €25-45, €15 fisso">
+                </div>
+
+                <div class="form-group">
+                    <label for="routeTicketInfo">Info Biglietti</label>
+                    <textarea id="routeTicketInfo" rows="2" placeholder="Come acquistare, dove comprare, validità..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <!-- RELIABILITY -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">⭐ Affidabilità</h3>
+
+                <div class="form-group">
+                    <label for="routeReliability">Livello Affidabilità</label>
+                    <select id="routeReliability">
+                        <option value="">Seleziona...</option>
+                        <option value="high">✅ Alta - Molto affidabile</option>
+                        <option value="medium">⚠️ Media - Generalmente ok</option>
+                        <option value="low">❌ Bassa - Ritardi frequenti</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="routeReliabilityNotes">Note Affidabilità</label>
+                    <textarea id="routeReliabilityNotes" rows="2" placeholder="Esperienza personale, problemi noti..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <!-- CONTACTS & LINKS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📞 Contatti e Link</h3>
+
+                <div class="form-group">
+                    <label for="routeContacts">Contatti</label>
+                    <input type="text" id="routeContacts" placeholder="Telefono, email, WhatsApp...">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="routeWebsite">Sito Web</label>
+                        <input type="url" id="routeWebsite" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="routeBookingUrl">Link Prenotazione</label>
+                        <input type="url" id="routeBookingUrl" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="routeMapsLink">Link Google Maps / Mappa Tratta</label>
+                    <input type="url" id="routeMapsLink" placeholder="https://maps.google.com/...">
+                </div>
+
+                <!-- ADDITIONAL INFO -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📝 Info Aggiuntive</h3>
+
+                <div class="form-group">
+                    <label for="routeNotes">Note</label>
+                    <textarea id="routeNotes" rows="2" placeholder="Informazioni utili..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="routeTips">Tips per TL</label>
+                    <textarea id="routeTips" rows="2" placeholder="Consigli pratici..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelRoute">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
+                </div>
+
+                <div id="routesError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- STAY DATABASE MODAL -->
+    <div id="stayModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="stayModalTitle">Aggiungi a STAY Database</h2>
+                <button class="modal-close" id="closeStayModal">&times;</button>
+            </div>
+
+            <form id="stayForm">
+                <!-- BASIC INFO -->
+                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">🏨 Info Base</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayName">Nome Struttura *</label>
+                        <input type="text" id="stayName" required placeholder="es. Hotel Bella Vista">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayType">Tipo *</label>
+                        <select id="stayType" required>
+                            <option value="">Seleziona...</option>
+                            <option value="hotel">🏨 Hotel</option>
+                            <option value="bnb">🏡 B&B</option>
+                            <option value="guesthouse">🏠 Guesthouse</option>
+                            <option value="boutique">✨ Boutique Hotel</option>
+                            <option value="hostel">🛏️ Hostel</option>
+                            <option value="apartment">🏢 Apartment</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- LOCATION -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Posizione</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayLocation">Città *</label>
+                        <input type="text" id="stayLocation" required placeholder="es. Firenze">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayDistanceCenter">Distanza dal Centro</label>
+                        <input type="text" id="stayDistanceCenter" placeholder="es. 10 min a piedi, 2 km">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="stayAddress">Indirizzo</label>
+                    <input type="text" id="stayAddress" placeholder="es. Via Roma 123">
+                </div>
+
+                <div class="form-group">
+                    <label for="stayGoogleMaps">Link Google Maps</label>
+                    <input type="url" id="stayGoogleMaps" placeholder="https://maps.google.com/...">
+                </div>
+
+                <!-- PRICING -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">💰 Prezzi</h3>
+
+                <div class="form-group">
+                    <label for="stayPriceRange">Fascia di Prezzo</label>
+                    <input type="text" id="stayPriceRange" placeholder="es. €50-80/notte, €100-150/camera">
+                </div>
+
+                <!-- CONTACTS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📞 Contatti e Booking</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayContact">Contatto</label>
+                        <input type="text" id="stayContact" placeholder="Nome referente">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayPhone">Telefono</label>
+                        <input type="tel" id="stayPhone" placeholder="+39 ...">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayWebsite">Sito Web</label>
+                        <input type="url" id="stayWebsite" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayBookingUrl">Link Booking</label>
+                        <input type="url" id="stayBookingUrl" placeholder="https://booking.com/...">
+                    </div>
+                </div>
+
+                <!-- SUITABILITY -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">👥 Idoneità</h3>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="staySuitableFamilies">
+                        <span>👨‍👩‍👧‍👦 Adatto a Famiglie</span>
+                    </label>
+
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="staySuitableGroups">
+                        <span>👥 Adatto a Gruppi</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="stayMaxGuests">Max Ospiti</label>
+                    <input type="number" id="stayMaxGuests" min="1" placeholder="es. 30">
+                </div>
+
+                <!-- FACILITIES -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">✨ Servizi</h3>
+
+                <div class="form-group">
+                    <label for="stayFacilities">Servizi (separati da virgola)</label>
+                    <textarea id="stayFacilities" rows="2" placeholder="es. WiFi, Colazione, Parcheggio, AC, Piscina, Palestra..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <!-- TL BENEFITS -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <input type="checkbox" id="stayCommission">
+                        <span>💰 Commission</span>
+                    </label>
+                    <input type="number" id="stayCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
+
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="staySpecialRate">
+                        <span>🏷️ Tariffa Speciale TL</span>
+                    </label>
+                    <input type="text" id="staySpecialRateDetails" placeholder="Dettagli tariffa speciale..." style="margin-left: 24px; width: calc(100% - 24px);">
+                </div>
+
+                <!-- TESTING & NOTES -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📝 Info Aggiuntive</h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group">
+                        <label for="stayTestedBy">Testato da (TL)</label>
+                        <input type="text" id="stayTestedBy" placeholder="Nome TL">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stayTestedDate">Data Test</label>
+                        <input type="date" id="stayTestedDate">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="stayRecommendedFor">Consigliato per</label>
+                    <input type="text" id="stayRecommendedFor" placeholder="es. Famiglie con bambini, Coppie, Backpackers">
+                </div>
+
+                <div class="form-group">
+                    <label for="stayNotes">Note</label>
+                    <textarea id="stayNotes" rows="3" placeholder="Note utili per altri TL..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelStay">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
+                </div>
+
+                <div id="stayError" class="error-message"></div>
             </form>
         </div>
     </div>
@@ -1610,6 +2080,140 @@ const { createClient } = supabase;
 const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2b214dHpjbmN6dmJjc2N5YmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTIwOTMsImV4cCI6MjA3OTA2ODA5M30.2fd-urmPrcuWrDdZtR6lNaRsfyNQW64fwEvJv2KI9AE';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ===== MULTI-LANGUAGE SYSTEM =====
+const translations = {
+    it: {
+        // Login
+        login: {
+            title: "Tour Leader Dashboard",
+            subtitle: "Accedi con le tue credenziali BlueRiot Syndicate",
+            email: "Email",
+            emailPlaceholder: "tuo@email.com",
+            password: "Password",
+            loginButton: "Accedi",
+            footer: "Problemi di accesso? Contatta @blueriot"
+        },
+        // Ecosystem Home
+        ecosystem: {
+            subtitle: "Seleziona un servizio per iniziare",
+            tastesDesc: "Database completo di ristoranti, bar, gelaterie e locali testati. Gestisci recensioni, vantaggi TL e info utili.",
+            routesDesc: "Database trasporti: bus, treni (AV, IC, R), ferry, taxi, NCC. Info su orari, prezzi e affidabilità.",
+            stayDesc: "Database hotel alternativi, B&B e strutture consigliate. Prezzi, contatti e recensioni personali.",
+            hubDesc: "Gestione tour completa: programma, ristoranti, hotel, emergenze, documenti, templates, eTickets e mini-site builder."
+        },
+        // Common
+        common: {
+            logout: "Logout",
+            backToEcosystem: "← Ecosystem",
+            save: "Salva",
+            cancel: "Annulla",
+            close: "Chiudi",
+            delete: "Elimina",
+            edit: "Modifica",
+            add: "Aggiungi",
+            search: "Cerca",
+            loading: "Caricamento...",
+            noData: "Nessun dato disponibile"
+        }
+    },
+    en: {
+        // Login
+        login: {
+            title: "Tour Leader Dashboard",
+            subtitle: "Sign in with your BlueRiot Syndicate credentials",
+            email: "Email",
+            emailPlaceholder: "your@email.com",
+            password: "Password",
+            loginButton: "Sign In",
+            footer: "Having issues? Contact @blueriot"
+        },
+        // Ecosystem Home
+        ecosystem: {
+            subtitle: "Select a service to get started",
+            tastesDesc: "Complete database of restaurants, bars, gelaterias and tested venues. Manage reviews, TL benefits and useful info.",
+            routesDesc: "Transport database: buses, trains (AV, IC, R), ferries, taxis, NCC. Info on schedules, prices and reliability.",
+            stayDesc: "Alternative hotels, B&Bs and recommended properties database. Prices, contacts and personal reviews.",
+            hubDesc: "Complete tour management: schedule, restaurants, hotels, emergencies, documents, templates, eTickets and mini-site builder."
+        },
+        // Common
+        common: {
+            logout: "Logout",
+            backToEcosystem: "← Ecosystem",
+            save: "Save",
+            cancel: "Cancel",
+            close: "Close",
+            delete: "Delete",
+            edit: "Edit",
+            add: "Add",
+            search: "Search",
+            loading: "Loading...",
+            noData: "No data available"
+        }
+    }
+};
+
+// Current language (default: Italian)
+let currentLanguage = localStorage.getItem('blueriot_language') || 'it';
+
+// Set language and apply translations
+function setLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('blueriot_language', lang);
+
+    // Update active button
+    document.getElementById('langBtnIt').classList.toggle('active', lang === 'it');
+    document.getElementById('langBtnEn').classList.toggle('active', lang === 'en');
+
+    // Apply translations
+    applyTranslations();
+}
+
+// Apply translations to all elements with data-i18n
+function applyTranslations() {
+    const elements = document.querySelectorAll('[data-i18n]');
+
+    elements.forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = getTranslation(key);
+
+        if (translation) {
+            element.textContent = translation;
+        }
+    });
+
+    // Handle placeholders
+    const placeholderElements = document.querySelectorAll('[data-i18n-placeholder]');
+    placeholderElements.forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        const translation = getTranslation(key);
+
+        if (translation) {
+            element.placeholder = translation;
+        }
+    });
+}
+
+// Get nested translation by key (e.g., "login.title")
+function getTranslation(key) {
+    const keys = key.split('.');
+    let translation = translations[currentLanguage];
+
+    for (const k of keys) {
+        if (translation && translation[k]) {
+            translation = translation[k];
+        } else {
+            return null;
+        }
+    }
+
+    return translation;
+}
+
+// Initialize language on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setLanguage(currentLanguage);
+});
 
 // Global state
 let currentUser = null;
@@ -2097,6 +2701,82 @@ function setupEventListeners() {
     const applyFiltersBtn = document.getElementById('applyFiltersBtn');
     if (applyFiltersBtn) {
         applyFiltersBtn.addEventListener('click', loadSharedRestaurants);
+    }
+
+    // ROUTES modal
+    const addRouteBtn = document.getElementById('addRouteBtn');
+    const closeRoutesModal = document.getElementById('closeRoutesModal');
+    const cancelRoute = document.getElementById('cancelRoute');
+    const routesForm = document.getElementById('routesForm');
+    const routesModal = document.getElementById('routesModal');
+
+    if (addRouteBtn) {
+        addRouteBtn.addEventListener('click', () => {
+            if (routesForm) routesForm.reset();
+            if (routesModal) routesModal.classList.add('active');
+        });
+    }
+
+    if (closeRoutesModal) {
+        closeRoutesModal.addEventListener('click', () => {
+            if (routesModal) routesModal.classList.remove('active');
+        });
+    }
+
+    if (cancelRoute) {
+        cancelRoute.addEventListener('click', () => {
+            if (routesModal) routesModal.classList.remove('active');
+        });
+    }
+
+    if (routesModal) {
+        routesModal.addEventListener('click', (e) => {
+            if (e.target === routesModal) {
+                routesModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (routesForm) {
+        routesForm.addEventListener('submit', handleSaveRoute);
+    }
+
+    // STAY modal
+    const addStayBtn = document.getElementById('addStayBtn');
+    const closeStayModal = document.getElementById('closeStayModal');
+    const cancelStay = document.getElementById('cancelStay');
+    const stayForm = document.getElementById('stayForm');
+    const stayModal = document.getElementById('stayModal');
+
+    if (addStayBtn) {
+        addStayBtn.addEventListener('click', () => {
+            if (stayForm) stayForm.reset();
+            if (stayModal) stayModal.classList.add('active');
+        });
+    }
+
+    if (closeStayModal) {
+        closeStayModal.addEventListener('click', () => {
+            if (stayModal) stayModal.classList.remove('active');
+        });
+    }
+
+    if (cancelStay) {
+        cancelStay.addEventListener('click', () => {
+            if (stayModal) stayModal.classList.remove('active');
+        });
+    }
+
+    if (stayModal) {
+        stayModal.addEventListener('click', (e) => {
+            if (e.target === stayModal) {
+                stayModal.classList.remove('active');
+            }
+        });
+    }
+
+    if (stayForm) {
+        stayForm.addEventListener('submit', handleSaveStay);
     }
 
     // Delete tour button (will be reattached when modal opens)
@@ -4395,29 +5075,55 @@ async function handleSaveSharedRestaurant(e) {
         return;
     }
 
-    const restaurantData = {
-        restaurant_name: document.getElementById('sharedRestaurantName').value,
-        city: document.getElementById('sharedRestaurantCity').value,
-        address: document.getElementById('sharedRestaurantAddress').value || null,
-        phone: document.getElementById('sharedRestaurantPhone').value || null,
-        cuisine_type: document.getElementById('sharedCuisineType').value || null,
+    // Parse tours_relevant from comma-separated string to array
+    const toursRelevantStr = document.getElementById('sharedToursRelevant').value || '';
+    const toursRelevantArray = toursRelevantStr ? toursRelevantStr.split(',').map(t => t.trim()).filter(t => t) : null;
+
+    const tastesData = {
+        // Basic info
+        name: document.getElementById('sharedRestaurantName').value,
+        type: document.getElementById('sharedType').value,
+        cuisine: document.getElementById('sharedCuisineType').value || null,
         price_range: document.getElementById('sharedPriceRange').value || null,
-        tl_free: document.getElementById('sharedTlFree').checked,
-        has_commission: document.getElementById('sharedHasCommission').checked,
-        commission_percentage: document.getElementById('sharedCommissionPerc').value ? parseInt(document.getElementById('sharedCommissionPerc').value) : null,
+
+        // TL benefits
+        gratuity: document.getElementById('sharedTlFree').checked,
+        commission: document.getElementById('sharedHasCommission').checked,
+        discount: document.getElementById('sharedHasDiscount').checked,
         discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
+
+        // Location
+        location: document.getElementById('sharedRestaurantCity').value,
+        address: document.getElementById('sharedRestaurantAddress').value || null,
+        google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
+
+        // Hours
+        opening_hours: document.getElementById('sharedOpeningHours').value || null,
+        booking_needed: document.getElementById('sharedBookingNeeded').checked,
+
+        // Group suitability
+        suitable_for_groups: document.getElementById('sharedSuitableForGroups').checked,
+        min_group_size: document.getElementById('sharedMinGroupSize').value ? parseInt(document.getElementById('sharedMinGroupSize').value) : null,
+        max_group_size: document.getElementById('sharedMaxGroupSize').value ? parseInt(document.getElementById('sharedMaxGroupSize').value) : null,
+
+        // Tours & testing
+        tours_relevant: toursRelevantArray,
+        tested_by: document.getElementById('sharedTestedBy').value || null,
+        tested_date: document.getElementById('sharedTestedDate').value || null,
         notes: document.getElementById('sharedNotes').value || null,
-        added_by_tl_id: currentTL.id
+
+        // System
+        added_by: currentTL.id
     };
 
     try {
         const { error } = await supabaseClient
-            .from('shared_restaurants')
-            .insert([restaurantData]);
+            .from('blueriot_tastes')
+            .insert([tastesData]);
 
         if (error) throw error;
 
-        alert('✅ Ristorante aggiunto al database condiviso!');
+        alert('✅ Locale aggiunto al database TASTES!');
 
         if (sharedRestaurantModal) sharedRestaurantModal.classList.remove('active');
         if (sharedRestaurantForm) sharedRestaurantForm.reset();
@@ -4425,7 +5131,7 @@ async function handleSaveSharedRestaurant(e) {
         loadSharedRestaurants();
 
     } catch (error) {
-        console.error('Save shared restaurant error:', error);
+        console.error('Save TASTES error:', error);
         alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
@@ -4641,6 +5347,158 @@ async function loadStayOptions() {
     } catch (error) {
         console.error('Load stay error:', error);
         stayList.innerHTML = '<p class="loading" style="color: var(--error);">Errore caricamento</p>';
+    }
+}
+
+// ===== ROUTES CRUD FUNCTIONS =====
+
+async function handleSaveRoute(e) {
+    e.preventDefault();
+
+    if (!currentTL || !currentTL.id) {
+        alert('❌ Errore: TL non identificato');
+        return;
+    }
+
+    const routeData = {
+        // Transport type
+        transport_type: document.getElementById('routeTransportType').value,
+        train_category: document.getElementById('routeTrainCategory').value || null,
+
+        // Operator
+        operator_name: document.getElementById('routeOperatorName').value,
+
+        // Route
+        area_served: document.getElementById('routeAreaServed').value || null,
+        start_point: document.getElementById('routeStartPoint').value || null,
+        end_point: document.getElementById('routeEndPoint').value || null,
+
+        // Timing
+        frequency: document.getElementById('routeFrequency').value || null,
+        duration: document.getElementById('routeDuration').value || null,
+        price: document.getElementById('routePrice').value || null,
+        ticket_info: document.getElementById('routeTicketInfo').value || null,
+
+        // Reliability
+        reliability: document.getElementById('routeReliability').value || null,
+        reliability_notes: document.getElementById('routeReliabilityNotes').value || null,
+
+        // Contacts
+        contacts: document.getElementById('routeContacts').value || null,
+        website: document.getElementById('routeWebsite').value || null,
+        booking_url: document.getElementById('routeBookingUrl').value || null,
+        maps_link: document.getElementById('routeMapsLink').value || null,
+
+        // Additional
+        notes: document.getElementById('routeNotes').value || null,
+        tips: document.getElementById('routeTips').value || null,
+
+        // System
+        added_by: currentTL.id
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('blueriot_routes')
+            .insert([routeData]);
+
+        if (error) throw error;
+
+        alert('✅ Trasporto aggiunto al database ROUTES!');
+
+        const routesModal = document.getElementById('routesModal');
+        const routesForm = document.getElementById('routesForm');
+
+        if (routesModal) routesModal.classList.remove('active');
+        if (routesForm) routesForm.reset();
+
+        loadRoutes();
+
+    } catch (error) {
+        console.error('Save ROUTES error:', error);
+        alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
+// ===== STAY CRUD FUNCTIONS =====
+
+async function handleSaveStay(e) {
+    e.preventDefault();
+
+    if (!currentTL || !currentTL.id) {
+        alert('❌ Errore: TL non identificato');
+        return;
+    }
+
+    // Parse facilities from comma-separated string to array
+    const facilitiesStr = document.getElementById('stayFacilities').value || '';
+    const facilitiesArray = facilitiesStr ? facilitiesStr.split(',').map(f => f.trim()).filter(f => f) : null;
+
+    const stayData = {
+        // Basic info
+        name: document.getElementById('stayName').value,
+        type: document.getElementById('stayType').value,
+
+        // Location
+        location: document.getElementById('stayLocation').value,
+        address: document.getElementById('stayAddress').value || null,
+        google_maps_link: document.getElementById('stayGoogleMaps').value || null,
+        distance_from_center: document.getElementById('stayDistanceCenter').value || null,
+
+        // Pricing
+        price_range: document.getElementById('stayPriceRange').value || null,
+
+        // Contacts
+        contact: document.getElementById('stayContact').value || null,
+        phone: document.getElementById('stayPhone').value || null,
+        website: document.getElementById('stayWebsite').value || null,
+        booking_url: document.getElementById('stayBookingUrl').value || null,
+
+        // Suitability
+        suitable_for_families: document.getElementById('staySuitableFamilies').checked,
+        suitable_for_groups: document.getElementById('staySuitableGroups').checked,
+        max_guests: document.getElementById('stayMaxGuests').value ? parseInt(document.getElementById('stayMaxGuests').value) : null,
+
+        // Facilities
+        facilities: facilitiesStr || null,
+        facilities_array: facilitiesArray,
+
+        // TL benefits
+        commission: document.getElementById('stayCommission').checked,
+        commission_percentage: document.getElementById('stayCommissionPerc').value ? parseInt(document.getElementById('stayCommissionPerc').value) : null,
+        special_tl_rate: document.getElementById('staySpecialRate').checked,
+        special_rate_details: document.getElementById('staySpecialRateDetails').value || null,
+
+        // Testing & notes
+        tested_by: document.getElementById('stayTestedBy').value || null,
+        tested_date: document.getElementById('stayTestedDate').value || null,
+        recommended_for: document.getElementById('stayRecommendedFor').value || null,
+        notes: document.getElementById('stayNotes').value || null,
+
+        // System
+        added_by: currentTL.id
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('blueriot_stay')
+            .insert([stayData]);
+
+        if (error) throw error;
+
+        alert('✅ Struttura aggiunta al database STAY!');
+
+        const stayModal = document.getElementById('stayModal');
+        const stayForm = document.getElementById('stayForm');
+
+        if (stayModal) stayModal.classList.remove('active');
+        if (stayForm) stayForm.reset();
+
+        loadStayOptions();
+
+    } catch (error) {
+        console.error('Save STAY error:', error);
+        alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
     </script>

@@ -183,3 +183,28 @@ export async function assignItemsToDay(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+
+/**
+ * Swap two days
+ * POST /api/days/swap
+ * Body: { day1Id, day2Id }
+ */
+export async function swapDays(req, res) {
+  try {
+    const { day1Id, day2Id } = req.body;
+
+    if (!day1Id || !day2Id) {
+      return res.status(400).json({ error: 'day1Id and day2Id are required' });
+    }
+
+    const result = await dayEngine.swapDays(day1Id, day2Id);
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    console.error('Swap days error:', error);
+    res.status(500).json({ error: error.message });
+  }
+}

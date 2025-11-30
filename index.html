@@ -706,6 +706,15 @@ body {
             <button onclick="setLanguage('en')" id="langBtnEn">
                 🇬🇧 EN
             </button>
+            <button onclick="setLanguage('de')" id="langBtnDe">
+                🇩🇪 DE
+            </button>
+            <button onclick="setLanguage('fr')" id="langBtnFr">
+                🇫🇷 FR
+            </button>
+            <button onclick="setLanguage('es')" id="langBtnEs">
+                🇪🇸 ES
+            </button>
         </div>
 
         <div class="login-container">
@@ -2150,6 +2159,108 @@ const translations = {
             loading: "Loading...",
             noData: "No data available"
         }
+    },
+    de: {
+        // Login
+        login: {
+            title: "Tour Leader Dashboard",
+            subtitle: "Melden Sie sich mit Ihren BlueRiot Syndicate Zugangsdaten an",
+            email: "E-Mail",
+            emailPlaceholder: "ihre@email.de",
+            password: "Passwort",
+            loginButton: "Anmelden",
+            footer: "Probleme? Kontaktieren Sie @blueriot"
+        },
+        // Ecosystem Home
+        ecosystem: {
+            subtitle: "Wählen Sie einen Service zum Starten",
+            tastesDesc: "Vollständige Datenbank mit Restaurants, Bars, Eisdielen und getesteten Lokalen. Verwalten Sie Bewertungen, TL-Vorteile und nützliche Infos.",
+            routesDesc: "Transportdatenbank: Busse, Züge (AV, IC, R), Fähren, Taxis, NCC. Infos zu Fahrplänen, Preisen und Zuverlässigkeit.",
+            stayDesc: "Datenbank für alternative Hotels, B&Bs und empfohlene Unterkünfte. Preise, Kontakte und persönliche Bewertungen.",
+            hubDesc: "Komplettes Tour-Management: Programm, Restaurants, Hotels, Notfälle, Dokumente, Templates, eTickets und Mini-Site Builder."
+        },
+        // Common
+        common: {
+            logout: "Abmelden",
+            backToEcosystem: "← Ecosystem",
+            save: "Speichern",
+            cancel: "Abbrechen",
+            close: "Schließen",
+            delete: "Löschen",
+            edit: "Bearbeiten",
+            add: "Hinzufügen",
+            search: "Suchen",
+            loading: "Laden...",
+            noData: "Keine Daten verfügbar"
+        }
+    },
+    fr: {
+        // Login
+        login: {
+            title: "Tour Leader Dashboard",
+            subtitle: "Connectez-vous avec vos identifiants BlueRiot Syndicate",
+            email: "Email",
+            emailPlaceholder: "votre@email.fr",
+            password: "Mot de passe",
+            loginButton: "Se connecter",
+            footer: "Des problèmes ? Contactez @blueriot"
+        },
+        // Ecosystem Home
+        ecosystem: {
+            subtitle: "Sélectionnez un service pour commencer",
+            tastesDesc: "Base de données complète de restaurants, bars, glaciers et établissements testés. Gérez les avis, avantages TL et infos utiles.",
+            routesDesc: "Base de données transport : bus, trains (AV, IC, R), ferries, taxis, NCC. Infos sur horaires, prix et fiabilité.",
+            stayDesc: "Base de données hôtels alternatifs, B&B et propriétés recommandées. Prix, contacts et avis personnels.",
+            hubDesc: "Gestion de tournée complète : programme, restaurants, hôtels, urgences, documents, templates, eTickets et mini-site builder."
+        },
+        // Common
+        common: {
+            logout: "Déconnexion",
+            backToEcosystem: "← Ecosystem",
+            save: "Enregistrer",
+            cancel: "Annuler",
+            close: "Fermer",
+            delete: "Supprimer",
+            edit: "Modifier",
+            add: "Ajouter",
+            search: "Rechercher",
+            loading: "Chargement...",
+            noData: "Aucune donnée disponible"
+        }
+    },
+    es: {
+        // Login
+        login: {
+            title: "Tour Leader Dashboard",
+            subtitle: "Inicia sesión con tus credenciales de BlueRiot Syndicate",
+            email: "Email",
+            emailPlaceholder: "tu@email.es",
+            password: "Contraseña",
+            loginButton: "Iniciar sesión",
+            footer: "¿Problemas? Contacta @blueriot"
+        },
+        // Ecosystem Home
+        ecosystem: {
+            subtitle: "Selecciona un servicio para empezar",
+            tastesDesc: "Base de datos completa de restaurantes, bares, heladerías y locales probados. Gestiona reseñas, ventajas TL e info útil.",
+            routesDesc: "Base de datos transporte: autobuses, trenes (AV, IC, R), ferries, taxis, NCC. Info sobre horarios, precios y fiabilidad.",
+            stayDesc: "Base de datos hoteles alternativos, B&B y propiedades recomendadas. Precios, contactos y reseñas personales.",
+            hubDesc: "Gestión de tour completa: programa, restaurantes, hoteles, emergencias, documentos, templates, eTickets y mini-site builder."
+        },
+        // Common
+        common: {
+            logout: "Cerrar sesión",
+            backToEcosystem: "← Ecosystem",
+            save: "Guardar",
+            cancel: "Cancelar",
+            close: "Cerrar",
+            delete: "Eliminar",
+            edit: "Editar",
+            add: "Añadir",
+            search: "Buscar",
+            loading: "Cargando...",
+            noData: "No hay datos disponibles"
+        }
     }
 };
 
@@ -2161,9 +2272,12 @@ function setLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('blueriot_language', lang);
 
-    // Update active button
+    // Update active button for all 5 languages
     document.getElementById('langBtnIt').classList.toggle('active', lang === 'it');
     document.getElementById('langBtnEn').classList.toggle('active', lang === 'en');
+    document.getElementById('langBtnDe').classList.toggle('active', lang === 'de');
+    document.getElementById('langBtnFr').classList.toggle('active', lang === 'fr');
+    document.getElementById('langBtnEs').classList.toggle('active', lang === 'es');
 
     // Apply translations
     applyTranslations();

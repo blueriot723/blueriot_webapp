@@ -1,6 +1,6 @@
 // PDF Text Extractor - Uses pdfjs-dist to extract text from PDF files
 
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import * as pdfjsLib from 'pdfjs-dist';
 
 /**
  * Extract all text from a PDF buffer

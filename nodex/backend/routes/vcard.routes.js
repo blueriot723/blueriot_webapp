@@ -26,4 +26,13 @@ router.post('/import/batch', upload.array('vcards', 50), vcardController.importB
 // Parse vCard (returns parsed data without saving)
 router.post('/parse', upload.single('vcard'), vcardController.parseVCard);
 
+// Map imported vCard to module (ΤΔSΤΞ5 or SΤΔΥ)
+router.post('/:importId/map', vcardController.mapVCard);
+
+// Get all pending vCard imports (not yet mapped)
+router.get('/pending', vcardController.getPendingImports);
+
+// Get vCard import by ID
+router.get('/:importId', vcardController.getImportById);
+
 export default router;

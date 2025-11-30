@@ -4544,16 +4544,18 @@ async function loadProgram() {
     try {
         daysList.innerHTML = '<p class="loading">Caricamento...</p>';
 
-        // Check if days are already generated
-        const { data: days, error } = await supabaseClient
-            .from('tour_days')
-            .select('*')
-            .eq('tour_id', currentTourDetail.id)
-            .order('day_number', { ascending: true });
+        // Use NODΞ Day Engine API
+        const NODEX_API = 'https://blueriot-matrikh-nodks.onrender.com/api/days';
+        const response = await fetch(`${NODEX_API}/tour/${currentTourDetail.id}`);
 
-        if (error) throw error;
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
 
-        if (!days || days.length === 0) {
+        const result = await response.json();
+        const days = result.days || [];
+
+        if (days.length === 0) {
             daysList.innerHTML = '<p class="loading">Clicca "Genera Giorni" per creare il programma</p>';
         } else {
             await displayProgram(days);
@@ -4569,64 +4571,184 @@ async function displayProgram(days) {
     const daysList = document.getElementById('daysList');
     if (!daysList) return;
 
-    // Load all activities for these days
-    const { data: activities, error } = await supabaseClient
-        .from('tour_activities')
-        .select('*')
-        .eq('tour_id', currentTourDetail.id)
-        .order('time', { ascending: true });
+    daysList.innerHTML = days.map(day => `
+        <div class="day-card" draggable="true" data-day-id="${day.id}" data-logical-number="${day.logical_day_number}" style="margin-bottom: 16px; cursor: move;">
+            <div class="data-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px; cursor: grab;">⋮⋮</span>
+                        <div>
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--primary-blue); margin: 0;">Giorno ${day.logical_day_number}</h3>
+                            <p style="font-size: 14px; color: var(--text-secondary); margin: 4px 0 0 0;">${formatDate(day.calendar_date)}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="openEditDayForm('${day.id}')">✏️ Modifica</button>
+                        <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;" onclick="deleteDay('${day.id}')">🗑️</button>
+                    </div>
+                </div>
 
-    if (error) {
-        console.error('Load activities error:', error);
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                    ${day.cities && day.cities.length > 0 ? `
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">📍 Città</div>
+                            <div style="font-size: 14px; font-weight: 600;">${day.cities.join(', ')}</div>
+                        </div>
+                    ` : ''}
+                    ${day.morning_schedule ? `
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">🌅 Mattina</div>
+                            <div style="font-size: 14px;">${day.morning_schedule}</div>
+                        </div>
+                    ` : ''}
+                    ${day.afternoon_schedule ? `
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">☀️ Pomeriggio</div>
+                            <div style="font-size: 14px;">${day.afternoon_schedule}</div>
+                        </div>
+                    ` : ''}
+                    ${day.evening_schedule ? `
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">🌙 Sera</div>
+                            <div style="font-size: 14px;">${day.evening_schedule}</div>
+                        </div>
+                    ` : ''}
+                    ${day.notes ? `
+                        <div style="grid-column: 1 / -1;">
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">📝 Note</div>
+                            <div style="font-size: 14px;">${day.notes}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Initialize drag and drop
+    initializeDragAndDrop();
+}
+
+// ===== DRAG AND DROP FOR DAY REORDERING =====
+
+let draggedDay = null;
+
+function initializeDragAndDrop() {
+    const dayCards = document.querySelectorAll('.day-card');
+
+    dayCards.forEach(card => {
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragover', handleDragOver);
+        card.addEventListener('drop', handleDrop);
+        card.addEventListener('dragend', handleDragEnd);
+    });
+}
+
+function handleDragStart(e) {
+    draggedDay = this;
+    this.style.opacity = '0.4';
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', this.innerHTML);
+}
+
+function handleDragOver(e) {
+    if (e.preventDefault) {
+        e.preventDefault();
+    }
+    e.dataTransfer.dropEffect = 'move';
+
+    const afterElement = getDragAfterElement(e.clientY);
+    if (afterElement == null) {
+        this.parentElement.appendChild(draggedDay);
+    } else {
+        this.parentElement.insertBefore(draggedDay, afterElement);
+    }
+
+    return false;
+}
+
+function handleDrop(e) {
+    if (e.stopPropagation) {
+        e.stopPropagation();
+    }
+    return false;
+}
+
+async function handleDragEnd(e) {
+    this.style.opacity = '1';
+
+    // Get new order
+    const dayCards = document.querySelectorAll('.day-card');
+    const newOrder = Array.from(dayCards).map((card, index) => ({
+        id: card.dataset.dayId,
+        new_logical_day_number: index + 1
+    }));
+
+    // Save new order to API
+    try {
+        const NODEX_API = 'https://blueriot-matrikh-nodks.onrender.com/api/days';
+        const response = await fetch(`${NODEX_API}/reorder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tourId: currentTourDetail.id,
+                dayOrder: newOrder
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Errore riordinamento giorni');
+        }
+
+        // Reload to show updated numbers
+        await loadProgram();
+    } catch (error) {
+        console.error('Reorder error:', error);
+        alert('❌ Errore durante il riordinamento. Ricarica la pagina.');
+    }
+}
+
+function getDragAfterElement(y) {
+    const dayCards = [...document.querySelectorAll('.day-card:not(.dragging)')];
+
+    return dayCards.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+// ===== DAY MANAGEMENT FUNCTIONS =====
+
+async function deleteDay(dayId) {
+    if (!confirm('⚠️ Sei sicuro di voler eliminare questo giorno? Tutti i giorni successivi verranno rinumerati.')) {
         return;
     }
 
-    // Group activities by day
-    const activitiesByDay = {};
-    if (activities) {
-        activities.forEach(activity => {
-            if (!activitiesByDay[activity.day_number]) {
-                activitiesByDay[activity.day_number] = [];
-            }
-            activitiesByDay[activity.day_number].push(activity);
+    try {
+        const NODEX_API = 'https://blueriot-matrikh-nodks.onrender.com/api/days';
+        const response = await fetch(`${NODEX_API}/${dayId}`, {
+            method: 'DELETE'
         });
+
+        if (!response.ok) {
+            throw new Error('Errore eliminazione giorno');
+        }
+
+        await loadProgram();
+        alert('✅ Giorno eliminato con successo');
+    } catch (error) {
+        console.error('Delete day error:', error);
+        alert('❌ Errore durante l\'eliminazione del giorno');
     }
+}
 
-    daysList.innerHTML = days.map(day => `
-        <div class="data-card" style="margin-bottom: 16px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
-                <div>
-                    <h3 style="font-size: 20px; font-weight: 700; color: var(--primary-blue); margin: 0;">Giorno ${day.day_number}</h3>
-                    <p style="font-size: 14px; color: var(--text-secondary); margin: 4px 0 0 0;">${formatDate(day.date)}</p>
-                </div>
-                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 14px;" onclick="openAddActivityForm(${day.day_number})">+ Aggiungi Attività</button>
-            </div>
-
-            ${activitiesByDay[day.day_number] && activitiesByDay[day.day_number].length > 0 ? `
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    ${activitiesByDay[day.day_number].map(activity => `
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; background: rgba(0, 240, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px;">
-                            <div style="flex: 1;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <span style="font-size: 16px;">${activityTypeIcons[activity.activity_type] || '📌'}</span>
-                                    <span style="font-weight: 600; color: var(--text-secondary); font-size: 14px;">${activity.time}</span>
-                                    <span style="font-weight: 700; font-size: 16px;">${activity.title}</span>
-                                </div>
-                                ${activity.location ? `<div style="font-size: 13px; color: var(--text-secondary); margin-left: 24px;">📍 ${activity.location}</div>` : ''}
-                                ${activity.description ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; margin-left: 24px;">${activity.description}</div>` : ''}
-                            </div>
-                            <div style="display: flex; gap: 8px; margin-left: 12px;">
-                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="openEditActivityForm(${activity.id})">✏️</button>
-                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px; background: var(--error); border-color: var(--error);" onclick="deleteActivity(${activity.id})">🗑️</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            ` : `
-                <p style="color: var(--text-secondary); font-size: 14px; text-align: center; padding: 20px;">Nessuna attività ancora. Clicca "+ Aggiungi Attività"</p>
-            `}
-        </div>
-    `).join('');
+function openEditDayForm(dayId) {
+    alert('🚧 Funzione modifica giorno in sviluppo. Per ora puoi modificare direttamente dal database o ricreare i giorni.');
 }
 
 async function generateDays() {
@@ -4641,55 +4763,55 @@ async function generateDays() {
     }
 
     try {
-        // Check if days already exist
-        const { data: existingDays, error: checkError } = await supabaseClient
-            .from('tour_days')
-            .select('id')
-            .eq('tour_id', currentTourDetail.id)
-            .limit(1);
+        // Check if days already exist using NODΞ API
+        const NODEX_API = 'https://blueriot-matrikh-nodks.onrender.com/api/days';
+        const checkResponse = await fetch(`${NODEX_API}/tour/${currentTourDetail.id}`);
 
-        if (checkError) throw checkError;
+        if (checkResponse.ok) {
+            const result = await checkResponse.json();
+            if (result.days && result.days.length > 0) {
+                if (!confirm('⚠️ I giorni sono già stati generati. Vuoi rigenerarli? Questo eliminerà tutti i giorni esistenti!')) {
+                    return;
+                }
 
-        if (existingDays && existingDays.length > 0) {
-            if (!confirm('⚠️ I giorni sono già stati generati. Vuoi rigenerarli? Questo eliminerà tutte le attività esistenti!')) {
-                return;
+                // Delete existing days
+                for (const day of result.days) {
+                    await fetch(`${NODEX_API}/${day.id}`, { method: 'DELETE' });
+                }
             }
-
-            // Delete existing days and activities
-            await supabaseClient
-                .from('tour_activities')
-                .delete()
-                .eq('tour_id', currentTourDetail.id);
-
-            await supabaseClient
-                .from('tour_days')
-                .delete()
-                .eq('tour_id', currentTourDetail.id);
         }
 
         // Generate days between start and end date
         const startDate = new Date(currentTourDetail.start_date);
         const endDate = new Date(currentTourDetail.end_date);
-        const days = [];
-        let dayNumber = 1;
+        const daysCreated = [];
 
         for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
-            days.push({
+            const dayData = {
                 tour_id: currentTourDetail.id,
-                day_number: dayNumber,
-                date: date.toISOString().split('T')[0]
+                calendar_date: date.toISOString().split('T')[0],
+                day_title: `Giorno ${daysCreated.length + 1}`,
+                cities: [],
+                morning_schedule: null,
+                afternoon_schedule: null,
+                evening_schedule: null
+            };
+
+            const response = await fetch(NODEX_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dayData)
             });
-            dayNumber++;
+
+            if (!response.ok) {
+                throw new Error('Errore creazione giorno');
+            }
+
+            const result = await response.json();
+            daysCreated.push(result.day);
         }
 
-        // Insert days
-        const { error: insertError } = await supabaseClient
-            .from('tour_days')
-            .insert(days);
-
-        if (insertError) throw insertError;
-
-        alert(`✅ Generati ${days.length} giorni con successo!`);
+        alert(`✅ Generati ${daysCreated.length} giorni con successo!`);
         loadProgram();
 
     } catch (error) {

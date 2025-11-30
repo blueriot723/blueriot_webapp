@@ -21,6 +21,9 @@ router.delete('/:id', daysController.deleteDay);
 // Reorder days
 router.post('/reorder', daysController.reorderDays);
 
+// Swap two days
+router.post('/swap', daysController.swapDays);
+
 // Assign items to day (tastes, routes, stay)
 router.post('/:id/assign', daysController.assignItemsToDay);
 

@@ -1,0 +1,2 @@
+// placeholder UI bindings
+export function initUIBindings(){ console.log('UI bindings active'); }

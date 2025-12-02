@@ -10,9 +10,14 @@ app.use(cors());
 app.use(express.json());
 
 // Supabase client
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+  console.error('❌ ERROR: SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in environment variables');
+  process.exit(1);
+}
+
 const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://kvomxtzcnczvbcscybcy.supabase.co',
-  process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2b214dHpjbmN6dmJjc2N5YmN5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzQ5MjA5MywiZXhwIjoyMDc5MDY4MDkzfQ.VgmWV9rbn0HqGzp2SaLbQuP59q5qKGlDQay_IVJU_94'
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 // Health check

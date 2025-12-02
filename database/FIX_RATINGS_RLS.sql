@@ -29,7 +29,7 @@ CREATE POLICY "Authenticated users can rate"
 CREATE POLICY "Users can update own ratings"
     ON restaurant_ratings FOR UPDATE
     TO authenticated
-    USING (user_id = auth.uid());
+    USING (tl_id = auth.uid());
 
 -- Verify policies
 SELECT

@@ -1384,8 +1384,20 @@ body {
 
                 <div class="form-grid-2">
                     <div class="form-group">
+                        <label for="sharedRestaurantCountry">Paese *</label>
+                        <input type="text" id="sharedRestaurantCountry" required placeholder="es. Italy, France, Spain">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sharedRestaurantRegion">Regione</label>
+                        <input type="text" id="sharedRestaurantRegion" placeholder="es. Lazio, Toscana, Île-de-France">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
                         <label for="sharedRestaurantCity">Città *</label>
-                        <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma">
+                        <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma, Firenze, Parigi">
                     </div>
 
                     <div class="form-group">
@@ -5352,51 +5364,134 @@ function displaySharedRestaurants(restaurants) {
     const sharedRestaurantsList = document.getElementById('sharedRestaurantsList');
     if (!sharedRestaurantsList) return;
 
-    // Group by location (city)
-    const grouped = restaurants.reduce((acc, restaurant) => {
-        const city = restaurant.location || 'Altro';
-        if (!acc[city]) acc[city] = [];
-        acc[city].push(restaurant);
-        return acc;
-    }, {});
+    // Build hierarchical structure: country → region → city → restaurants
+    const hierarchy = {};
 
-    // Sort cities alphabetically
-    const cities = Object.keys(grouped).sort();
+    restaurants.forEach(restaurant => {
+        const country = restaurant.country || 'Other';
+        const region = restaurant.region || 'Other';
+        const city = restaurant.city || restaurant.location || 'Other';
 
-    sharedRestaurantsList.innerHTML = cities.map(city => `
-        <div style="margin-bottom: 40px;">
-            <h3 style="color: var(--primary-blue); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color);">
-                📍 ${city} <span style="font-size: 14px; color: var(--text-secondary);">(${grouped[city].length})</span>
-            </h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
-                ${grouped[city].map(restaurant => {
+        if (!hierarchy[country]) hierarchy[country] = {};
+        if (!hierarchy[country][region]) hierarchy[country][region] = {};
+        if (!hierarchy[country][region][city]) hierarchy[country][region][city] = [];
+
+        hierarchy[country][region][city].push(restaurant);
+    });
+
+    // Sort alphabetically
+    const countries = Object.keys(hierarchy).sort();
+
+    let html = '<div style="padding: 20px;">';
+
+    countries.forEach(country => {
+        const countryCount = Object.values(hierarchy[country]).flat().flat().length;
+        const countryId = country.replace(/\s+/g, '_');
+
+        html += `
+            <div style="margin-bottom: 24px;">
+                <button onclick="toggleSection('${countryId}')"
+                        style="width: 100%; text-align: left; padding: 16px; background: var(--card-bg); border: 2px solid var(--primary-blue); border-radius: 12px; color: var(--text-primary); font-size: 18px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                    <span>🌍 ${country} <span style="color: var(--text-secondary); font-size: 14px; font-weight: 400;">(${countryCount})</span></span>
+                    <span id="${countryId}_arrow">▼</span>
+                </button>
+
+                <div id="${countryId}" style="display: none; margin-left: 20px; margin-top: 12px;">
+        `;
+
+        const regions = Object.keys(hierarchy[country]).sort();
+
+        regions.forEach(region => {
+            const regionCount = Object.values(hierarchy[country][region]).flat().length;
+            const regionId = `${countryId}_${region.replace(/\s+/g, '_')}`;
+
+            html += `
+                <button onclick="toggleSection('${regionId}')"
+                        style="width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                    <span>📍 ${region} <span style="color: var(--text-secondary); font-size: 13px;">(${regionCount})</span></span>
+                    <span id="${regionId}_arrow">▶</span>
+                </button>
+
+                <div id="${regionId}" style="display: none; margin-left: 20px; margin-top: 8px;">
+            `;
+
+            const cities = Object.keys(hierarchy[country][region]).sort();
+
+            cities.forEach(city => {
+                const cityRestaurants = hierarchy[country][region][city];
+                const cityId = `${regionId}_${city.replace(/\s+/g, '_')}`;
+
+                html += `
+                    <button onclick="toggleSection('${cityId}')"
+                            style="width: 100%; text-align: left; padding: 10px; margin-bottom: 8px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--primary-blue); font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <span>🏙️ ${city} <span style="color: var(--text-secondary); font-size: 12px;">(${cityRestaurants.length})</span></span>
+                        <span id="${cityId}_arrow">▶</span>
+                    </button>
+
+                    <div id="${cityId}" style="display: none; margin-left: 20px; margin-top: 8px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                `;
+
+                cityRestaurants.forEach(restaurant => {
                     const stars = '⭐'.repeat(Math.round(restaurant.rating_avg || 0));
-                    return `
-                        <div class="data-card">
-                            <h4 style="margin: 0 0 8px 0;">${restaurant.name}</h4>
-                            ${restaurant.address ? `<div class="meta">📍 ${restaurant.address}</div>` : ''}
-                            ${restaurant.cuisine ? `<div class="meta">🍽️ ${restaurant.cuisine}</div>` : ''}
-                            ${restaurant.price_range ? `<div class="meta">${restaurant.price_range}</div>` : ''}
-                            ${restaurant.phone ? `<div class="meta">📞 ${restaurant.phone}</div>` : ''}
-                            <div style="margin-top: 8px;">
-                                ${restaurant.gratuity ? '<span class="badge badge-green">🎁 TL Free</span>' : ''}
-                                ${restaurant.commission ? '<span class="badge badge-yellow">💰 Commission</span>' : ''}
-                                ${restaurant.discount_percentage ? '<span class="badge badge-blue">🏷️ Discount ' + restaurant.discount_percentage + '%</span>' : ''}
+                    html += `
+                        <div class="data-card" style="font-size: 13px;">
+                            <h4 style="margin: 0 0 6px 0; font-size: 15px;">${restaurant.name}</h4>
+                            ${restaurant.address ? `<div class="meta" style="font-size: 12px;">📍 ${restaurant.address}</div>` : ''}
+                            ${restaurant.cuisine ? `<div class="meta" style="font-size: 12px;">🍽️ ${restaurant.cuisine}</div>` : ''}
+                            ${restaurant.price_range ? `<div class="meta" style="font-size: 12px;">${restaurant.price_range}</div>` : ''}
+                            ${restaurant.phone ? `<div class="meta" style="font-size: 12px;">📞 ${restaurant.phone}</div>` : ''}
+                            <div style="margin-top: 6px;">
+                                ${restaurant.gratuity ? '<span class="badge badge-green" style="font-size: 10px; padding: 3px 6px;">🎁 TL Free</span>' : ''}
+                                ${restaurant.commission ? '<span class="badge badge-yellow" style="font-size: 10px; padding: 3px 6px;">💰 ' + (restaurant.commission_percentage ? restaurant.commission_percentage + '%' : 'Comm.') + '</span>' : ''}
+                                ${restaurant.discount_percentage ? '<span class="badge badge-blue" style="font-size: 10px; padding: 3px 6px;">🏷️ ' + restaurant.discount_percentage + '%</span>' : ''}
                             </div>
-                            ${stars ? `<div style="margin-top: 8px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
-                            ${restaurant.notes ? `<div class="meta" style="margin-top: 8px;">💬 ${restaurant.notes}</div>` : ''}
-                            <div style="display: flex; gap: 8px; margin-top: 12px;">
-                                <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 13px;" onclick="openRatingModal('${restaurant.id}')">⭐ Vota</button>
-                                <button class="btn" style="flex: 1; padding: 8px; font-size: 13px; background: var(--error); border-color: var(--error);" onclick="deleteRestaurant('${restaurant.id}', '${restaurant.name}')">🗑️ Elimina</button>
+                            ${stars ? `<div style="margin-top: 6px; font-size: 12px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
+                            ${restaurant.notes ? `<div class="meta" style="margin-top: 6px; font-size: 11px;">💬 ${restaurant.notes}</div>` : ''}
+                            <div style="display: flex; gap: 6px; margin-top: 8px;">
+                                <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 11px;" onclick="openRatingModal('${restaurant.id}')">⭐</button>
+                                <button class="btn" style="padding: 6px 8px; font-size: 11px; background: rgba(255, 71, 87, 0.2); border-color: var(--error); color: var(--error);" onclick="deleteRestaurant('${restaurant.id}', '${restaurant.name}')" title="Elimina">🗑️</button>
                             </div>
                         </div>
                     `;
-                }).join('')}
-            </div>
-        </div>
-    `).join('');
+                });
 
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+
+    sharedRestaurantsList.innerHTML = html;
     window.allSharedRestaurants = restaurants;
+}
+
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const arrow = document.getElementById(sectionId + '_arrow');
+
+    if (!section || !arrow) return;
+
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        arrow.textContent = '▼';
+    } else {
+        section.style.display = 'none';
+        arrow.textContent = '▶';
+    }
 }
 
 async function deleteRestaurant(id, name) {
@@ -5442,12 +5537,17 @@ async function handleSaveSharedRestaurant(e) {
         // TL benefits
         gratuity: document.getElementById('sharedTlFree').checked,
         commission: document.getElementById('sharedHasCommission').checked,
+        commission_percentage: document.getElementById('sharedCommissionPerc').value ? parseInt(document.getElementById('sharedCommissionPerc').value) : null,
         discount: document.getElementById('sharedHasDiscount').checked,
         discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
 
-        // Location
-        location: document.getElementById('sharedRestaurantCity').value,
+        // Location (NEW: hierarchical structure)
+        country: document.getElementById('sharedRestaurantCountry').value,
+        region: document.getElementById('sharedRestaurantRegion').value || null,
+        city: document.getElementById('sharedRestaurantCity').value,
+        location: document.getElementById('sharedRestaurantCity').value, // Keep for backwards compatibility
         address: document.getElementById('sharedRestaurantAddress').value || null,
+        phone: document.getElementById('sharedRestaurantPhone').value || null,
         google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
 
         // Hours

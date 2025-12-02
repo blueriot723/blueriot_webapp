@@ -522,6 +522,35 @@ body {
     max-width: 1000px;
 }
 
+/* Form modals for databases (TASTES, ROUTES, STAY) */
+.modal-content.form-wide {
+    max-width: 800px;
+}
+
+/* Form grids - responsive columns */
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Compact inline fields for checkboxes with values */
+.inline-field-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.inline-field-group input[type="number"] {
+    width: 120px;
+    padding: 8px 12px;
+    background: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+}
+
 /* ===== RATING STARS ===== */
 .star-rating {
     cursor: pointer;
@@ -535,6 +564,23 @@ body {
 }
 
 /* ===== RESPONSIVE ===== */
+
+/* iPad Pro 12.9" and smaller tablets (1024px and below) */
+@media (max-width: 1024px) {
+    .modal-content.wide {
+        max-width: 90vw;
+    }
+
+    .modal-content.form-wide {
+        max-width: 90vw;
+    }
+
+    .ecosystem-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile and small tablets (768px and below) */
 @media (max-width: 768px) {
     .login-form {
         padding: 32px 24px;
@@ -566,10 +612,36 @@ body {
 
     .tabs {
         padding: 0 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .modal-content.wide {
-        max-width: 100%;
+    .modal-content.wide,
+    .modal-content.form-wide {
+        max-width: 95vw;
+    }
+
+    .modal-content {
+        max-height: 85vh;
+    }
+
+    .ecosystem-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Form grids become single column on mobile */
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Inline fields stack on mobile */
+    .inline-field-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .inline-field-group input[type="number"] {
+        width: 100%;
     }
 }
 
@@ -1258,7 +1330,7 @@ body {
     <!-- SHARED RESTAURANT FORM MODAL -->
     <!-- TASTES DATABASE MODAL (Complete Form) -->
     <div id="sharedRestaurantModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-content form-wide">
             <div class="modal-header">
                 <h2 id="tastesModalTitle">Aggiungi a ΤΔSΤΞ5 Database</h2>
                 <button class="modal-close" id="closeSharedRestaurantModal">&times;</button>
@@ -1268,7 +1340,7 @@ body {
                 <!-- BASIC INFO -->
                 <h3 style="margin: 0 0 16px; color: var(--primary-blue);">📋 Info Base</h3>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label for="sharedRestaurantName">Nome Locale *</label>
                         <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
@@ -1289,7 +1361,7 @@ body {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label for="sharedCuisineType">Tipo Cucina</label>
                         <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
@@ -1310,7 +1382,7 @@ body {
                 <!-- LOCATION -->
                 <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Posizione</h3>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label for="sharedRestaurantCity">Città *</label>
                         <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma">
@@ -1322,7 +1394,7 @@ body {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label for="sharedGoogleMaps">Link Google Maps</label>
                         <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/...">
@@ -1353,22 +1425,26 @@ body {
                 <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
 
                 <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
                         <input type="checkbox" id="sharedTlFree">
                         <span>🎁 Gratuity (TL Free)</span>
                     </label>
 
-                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        <input type="checkbox" id="sharedHasCommission">
-                        <span>💰 Commission</span>
-                    </label>
-                    <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% commissione" style="margin-left: 24px; margin-bottom: 12px; width: calc(100% - 24px);">
+                    <div class="inline-field-group">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="sharedHasCommission">
+                            <span>💰 Commission</span>
+                        </label>
+                        <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% (es. 10)">
+                    </div>
 
-                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        <input type="checkbox" id="sharedHasDiscount">
-                        <span>🏷️ Discount</span>
-                    </label>
-                    <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% sconto" style="margin-left: 24px; width: calc(100% - 24px);">
+                    <div class="inline-field-group">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="sharedHasDiscount">
+                            <span>🏷️ Discount</span>
+                        </label>
+                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% (es. 15)">
+                    </div>
                 </div>
 
                 <!-- GROUP SUITABILITY -->
@@ -1381,7 +1457,7 @@ body {
                     </label>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label for="sharedMinGroupSize">Min Persone Gruppo</label>
                         <input type="number" id="sharedMinGroupSize" min="1" placeholder="es. 10">
@@ -1401,7 +1477,7 @@ body {
                     <input type="text" id="sharedToursRelevant" placeholder="es. ZMXI, ZXXI, ZMXD">
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid-2">
                     <div class="form-group">
                         <label for="sharedTestedBy">Testato da (TL)</label>
                         <input type="text" id="sharedTestedBy" placeholder="es. Marco Rossi">
@@ -1489,7 +1565,7 @@ body {
 
     <!-- ROUTES DATABASE MODAL -->
     <div id="routesModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-content form-wide">
             <div class="modal-header">
                 <h2 id="routesModalTitle">Aggiungi a R0UT35 Database</h2>
                 <button class="modal-close" id="closeRoutesModal">&times;</button>
@@ -1649,7 +1725,7 @@ body {
 
     <!-- STAY DATABASE MODAL -->
     <div id="stayModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-content form-wide">
             <div class="modal-header">
                 <h2 id="stayModalTitle">Aggiungi a SΤΔΥ Database</h2>
                 <button class="modal-close" id="closeStayModal">&times;</button>
@@ -5276,31 +5352,72 @@ function displaySharedRestaurants(restaurants) {
     const sharedRestaurantsList = document.getElementById('sharedRestaurantsList');
     if (!sharedRestaurantsList) return;
 
-    sharedRestaurantsList.innerHTML = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">` +
-        restaurants.map(restaurant => {
-            const stars = '⭐'.repeat(Math.round(restaurant.rating_avg || 0));
-            return `
-                <div class="data-card">
-                    <h4 style="margin: 0 0 8px 0;">${restaurant.name}</h4>
-                    <div class="meta">📍 ${restaurant.location}${restaurant.address ? ' - ' + restaurant.address : ''}</div>
-                    ${restaurant.cuisine ? `<div class="meta">🍽️ ${restaurant.cuisine}</div>` : ''}
-                    ${restaurant.price_range ? `<div class="meta">${restaurant.price_range}</div>` : ''}
-                    ${restaurant.phone ? `<div class="meta">📞 ${restaurant.phone}</div>` : ''}
-                    <div style="margin-top: 8px;">
-                        ${restaurant.gratuity ? '<span class="badge badge-green">🎁 TL Free</span>' : ''}
-                        ${restaurant.commission ? '<span class="badge badge-yellow">💰 Commission</span>' : ''}
-                        ${restaurant.discount_percentage ? '<span class="badge badge-blue">🏷️ Discount ' + restaurant.discount_percentage + '%</span>' : ''}
-                    </div>
-                    ${stars ? `<div style="margin-top: 8px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
-                    ${restaurant.notes ? `<div class="meta" style="margin-top: 8px;">💬 ${restaurant.notes}</div>` : ''}
-                    <div style="display: flex; gap: 8px; margin-top: 12px;">
-                        <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 13px;" onclick="openRatingModal('${restaurant.id}')">⭐ Vota</button>
-                    </div>
-                </div>
-            `;
-        }).join('') + '</div>';
+    // Group by location (city)
+    const grouped = restaurants.reduce((acc, restaurant) => {
+        const city = restaurant.location || 'Altro';
+        if (!acc[city]) acc[city] = [];
+        acc[city].push(restaurant);
+        return acc;
+    }, {});
+
+    // Sort cities alphabetically
+    const cities = Object.keys(grouped).sort();
+
+    sharedRestaurantsList.innerHTML = cities.map(city => `
+        <div style="margin-bottom: 40px;">
+            <h3 style="color: var(--primary-blue); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color);">
+                📍 ${city} <span style="font-size: 14px; color: var(--text-secondary);">(${grouped[city].length})</span>
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                ${grouped[city].map(restaurant => {
+                    const stars = '⭐'.repeat(Math.round(restaurant.rating_avg || 0));
+                    return `
+                        <div class="data-card">
+                            <h4 style="margin: 0 0 8px 0;">${restaurant.name}</h4>
+                            ${restaurant.address ? `<div class="meta">📍 ${restaurant.address}</div>` : ''}
+                            ${restaurant.cuisine ? `<div class="meta">🍽️ ${restaurant.cuisine}</div>` : ''}
+                            ${restaurant.price_range ? `<div class="meta">${restaurant.price_range}</div>` : ''}
+                            ${restaurant.phone ? `<div class="meta">📞 ${restaurant.phone}</div>` : ''}
+                            <div style="margin-top: 8px;">
+                                ${restaurant.gratuity ? '<span class="badge badge-green">🎁 TL Free</span>' : ''}
+                                ${restaurant.commission ? '<span class="badge badge-yellow">💰 Commission</span>' : ''}
+                                ${restaurant.discount_percentage ? '<span class="badge badge-blue">🏷️ Discount ' + restaurant.discount_percentage + '%</span>' : ''}
+                            </div>
+                            ${stars ? `<div style="margin-top: 8px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
+                            ${restaurant.notes ? `<div class="meta" style="margin-top: 8px;">💬 ${restaurant.notes}</div>` : ''}
+                            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                                <button class="btn btn-secondary" style="flex: 1; padding: 8px; font-size: 13px;" onclick="openRatingModal('${restaurant.id}')">⭐ Vota</button>
+                                <button class="btn" style="flex: 1; padding: 8px; font-size: 13px; background: var(--error); border-color: var(--error);" onclick="deleteRestaurant('${restaurant.id}', '${restaurant.name}')">🗑️ Elimina</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `).join('');
 
     window.allSharedRestaurants = restaurants;
+}
+
+async function deleteRestaurant(id, name) {
+    if (!confirm(`🗑️ Sei sicuro di voler eliminare "${name}"?\n\nQuesta azione è irreversibile!`)) {
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('blueriot_tastes')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert(`✅ "${name}" eliminato con successo!`);
+        loadSharedRestaurants(); // Reload list
+    } catch (error) {
+        console.error('Delete restaurant error:', error);
+        alert('❌ Errore eliminazione:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
 }
 
 async function handleSaveSharedRestaurant(e) {

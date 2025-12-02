@@ -5254,9 +5254,9 @@ async function loadSharedRestaurants() {
         sharedRestaurantsList.innerHTML = '<p class="loading">Caricamento...</p>';
 
         const { data: restaurants, error } = await supabaseClient
-            .from('shared_restaurants')
+            .from('blueriot_tastes')
             .select('*')
-            .order('city', { ascending: true });
+            .order('location', { ascending: true });
 
         if (error) throw error;
 
@@ -5281,14 +5281,14 @@ function displaySharedRestaurants(restaurants) {
             const stars = '⭐'.repeat(Math.round(restaurant.rating_avg || 0));
             return `
                 <div class="data-card">
-                    <h4 style="margin: 0 0 8px 0;">${restaurant.restaurant_name}</h4>
-                    <div class="meta">📍 ${restaurant.city}${restaurant.address ? ' - ' + restaurant.address : ''}</div>
-                    ${restaurant.cuisine_type ? `<div class="meta">🍽️ ${restaurant.cuisine_type}</div>` : ''}
+                    <h4 style="margin: 0 0 8px 0;">${restaurant.name}</h4>
+                    <div class="meta">📍 ${restaurant.location}${restaurant.address ? ' - ' + restaurant.address : ''}</div>
+                    ${restaurant.cuisine ? `<div class="meta">🍽️ ${restaurant.cuisine}</div>` : ''}
                     ${restaurant.price_range ? `<div class="meta">${restaurant.price_range}</div>` : ''}
                     ${restaurant.phone ? `<div class="meta">📞 ${restaurant.phone}</div>` : ''}
                     <div style="margin-top: 8px;">
-                        ${restaurant.tl_free ? '<span class="badge badge-green">🎁 TL Free</span>' : ''}
-                        ${restaurant.has_commission ? '<span class="badge badge-yellow">💰 Commission ' + (restaurant.commission_percentage || '') + '%</span>' : ''}
+                        ${restaurant.gratuity ? '<span class="badge badge-green">🎁 TL Free</span>' : ''}
+                        ${restaurant.commission ? '<span class="badge badge-yellow">💰 Commission</span>' : ''}
                         ${restaurant.discount_percentage ? '<span class="badge badge-blue">🏷️ Discount ' + restaurant.discount_percentage + '%</span>' : ''}
                     </div>
                     ${stars ? `<div style="margin-top: 8px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
@@ -5389,10 +5389,10 @@ async function performRestaurantSearch() {
     try {
         searchResultsList.innerHTML = '<p class="loading">Ricerca...</p>';
 
-        let query = supabaseClient.from('shared_restaurants').select('*');
+        let query = supabaseClient.from('blueriot_tastes').select('*');
 
-        if (city) query = query.ilike('city', `%${city}%`);
-        if (cuisine) query = query.ilike('cuisine_type', `%${cuisine}%`);
+        if (city) query = query.ilike('location', `%${city}%`);
+        if (cuisine) query = query.ilike('cuisine', `%${cuisine}%`);
 
         const { data: restaurants, error } = await query.order('rating_avg', { ascending: false });
 
@@ -5405,9 +5405,9 @@ async function performRestaurantSearch() {
 
         searchResultsList.innerHTML = restaurants.map(r => `
             <div class="data-card">
-                <h4>${r.restaurant_name}</h4>
-                <div class="meta">📍 ${r.city}</div>
-                ${r.cuisine_type ? `<div class="meta">🍽️ ${r.cuisine_type}</div>` : ''}
+                <h4>${r.name}</h4>
+                <div class="meta">📍 ${r.location}</div>
+                ${r.cuisine ? `<div class="meta">🍽️ ${r.cuisine}</div>` : ''}
                 <button class="btn btn-primary" style="width: 100%; margin-top: 12px;" onclick="copyRestaurantToTour('${r.id}')">➕ Aggiungi al Tour</button>
             </div>
         `).join('');
@@ -5427,8 +5427,8 @@ async function copyRestaurantToTour(restaurantId) {
 
     // Pre-populate form
     document.getElementById('restaurantDay').value = '';
-    document.getElementById('restaurantName').value = restaurant.restaurant_name;
-    document.getElementById('restaurantCity').value = restaurant.city;
+    document.getElementById('restaurantName').value = restaurant.name;
+    document.getElementById('restaurantCity').value = restaurant.location;
     document.getElementById('restaurantAddress').value = restaurant.address || '';
     document.getElementById('restaurantPhone').value = restaurant.phone || '';
     document.getElementById('restaurantNotes').value = restaurant.notes || '';
@@ -5486,7 +5486,7 @@ async function handleSubmitRating(e) {
         const avg = ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length;
 
         await supabaseClient
-            .from('shared_restaurants')
+            .from('blueriot_tastes')
             .update({
                 rating_avg: avg,
                 total_ratings: ratings.length

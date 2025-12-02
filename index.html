@@ -352,8 +352,14 @@ body {
     border-radius: 16px;
     width: 100%;
     max-width: 500px;
-    max-height: 90vh;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content form {
     overflow-y: auto;
+    flex: 1;
 }
 
 .modal-header {
@@ -1408,13 +1414,17 @@ body {
 
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label for="sharedGoogleMaps">Link Google Maps</label>
-                        <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/...">
+                        <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
+                        <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." onblur="autofillFromGoogleMaps()">
+                        <small style="color: var(--text-secondary); font-size: 11px;">Incolla il link e premi Tab per autofill</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="sharedRestaurantPhone">Telefono</label>
-                        <input type="tel" id="sharedRestaurantPhone" placeholder="es. +39 06 1234567">
+                        <label>Telefoni</label>
+                        <div id="phoneNumbersList" style="display: flex; flex-direction: column; gap: 8px;">
+                            <input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
+                        </div>
+                        <button type="button" onclick="addPhoneField()" style="margin-top: 8px; padding: 6px 12px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 12px; cursor: pointer;">➕ Aggiungi numero</button>
                     </div>
                 </div>
 
@@ -5434,23 +5444,54 @@ function displaySharedRestaurants(restaurants) {
 
                 cityRestaurants.forEach(restaurant => {
                     const stars = '⭐'.repeat(Math.round(restaurant.rating_avg || 0));
+                    const cardId = `card_${restaurant.id}`;
+                    const detailsId = `details_${restaurant.id}`;
+
+                    // Parse phone numbers (can be array or string)
+                    let phoneDisplay = '';
+                    if (restaurant.phone) {
+                        const phones = Array.isArray(restaurant.phone) ? restaurant.phone : [restaurant.phone];
+                        phoneDisplay = phones.map(p => `📞 ${p}`).join('<br>');
+                    }
+
                     html += `
-                        <div class="data-card" style="font-size: 13px;">
+                        <div id="${cardId}" class="data-card" style="font-size: 13px; cursor: pointer; transition: all 0.2s;" onclick="toggleCardDetails('${detailsId}', '${cardId}')">
                             <h4 style="margin: 0 0 6px 0; font-size: 15px;">${restaurant.name}</h4>
-                            ${restaurant.address ? `<div class="meta" style="font-size: 12px;">📍 ${restaurant.address}</div>` : ''}
-                            ${restaurant.cuisine ? `<div class="meta" style="font-size: 12px;">🍽️ ${restaurant.cuisine}</div>` : ''}
-                            ${restaurant.price_range ? `<div class="meta" style="font-size: 12px;">${restaurant.price_range}</div>` : ''}
-                            ${restaurant.phone ? `<div class="meta" style="font-size: 12px;">📞 ${restaurant.phone}</div>` : ''}
-                            <div style="margin-top: 6px;">
-                                ${restaurant.gratuity ? '<span class="badge badge-green" style="font-size: 10px; padding: 3px 6px;">🎁 TL Free</span>' : ''}
-                                ${restaurant.commission ? '<span class="badge badge-yellow" style="font-size: 10px; padding: 3px 6px;">💰 ' + (restaurant.commission_percentage ? restaurant.commission_percentage + '%' : 'Comm.') + '</span>' : ''}
-                                ${restaurant.discount_percentage ? '<span class="badge badge-blue" style="font-size: 10px; padding: 3px 6px;">🏷️ ' + restaurant.discount_percentage + '%</span>' : ''}
+
+                            <!-- BASIC INFO (always visible) -->
+                            <div style="font-size: 12px;">
+                                ${restaurant.cuisine ? `<div class="meta">🍽️ ${restaurant.cuisine}</div>` : ''}
+                                ${restaurant.price_range ? `<div class="meta">${restaurant.price_range}</div>` : ''}
+                                <div style="margin-top: 6px;">
+                                    ${restaurant.gratuity ? '<span class="badge badge-green" style="font-size: 10px; padding: 3px 6px;">🎁 TL Free</span>' : ''}
+                                    ${restaurant.commission ? '<span class="badge badge-yellow" style="font-size: 10px; padding: 3px 6px;">💰 ' + (restaurant.commission_percentage ? restaurant.commission_percentage + '%' : 'Comm.') + '</span>' : ''}
+                                    ${restaurant.discount_percentage ? '<span class="badge badge-blue" style="font-size: 10px; padding: 3px 6px;">🏷️ ' + restaurant.discount_percentage + '%</span>' : ''}
+                                </div>
                             </div>
-                            ${stars ? `<div style="margin-top: 6px; font-size: 12px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
-                            ${restaurant.notes ? `<div class="meta" style="margin-top: 6px; font-size: 11px;">💬 ${restaurant.notes}</div>` : ''}
-                            <div style="display: flex; gap: 6px; margin-top: 8px;">
-                                <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 11px;" onclick="openRatingModal('${restaurant.id}')">⭐</button>
-                                <button class="btn" style="padding: 6px 8px; font-size: 11px; background: rgba(255, 71, 87, 0.2); border-color: var(--error); color: var(--error);" onclick="deleteRestaurant('${restaurant.id}', '${restaurant.name}')" title="Elimina">🗑️</button>
+
+                            <!-- DETAILED INFO (collapsible) -->
+                            <div id="${detailsId}" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 12px;" onclick="event.stopPropagation()">
+                                ${restaurant.address ? `<div class="meta">📍 ${restaurant.address}</div>` : ''}
+                                ${phoneDisplay ? `<div class="meta">${phoneDisplay}</div>` : ''}
+                                ${restaurant.google_maps_link ? `<div class="meta"><a href="${restaurant.google_maps_link}" target="_blank" style="color: var(--primary-blue);">🗺️ Google Maps</a></div>` : ''}
+                                ${restaurant.opening_hours ? `<div class="meta">🕐 ${restaurant.opening_hours}</div>` : ''}
+                                ${restaurant.booking_needed ? '<div class="meta">📅 Prenotazione necessaria</div>' : ''}
+                                ${restaurant.min_group_size || restaurant.max_group_size ? `<div class="meta">👥 Gruppi: ${restaurant.min_group_size || '?'}-${restaurant.max_group_size || '?'} persone</div>` : ''}
+                                ${stars ? `<div style="margin-top: 6px;">${stars} (${restaurant.total_ratings || 0})</div>` : ''}
+                                ${restaurant.notes ? `<div class="meta" style="margin-top: 6px;">💬 ${restaurant.notes}</div>` : ''}
+                                ${restaurant.tested_by ? `<div class="meta" style="margin-top: 6px; font-size: 11px;">🧪 Testato da ${restaurant.tested_by}${restaurant.tested_date ? ' il ' + restaurant.tested_date : ''}</div>` : ''}
+
+                                <!-- ACTION BUTTONS -->
+                                <div style="display: flex; gap: 6px; margin-top: 10px;">
+                                    <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 11px;" onclick="editRestaurant('${restaurant.id}')">✏️ Modifica</button>
+                                    <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 11px;" onclick="openRatingModal('${restaurant.id}')">⭐ Vota</button>
+                                    <button class="btn" style="padding: 6px 10px; font-size: 11px; background: #ff0000; border-color: #ff0000; color: white;" onclick="deleteRestaurant('${restaurant.id}', '${restaurant.name}')" title="Elimina">🗑️</button>
+                                </div>
+                            </div>
+
+                            <!-- EXPAND INDICATOR -->
+                            <div style="text-align: center; margin-top: 8px; color: var(--text-secondary); font-size: 11px;">
+                                <span id="${detailsId}_arrow">▼ Click per dettagli</span>
                             </div>
                         </div>
                     `;
@@ -5494,6 +5535,196 @@ function toggleSection(sectionId) {
     }
 }
 
+function toggleCardDetails(detailsId, cardId) {
+    const details = document.getElementById(detailsId);
+    const card = document.getElementById(cardId);
+    const arrow = document.getElementById(detailsId + '_arrow');
+
+    if (!details || !arrow) return;
+
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        arrow.textContent = '▲ Chiudi';
+        if (card) card.style.background = 'rgba(0, 240, 255, 0.05)';
+    } else {
+        details.style.display = 'none';
+        arrow.textContent = '▼ Click per dettagli';
+        if (card) card.style.background = '';
+    }
+}
+
+function addPhoneField() {
+    const phonesList = document.getElementById('phoneNumbersList');
+    if (!phonesList) return;
+
+    const newInput = document.createElement('input');
+    newInput.type = 'tel';
+    newInput.className = 'phone-input';
+    newInput.placeholder = 'es. +39 06 1234567';
+    newInput.style.cssText = 'width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);';
+
+    phonesList.appendChild(newInput);
+}
+
+async function autofillFromGoogleMaps() {
+    const mapsLink = document.getElementById('sharedGoogleMaps').value;
+    if (!mapsLink || !mapsLink.includes('google.com/maps')) return;
+
+    try {
+        // Extract place name from URL
+        let placeName = '';
+        const placeMatch = mapsLink.match(/place\/([^/]+)/);
+        if (placeMatch) {
+            placeName = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
+
+            // Auto-fill name if empty
+            const nameInput = document.getElementById('sharedRestaurantName');
+            if (nameInput && !nameInput.value) {
+                nameInput.value = placeName;
+            }
+        }
+
+        // Extract coordinates
+        const coordMatch = mapsLink.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (coordMatch) {
+            const lat = coordMatch[1];
+            const lng = coordMatch[2];
+
+            // Try to detect country from coordinates (rough approximation)
+            const latitude = parseFloat(lat);
+            const longitude = parseFloat(lng);
+
+            let country = '';
+            let region = '';
+
+            // Europe detection (very basic)
+            if (latitude >= 35 && latitude <= 71 && longitude >= -10 && longitude <= 40) {
+                // Italy
+                if (latitude >= 36 && latitude <= 47 && longitude >= 6 && longitude <= 19) {
+                    country = 'Italy';
+                    // Rough region detection for Italy
+                    if (latitude >= 41.5 && latitude <= 42.5 && longitude >= 12 && longitude <= 13) {
+                        region = 'Lazio';
+                    } else if (latitude >= 43 && latitude <= 44 && longitude >= 11 && longitude <= 12) {
+                        region = 'Toscana';
+                    } else if (latitude >= 45 && latitude <= 46 && longitude >= 12 && longitude <= 13) {
+                        region = 'Veneto';
+                    }
+                }
+                // France
+                else if (latitude >= 41 && latitude <= 51 && longitude >= -5 && longitude <= 9) {
+                    country = 'France';
+                    if (latitude >= 48 && latitude <= 49 && longitude >= 2 && longitude <= 3) {
+                        region = 'Île-de-France';
+                    }
+                }
+                // Spain
+                else if (latitude >= 36 && latitude <= 44 && longitude >= -10 && longitude <= 3) {
+                    country = 'Spain';
+                }
+            }
+
+            // Auto-fill country if detected and empty
+            const countryInput = document.getElementById('sharedRestaurantCountry');
+            if (countryInput && !countryInput.value && country) {
+                countryInput.value = country;
+            }
+
+            // Auto-fill region if detected and empty
+            const regionInput = document.getElementById('sharedRestaurantRegion');
+            if (regionInput && !regionInput.value && region) {
+                regionInput.value = region;
+            }
+        }
+
+        alert('✅ Autofill completato! Controlla e completa i dati mancanti.');
+
+    } catch (error) {
+        console.error('Autofill error:', error);
+        alert('⚠️ Autofill parziale. Completa manualmente i dati.');
+    }
+}
+
+async function editRestaurant(id) {
+    try {
+        // Find restaurant data
+        const restaurant = window.allSharedRestaurants.find(r => r.id === id);
+        if (!restaurant) {
+            alert('❌ Ristorante non trovato');
+            return;
+        }
+
+        // Open modal
+        const modal = document.getElementById('sharedRestaurantModal');
+        const form = document.getElementById('sharedRestaurantForm');
+        if (!modal || !form) return;
+
+        // Set editing mode
+        window.currentEditingId = id;
+
+        // Fill form with data
+        document.getElementById('sharedRestaurantName').value = restaurant.name || '';
+        document.getElementById('sharedType').value = restaurant.type || '';
+        document.getElementById('sharedCuisineType').value = restaurant.cuisine || '';
+        document.getElementById('sharedPriceRange').value = restaurant.price_range || '';
+
+        // Location
+        document.getElementById('sharedRestaurantCountry').value = restaurant.country || '';
+        document.getElementById('sharedRestaurantRegion').value = restaurant.region || '';
+        document.getElementById('sharedRestaurantCity').value = restaurant.city || restaurant.location || '';
+        document.getElementById('sharedRestaurantAddress').value = restaurant.address || '';
+        document.getElementById('sharedGoogleMaps').value = restaurant.google_maps_link || '';
+
+        // Phone numbers
+        const phonesList = document.getElementById('phoneNumbersList');
+        if (phonesList) {
+            phonesList.innerHTML = ''; // Clear existing
+            const phones = Array.isArray(restaurant.phone) ? restaurant.phone : (restaurant.phone ? [restaurant.phone] : ['']);
+            phones.forEach((phone, i) => {
+                const input = document.createElement('input');
+                input.type = 'tel';
+                input.className = 'phone-input';
+                input.value = phone;
+                input.placeholder = 'es. +39 06 1234567';
+                input.style.cssText = 'width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);';
+                phonesList.appendChild(input);
+            });
+        }
+
+        // Hours
+        document.getElementById('sharedOpeningHours').value = restaurant.opening_hours || '';
+        document.getElementById('sharedBookingNeeded').checked = restaurant.booking_needed || false;
+
+        // Benefits
+        document.getElementById('sharedTlFree').checked = restaurant.gratuity || false;
+        document.getElementById('sharedHasCommission').checked = restaurant.commission || false;
+        document.getElementById('sharedCommissionPerc').value = restaurant.commission_percentage || '';
+        document.getElementById('sharedHasDiscount').checked = restaurant.discount || false;
+        document.getElementById('sharedDiscountPerc').value = restaurant.discount_percentage || '';
+
+        // Group
+        document.getElementById('sharedSuitableForGroups').checked = restaurant.suitable_for_groups !== false;
+        document.getElementById('sharedMinGroupSize').value = restaurant.min_group_size || '';
+        document.getElementById('sharedMaxGroupSize').value = restaurant.max_group_size || '';
+
+        // Additional
+        document.getElementById('sharedToursRelevant').value = Array.isArray(restaurant.tours_relevant) ? restaurant.tours_relevant.join(', ') : '';
+        document.getElementById('sharedTestedBy').value = restaurant.tested_by || '';
+        document.getElementById('sharedTestedDate').value = restaurant.tested_date || '';
+        document.getElementById('sharedNotes').value = restaurant.notes || '';
+
+        // Change modal title
+        const modalTitle = document.getElementById('tastesModalTitle');
+        if (modalTitle) modalTitle.textContent = '✏️ Modifica Ristorante';
+
+        modal.classList.add('active');
+
+    } catch (error) {
+        console.error('Edit restaurant error:', error);
+        alert('❌ Errore apertura modifica:\n\n' + (error.message || 'Errore sconosciuto'));
+    }
+}
+
 async function deleteRestaurant(id, name) {
     if (!confirm(`🗑️ Sei sicuro di voler eliminare "${name}"?\n\nQuesta azione è irreversibile!`)) {
         return;
@@ -5527,6 +5758,12 @@ async function handleSaveSharedRestaurant(e) {
     const toursRelevantStr = document.getElementById('sharedToursRelevant').value || '';
     const toursRelevantArray = toursRelevantStr ? toursRelevantStr.split(',').map(t => t.trim()).filter(t => t) : null;
 
+    // Collect phone numbers from all input fields
+    const phoneInputs = document.querySelectorAll('.phone-input');
+    const phoneNumbers = Array.from(phoneInputs)
+        .map(input => input.value.trim())
+        .filter(phone => phone); // Remove empty values
+
     const tastesData = {
         // Basic info
         name: document.getElementById('sharedRestaurantName').value,
@@ -5541,13 +5778,13 @@ async function handleSaveSharedRestaurant(e) {
         discount: document.getElementById('sharedHasDiscount').checked,
         discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
 
-        // Location (NEW: hierarchical structure)
+        // Location (hierarchical structure)
         country: document.getElementById('sharedRestaurantCountry').value,
         region: document.getElementById('sharedRestaurantRegion').value || null,
         city: document.getElementById('sharedRestaurantCity').value,
         location: document.getElementById('sharedRestaurantCity').value, // Keep for backwards compatibility
         address: document.getElementById('sharedRestaurantAddress').value || null,
-        phone: document.getElementById('sharedRestaurantPhone').value || null,
+        phone: phoneNumbers.length > 0 ? phoneNumbers : null, // Array of phone numbers
         google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
 
         // Hours
@@ -5570,16 +5807,40 @@ async function handleSaveSharedRestaurant(e) {
     };
 
     try {
-        const { error } = await supabaseClient
-            .from('blueriot_tastes')
-            .insert([tastesData]);
+        let result;
+        const isEditing = window.currentEditingId;
 
-        if (error) throw error;
+        if (isEditing) {
+            // UPDATE existing restaurant
+            result = await supabaseClient
+                .from('blueriot_tastes')
+                .update(tastesData)
+                .eq('id', isEditing);
+        } else {
+            // INSERT new restaurant
+            result = await supabaseClient
+                .from('blueriot_tastes')
+                .insert([tastesData]);
+        }
 
-        alert('✅ Locale aggiunto al database ΤΔSΤΞ5!');
+        if (result.error) throw result.error;
 
+        alert(isEditing ? '✅ Ristorante modificato!' : '✅ Locale aggiunto al database ΤΔSΤΞ5!');
+
+        // Reset and close
         if (sharedRestaurantModal) sharedRestaurantModal.classList.remove('active');
         if (sharedRestaurantForm) sharedRestaurantForm.reset();
+
+        // Reset modal title and editing mode
+        const modalTitle = document.getElementById('tastesModalTitle');
+        if (modalTitle) modalTitle.textContent = 'Aggiungi a ΤΔSΤΞ5 Database';
+        window.currentEditingId = null;
+
+        // Reload phone field (reset to 1)
+        const phonesList = document.getElementById('phoneNumbersList');
+        if (phonesList) {
+            phonesList.innerHTML = '<input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">';
+        }
 
         loadSharedRestaurants();
 

@@ -215,6 +215,23 @@ body {
     background: var(--border-color);
 }
 
+.btn-google {
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    width: 100%;
+}
+
+.btn-google:hover {
+    background: #f8f8f8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-google:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* ===== NAVBAR ===== */
 .navbar {
     background: var(--card-bg);
@@ -815,6 +832,20 @@ body {
 
                 <button type="submit" class="btn btn-primary" id="loginBtn">
                     <span class="btn-text" data-i18n="login.loginButton">Accedi</span>
+                </button>
+
+                <div style="text-align: center; margin: 20px 0; color: #666; font-size: 14px;">
+                    <span>oppure</span>
+                </div>
+
+                <button type="button" class="btn btn-google" id="googleLoginBtn" onclick="handleGoogleLogin()">
+                    <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right: 8px;">
+                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                        <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
+                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                    </svg>
+                    <span class="btn-text">Accedi con Google</span>
                 </button>
 
                 <div id="loginError" class="error-message"></div>
@@ -2559,6 +2590,9 @@ function init() {
     // Set up event listeners
     setupEventListeners();
 
+    // Handle OAuth callback (if returning from Google)
+    handleOAuthCallback();
+
     // Check if user is already logged in
     checkAuth();
 }
@@ -3078,6 +3112,102 @@ async function handleLogin(e) {
             loginBtn.disabled = false;
             loginBtn.innerHTML = '<span class="btn-text">Accedi</span>';
         }
+    }
+}
+
+async function handleGoogleLogin() {
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+
+    if (googleLoginBtn) {
+        googleLoginBtn.disabled = true;
+        googleLoginBtn.innerHTML = '<span class="btn-text">Reindirizzamento a Google...</span>';
+    }
+
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + window.location.pathname
+            }
+        });
+
+        if (error) {
+            console.error('❌ OAuth error:', error);
+            throw new Error(`OAuth: ${error.message}`);
+        }
+
+        // Il browser verrà reindirizzato a Google
+        // Quando torna, handleOAuthCallback() gestirà il login
+
+    } catch (error) {
+        console.error('💥 Google login failed:', error);
+        alert('❌ ERRORE GOOGLE LOGIN:\n\n' + (error.message || 'Errore sconosciuto'));
+
+        if (googleLoginBtn) {
+            googleLoginBtn.disabled = false;
+            googleLoginBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" style="margin-right: 8px;"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg><span class="btn-text">Accedi con Google</span>';
+        }
+    }
+}
+
+async function handleOAuthCallback() {
+    // Controlla se l'utente sta tornando da OAuth
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
+
+    if (!accessToken) {
+        // Non è un callback OAuth, ignora
+        return;
+    }
+
+    console.log('🔄 Callback OAuth rilevato, completamento login...');
+
+    try {
+        // Ottieni la sessione corrente (già impostata da Supabase dopo OAuth)
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+
+        if (sessionError) {
+            console.error('❌ Session error:', sessionError);
+            throw new Error(`Session: ${sessionError.message}`);
+        }
+
+        if (!session || !session.user) {
+            throw new Error('Sessione non valida dopo OAuth');
+        }
+
+        console.log('✅ OAuth Session OK, user:', session.user.id);
+
+        // Cerca il profilo TL nel database
+        const { data: tlData, error: tlError } = await supabaseClient
+            .from('tl_users')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+
+        if (tlError) {
+            console.error('❌ DB error:', tlError);
+            throw new Error(`DB: ${tlError.message} (${tlError.code})`);
+        }
+
+        if (!tlData) {
+            throw new Error('Profilo TL non trovato per questo account Google.\n\nContatta @blueriot per registrarti.');
+        }
+
+        console.log('✅ TL profile found via OAuth');
+
+        // Pulisci l'URL dal hash
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Mostra la dashboard
+        showDashboard(session.user, tlData);
+
+    } catch (error) {
+        console.error('💥 OAuth callback failed:', error);
+        alert('❌ LOGIN GOOGLE FALLITO:\n\n' + (error.message || 'Errore sconosciuto'));
+
+        // Pulisci l'URL e torna al login
+        window.history.replaceState({}, document.title, window.location.pathname);
+        window.location.reload();
     }
 }
 

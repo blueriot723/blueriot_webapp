@@ -6342,6 +6342,33 @@ async function handleSaveStay(e) {
         alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
-    </script>
+        <script>
+  // Inizializza Supabase con le chiavi corrette (NUOVE)
+  const supabaseClient = supabase.createClient(
+    "https://kvomxtzcnczvbcsqcybcy.supabase.co",
+    "sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC" // tua publishable key
+  );
+
+  // Funzione di login Google
+  async function loginWithGoogle() {
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: "https://blueriot723.github.io/blueriot_webapp/" 
+        }
+      });
+
+      if (error) {
+        console.error("Errore OAuth:", error);
+        alert("Errore nel login Google. Riprova.");
+      }
+    } catch (err) {
+      console.error("Errore inatteso:", err);
+    }
+  }
+  // Collega il bottone alla funzione
+  document.getElementById("google-login-btn").addEventListener("click", loginWithGoogle);
+</script>
 </body>
 </html>

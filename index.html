@@ -2185,8 +2185,8 @@ body {
 const { createClient } = supabase;
 
 const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const SUPABASE_PUBLISHABLE_OR_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_OR_ANON_KEY);
 
 // ===== MULTI-LANGUAGE SYSTEM =====
 const translations = {
@@ -3033,9 +3033,6 @@ async function handleLogin(e) {
         loginBtn.innerHTML = '<span class="btn-text">Caricamento...</span>';
     }
     hideError();
-
-    // Show immediate feedback
-    alert(`⏳ Tentativo login con:\n${email}\n\nPremi OK...`);
 
     try {
         const { data, error } = await supabaseClient.auth.signInWithPassword({

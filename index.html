@@ -351,9 +351,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(10, 14, 39, 0.9);
-    backdrop-filter: blur(8px);
-    z-index: 1000;
+    background: rgba(10, 14, 39, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -547,7 +547,7 @@ body {
 
 /* Form modals for databases (TASTES, ROUTES, STAY) */
 .modal-content.form-wide {
-    max-width: 800px;
+    max-width: 700px;
 }
 
 /* Form grids - responsive columns */
@@ -584,6 +584,61 @@ body {
 .star-rating:hover,
 .star-rating.selected {
     opacity: 1;
+}
+
+/* ===== FORM IMPROVEMENTS ===== */
+/* Larger, more readable form inputs */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="url"],
+.form-group input[type="tel"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+    padding: 16px !important;
+    font-size: 16px !important;
+}
+
+/* Better label styling */
+.form-group label:not([style*="display: flex"]) {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    display: block;
+}
+
+/* Section headers with visual separation */
+#sharedRestaurantForm h3 {
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+#sharedRestaurantForm h3:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+/* Larger checkbox labels */
+.form-group label[style*="display: flex"] span,
+.form-group label input[type="checkbox"] + span {
+    font-size: 15px !important;
+}
+
+/* Full-width primary save button */
+#sharedRestaurantForm button[type="submit"] {
+    width: 100% !important;
+    padding: 18px !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    flex: none !important;
+}
+
+/* Better spacing for form sections */
+#sharedRestaurantForm .form-group {
+    margin-bottom: 24px;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -1374,181 +1429,130 @@ body {
             </div>
 
             <form id="sharedRestaurantForm">
-                <!-- BASIC INFO -->
-                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">📋 Info Base</h3>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedRestaurantName">Nome Locale *</label>
-                        <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedType">Tipo *</label>
-                        <select id="sharedType" required>
-                            <option value="">Seleziona...</option>
-                            <option value="restaurant">🍝 Restaurant</option>
-                            <option value="bar">🍷 Bar</option>
-                            <option value="bakery">🥖 Bakery</option>
-                            <option value="quick_bite">🥪 Quick Bite</option>
-                            <option value="gelateria">🍨 Gelateria</option>
-                            <option value="aperitivo">🍹 Aperitivo</option>
-                            <option value="caffetteria">☕ Caffetteria</option>
-                        </select>
-                    </div>
+                <!-- 1. NOME RISTORANTE -->
+                <div class="form-group">
+                    <label for="sharedRestaurantName">Nome Locale *</label>
+                    <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedCuisineType">Tipo Cucina</label>
-                        <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedPriceRange">Fascia Prezzo</label>
-                        <select id="sharedPriceRange">
-                            <option value="">Seleziona...</option>
-                            <option value="€">€ - Economico</option>
-                            <option value="€€">€€ - Medio</option>
-                            <option value="€€€">€€€ - Alto</option>
-                            <option value="€€€€">€€€€ - Lusso</option>
-                        </select>
-                    </div>
+                <!-- 2. CITTÀ -->
+                <div class="form-group">
+                    <label for="sharedRestaurantCity">Città *</label>
+                    <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma, Firenze, Parigi">
                 </div>
 
-                <!-- LOCATION -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Posizione</h3>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedRestaurantCountry">Paese *</label>
-                        <input type="text" id="sharedRestaurantCountry" required placeholder="es. Italy, France, Spain">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedRestaurantRegion">Regione</label>
-                        <input type="text" id="sharedRestaurantRegion" placeholder="es. Lazio, Toscana, Île-de-France">
-                    </div>
+                <!-- 3. GOOGLE MAPS -->
+                <div class="form-group">
+                    <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
+                    <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." onpaste="setTimeout(() => autofillFromGoogleMaps(), 100)" onblur="autofillFromGoogleMaps()">
+                    <small style="color: var(--text-secondary); font-size: 12px;">Incolla link e autofill automatico</small>
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedRestaurantCity">Città *</label>
-                        <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma, Firenze, Parigi">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedRestaurantAddress">Indirizzo</label>
-                        <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
-                    </div>
+                <!-- 4. APPLE MAPS -->
+                <div class="form-group">
+                    <label for="sharedAppleMaps">Link Apple Maps 🍎</label>
+                    <input type="url" id="sharedAppleMaps" placeholder="https://maps.apple.com/..." onpaste="setTimeout(() => autofillFromAppleMaps(), 100)" onblur="autofillFromAppleMaps()">
+                    <small style="color: var(--text-secondary); font-size: 12px;">Incolla link e autofill automatico</small>
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
-                        <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." onblur="autofillFromGoogleMaps()">
-                        <small style="color: var(--text-secondary); font-size: 11px;">Incolla il link e premi Tab per autofill</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Telefoni</label>
-                        <div id="phoneNumbersList" style="display: flex; flex-direction: column; gap: 8px;">
-                            <input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
-                        </div>
-                        <button type="button" onclick="addPhoneField()" style="margin-top: 8px; padding: 6px 12px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 12px; cursor: pointer;">➕ Aggiungi numero</button>
-                    </div>
+                <!-- 5. INDIRIZZO -->
+                <div class="form-group">
+                    <label for="sharedRestaurantAddress">Indirizzo</label>
+                    <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
                 </div>
 
-                <!-- OPENING HOURS -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🕐 Orari</h3>
+                <!-- 6. TELEFONI SECTION -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📞 Contatti</h3>
 
+                <div class="form-group">
+                    <label for="sharedContactPerson">Riferimento/Contatto</label>
+                    <input type="text" id="sharedContactPerson" placeholder="es. Mario Rossi, Responsabile sala">
+                </div>
+
+                <div class="form-group">
+                    <label>Numeri Telefono</label>
+                    <div id="phoneNumbersList" style="display: flex; flex-direction: column; gap: 8px;">
+                        <input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;">
+                    </div>
+                    <button type="button" onclick="addPhoneField()" style="margin-top: 8px; padding: 8px 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 14px; cursor: pointer;">➕ Aggiungi numero</button>
+                </div>
+
+                <!-- 7. TIPO CUCINA -->
+                <div class="form-group">
+                    <label for="sharedCuisineType">Tipo Cucina</label>
+                    <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
+                </div>
+
+                <!-- 8. FASCIA PREZZO -->
+                <div class="form-group">
+                    <label for="sharedPriceRange">Fascia Prezzo</label>
+                    <select id="sharedPriceRange">
+                        <option value="">Seleziona...</option>
+                        <option value="€">€ - Economico</option>
+                        <option value="€€">€€ - Medio</option>
+                        <option value="€€€">€€€ - Alto</option>
+                        <option value="€€€€">€€€€ - Lusso</option>
+                    </select>
+                </div>
+
+                <!-- 9. ORARI DI APERTURA (TEXTAREA) -->
                 <div class="form-group">
                     <label for="sharedOpeningHours">Orari di Apertura</label>
-                    <input type="text" id="sharedOpeningHours" placeholder="es. Lun-Ven 12:00-23:00, Sab-Dom 11:00-00:00">
+                    <textarea id="sharedOpeningHours" rows="3" placeholder="es. Lun-Ven 12:00-23:00&#10;Sab-Dom 11:00-00:00&#10;Chiuso Martedì" style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; font-size: 16px; resize: vertical;"></textarea>
                 </div>
 
+                <!-- 10. PRENOTAZIONE NECESSARIA -->
                 <div class="form-group">
-                    <label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
                         <input type="checkbox" id="sharedBookingNeeded">
                         <span>📅 Prenotazione Necessaria</span>
                     </label>
                 </div>
 
-                <!-- TL BENEFITS -->
+                <!-- 11. VANTAGGI TL (SIMPLIFIED - NO USELESS PERCENTAGES) -->
                 <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
 
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
                         <input type="checkbox" id="sharedTlFree">
-                        <span>🎁 Gratuity (TL Free)</span>
+                        <span>🆓 TL Free</span>
                     </label>
 
-                    <div class="inline-field-group">
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="sharedHasCommission">
-                            <span>💰 Commission</span>
-                        </label>
-                        <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% (es. 10)">
-                    </div>
-
-                    <div class="inline-field-group">
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="sharedHasDiscount">
-                            <span>🏷️ Discount</span>
-                        </label>
-                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% (es. 15)">
-                    </div>
-                </div>
-
-                <!-- GROUP SUITABILITY -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">👥 Idoneità Gruppi</h3>
-
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sharedSuitableForGroups" checked>
-                        <span>Adatto ai Gruppi</span>
+                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <input type="checkbox" id="sharedHasCommission">
+                        <span>💰 Commissione Disponibile</span>
                     </label>
+
+                    <label for="sharedDiscountPerc" style="display: block; margin-bottom: 8px;">💵 Sconto %</label>
+                    <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="es. 10" style="width: 100%; max-width: 200px;">
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedMinGroupSize">Min Persone Gruppo</label>
-                        <input type="number" id="sharedMinGroupSize" min="1" placeholder="es. 10">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedMaxGroupSize">Max Persone Gruppo</label>
-                        <input type="number" id="sharedMaxGroupSize" min="1" placeholder="es. 50">
-                    </div>
-                </div>
-
-                <!-- TOURS & TESTING -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🗺️ Info Aggiuntive</h3>
-
+                <!-- 12. DIMENSIONE GRUPPO MASSIMA (NO % SYMBOL!) -->
                 <div class="form-group">
-                    <label for="sharedToursRelevant">Tour Rilevanti (separati da virgola)</label>
-                    <input type="text" id="sharedToursRelevant" placeholder="es. ZMXI, ZXXI, ZMXD">
+                    <label for="sharedMaxGroupSize">Dimensione Gruppo Massima</label>
+                    <input type="number" id="sharedMaxGroupSize" min="1" max="99" placeholder="es. 15 persone">
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedTestedBy">Testato da (TL)</label>
-                        <input type="text" id="sharedTestedBy" placeholder="es. Marco Rossi">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedTestedDate">Data Test</label>
-                        <input type="date" id="sharedTestedDate">
-                    </div>
-                </div>
-
+                <!-- 13. NOTE -->
                 <div class="form-group">
                     <label for="sharedNotes">Note</label>
-                    <textarea id="sharedNotes" rows="3" placeholder="Note utili per altri TL..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                    <textarea id="sharedNotes" rows="4" placeholder="Note utili per altri TL..." style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; font-size: 16px; resize: vertical;"></textarea>
                 </div>
 
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelSharedRestaurant">Annulla</button>
+                <!-- HIDDEN FIELDS (still needed for database) -->
+                <input type="hidden" id="sharedType" value="restaurant">
+                <input type="hidden" id="sharedRestaurantCountry" value="Italy">
+                <input type="hidden" id="sharedRestaurantRegion" value="">
+                <input type="hidden" id="sharedSuitableForGroups" value="true">
+                <input type="hidden" id="sharedMinGroupSize" value="1">
+                <input type="hidden" id="sharedToursRelevant" value="">
+                <input type="hidden" id="sharedTestedBy" value="">
+                <input type="hidden" id="sharedTestedDate" value="">
+                <input type="hidden" id="sharedCommissionPerc" value="0">
+                <input type="hidden" id="sharedHasDiscount" value="false">
+
+                <!-- 14. SAVE BUTTON (FULL WIDTH) -->
+                <div class="modal-actions" style="border-top: 1px solid var(--border-color); margin-top: 32px; padding-top: 24px;">
                     <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
                 </div>
 
@@ -5766,6 +5770,103 @@ async function autofillFromGoogleMaps() {
     }
 }
 
+async function autofillFromAppleMaps() {
+    const mapsLink = document.getElementById('sharedAppleMaps').value;
+    if (!mapsLink || !mapsLink.includes('maps.apple.com')) return;
+
+    try {
+        // Extract place name from Apple Maps URL
+        let placeName = '';
+
+        // Apple Maps format: maps.apple.com/?address=...&q=PlaceName
+        const qMatch = mapsLink.match(/[?&]q=([^&]+)/);
+        if (qMatch) {
+            placeName = decodeURIComponent(qMatch[1].replace(/\+/g, ' '));
+
+            // Auto-fill name if empty
+            const nameInput = document.getElementById('sharedRestaurantName');
+            if (nameInput && !nameInput.value) {
+                nameInput.value = placeName;
+            }
+        }
+
+        // Extract address from Apple Maps URL
+        const addressMatch = mapsLink.match(/[?&]address=([^&]+)/);
+        if (addressMatch) {
+            const address = decodeURIComponent(addressMatch[1].replace(/\+/g, ' '));
+
+            // Auto-fill address if empty
+            const addressInput = document.getElementById('sharedRestaurantAddress');
+            if (addressInput && !addressInput.value) {
+                addressInput.value = address;
+            }
+
+            // Try to extract city from address (last part before postal code)
+            const cityMatch = address.match(/,\s*([^,\d]+)\s*\d/);
+            if (cityMatch) {
+                const cityInput = document.getElementById('sharedRestaurantCity');
+                if (cityInput && !cityInput.value) {
+                    cityInput.value = cityMatch[1].trim();
+                }
+            }
+        }
+
+        // Extract coordinates from ll parameter
+        const llMatch = mapsLink.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (llMatch) {
+            const lat = parseFloat(llMatch[1]);
+            const lng = parseFloat(llMatch[2]);
+
+            let country = '';
+            let region = '';
+
+            // Same geo-detection as Google Maps
+            if (lat >= 35 && lat <= 71 && lng >= -10 && lng <= 40) {
+                // Italy
+                if (lat >= 36 && lat <= 47 && lng >= 6 && lng <= 19) {
+                    country = 'Italy';
+                    if (lat >= 41.5 && lat <= 42.5 && lng >= 12 && lng <= 13) {
+                        region = 'Lazio';
+                    } else if (lat >= 43 && lat <= 44 && lng >= 11 && lng <= 12) {
+                        region = 'Toscana';
+                    } else if (lat >= 45 && lat <= 46 && lng >= 12 && lng <= 13) {
+                        region = 'Veneto';
+                    }
+                }
+                // France
+                else if (lat >= 41 && lat <= 51 && lng >= -5 && lng <= 9) {
+                    country = 'France';
+                    if (lat >= 48 && lat <= 49 && lng >= 2 && lng <= 3) {
+                        region = 'Île-de-France';
+                    }
+                }
+                // Spain
+                else if (lat >= 36 && lat <= 44 && lng >= -10 && lng <= 3) {
+                    country = 'Spain';
+                }
+            }
+
+            // Auto-fill country (hidden field)
+            const countryInput = document.getElementById('sharedRestaurantCountry');
+            if (countryInput && country) {
+                countryInput.value = country;
+            }
+
+            // Auto-fill region (hidden field)
+            const regionInput = document.getElementById('sharedRestaurantRegion');
+            if (regionInput && region) {
+                regionInput.value = region;
+            }
+        }
+
+        alert('✅ Autofill da Apple Maps completato! Controlla e completa i dati.');
+
+    } catch (error) {
+        console.error('Apple Maps autofill error:', error);
+        alert('⚠️ Autofill parziale. Completa manualmente i dati.');
+    }
+}
+
 async function editRestaurant(id) {
     try {
         // Find restaurant data
@@ -5892,11 +5993,11 @@ async function handleSaveSharedRestaurant(e) {
         cuisine: document.getElementById('sharedCuisineType').value || null,
         price_range: document.getElementById('sharedPriceRange').value || null,
 
-        // TL benefits
+        // TL benefits (simplified - no useless percentages for commission)
         gratuity: document.getElementById('sharedTlFree').checked,
         commission: document.getElementById('sharedHasCommission').checked,
-        commission_percentage: document.getElementById('sharedCommissionPerc').value ? parseInt(document.getElementById('sharedCommissionPerc').value) : null,
-        discount: document.getElementById('sharedHasDiscount').checked,
+        commission_percentage: null, // Removed from form - nobody cares about exact %
+        discount: document.getElementById('sharedDiscountPerc').value ? true : false, // Has discount if % provided
         discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
 
         // Location (hierarchical structure)
@@ -5905,8 +6006,10 @@ async function handleSaveSharedRestaurant(e) {
         city: document.getElementById('sharedRestaurantCity').value,
         location: document.getElementById('sharedRestaurantCity').value, // Keep for backwards compatibility
         address: document.getElementById('sharedRestaurantAddress').value || null,
+        contact_person: document.getElementById('sharedContactPerson').value || null, // NEW: Contact person name
         phone: phoneNumbers.length > 0 ? phoneNumbers : null, // Array of phone numbers
         google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
+        apple_maps_link: document.getElementById('sharedAppleMaps').value || null, // NEW: Apple Maps support
 
         // Hours
         opening_hours: document.getElementById('sharedOpeningHours').value || null,

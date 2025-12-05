@@ -367,16 +367,19 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    width: 100%;
+    width: 90vw;
     max-width: 500px;
-    max-height: 85vh;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .modal-content form {
     overflow-y: auto;
+    overflow-x: hidden;
     flex: 1;
+    padding: 24px;
 }
 
 .modal-header {
@@ -547,8 +550,7 @@ body {
 
 /* Form modals for databases (TASTES, ROUTES, STAY) */
 .modal-content.form-wide {
-    max-width: 600px;
-    max-height: 90vh;
+    max-width: 900px;
 }
 
 /* Form grids - responsive columns */
@@ -1445,15 +1447,15 @@ body {
                 <!-- 3. GOOGLE MAPS -->
                 <div class="form-group">
                     <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
-                    <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." onpaste="setTimeout(() => autofillFromGoogleMaps(), 100)" onblur="autofillFromGoogleMaps()">
-                    <small style="color: var(--text-secondary); font-size: 12px;">Incolla link e autofill automatico</small>
+                    <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." oninput="setTimeout(() => autofillFromGoogleMaps(), 200)" onpaste="setTimeout(() => autofillFromGoogleMaps(), 200)" onchange="autofillFromGoogleMaps()">
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Incolla link → autofill automatico</small>
                 </div>
 
                 <!-- 4. APPLE MAPS -->
                 <div class="form-group">
                     <label for="sharedAppleMaps">Link Apple Maps 🍎</label>
-                    <input type="url" id="sharedAppleMaps" placeholder="https://maps.apple.com/..." onpaste="setTimeout(() => autofillFromAppleMaps(), 100)" onblur="autofillFromAppleMaps()">
-                    <small style="color: var(--text-secondary); font-size: 12px;">Incolla link e autofill automatico</small>
+                    <input type="url" id="sharedAppleMaps" placeholder="https://maps.apple.com/..." oninput="setTimeout(() => autofillFromAppleMaps(), 200)" onpaste="setTimeout(() => autofillFromAppleMaps(), 200)" onchange="autofillFromAppleMaps()">
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Incolla link → autofill automatico</small>
                 </div>
 
                 <!-- 5. INDIRIZZO -->
@@ -1517,34 +1519,33 @@ body {
                     </label>
                 </div>
 
-                <!-- 11. VANTAGGI TL (SIMPLIFIED - NO USELESS PERCENTAGES) -->
+                <!-- 11. VANTAGGI TL -->
                 <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
 
-                <div class="form-group">
-                    <!-- TL FREE e COMMISSIONE sulla stessa riga -->
-                    <div style="display: flex; gap: 32px; margin-bottom: 16px; flex-wrap: wrap;">
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="sharedTlFree">
-                            <span>🆓 TL FREE</span>
-                        </label>
-
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="sharedHasCommission">
-                            <span>💰 COMMISSIONE</span>
-                        </label>
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- TL FREE checkbox -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="sharedTlFree" style="width: 20px; height: 20px; margin: 0;">
+                        <label for="sharedTlFree" style="margin: 0; font-size: 15px;">🆓 TL Free</label>
                     </div>
 
-                    <!-- SCONTO sotto -->
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <label for="sharedDiscountPerc" style="margin: 0; font-weight: 600;">💵 SCONTO:</label>
-                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="%" style="width: 100px; padding: 12px;">
+                    <!-- COMMISSIONE checkbox -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="sharedHasCommission" style="width: 20px; height: 20px; margin: 0;">
+                        <label for="sharedHasCommission" style="margin: 0; font-size: 15px;">💰 Commissione</label>
+                    </div>
+
+                    <!-- SCONTO -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="sharedDiscountPerc" style="margin: 0; font-size: 15px; font-weight: 600;">💵 Sconto %:</label>
+                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="10" style="width: 80px; padding: 12px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;">
                     </div>
                 </div>
 
                 <!-- 12. DIMENSIONE GRUPPO MASSIMA (NO % SYMBOL!) -->
                 <div class="form-group">
                     <label for="sharedMaxGroupSize">Dimensione Gruppo Massima</label>
-                    <input type="number" id="sharedMaxGroupSize" min="1" max="99" placeholder="es. 15 persone">
+                    <input type="number" id="sharedMaxGroupSize" min="1" max="99" placeholder="es. 15">
                 </div>
 
                 <!-- 13. NOTE -->

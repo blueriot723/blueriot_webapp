@@ -2845,7 +2845,10 @@ function setupEventListeners() {
     }
 
     if (newTourForm) {
+        console.log('✅ Adding submit event listener to newTourForm');
         newTourForm.addEventListener('submit', handleCreateTour);
+    } else {
+        console.error('❌ newTourForm not found!');
     }
 
     // Tour detail modal
@@ -3518,7 +3521,18 @@ function formatDate(dateString) {
 
 async function handleCreateTour(e) {
     e.preventDefault();
+
+    console.log('🔍 DEBUG: handleCreateTour called');
+    console.log('🔍 DEBUG: currentTL =', currentTL);
+
     hideTourError();
+
+    // Check if currentTL exists
+    if (!currentTL || !currentTL.id) {
+        console.error('❌ currentTL is not set!');
+        showTourError('Errore: TL non identificato. Riprova a effettuare il login.');
+        return;
+    }
 
     const tourData = {
         tl_id: currentTL.id,
@@ -3530,24 +3544,32 @@ async function handleCreateTour(e) {
         status: 'active'
     };
 
+    console.log('🔍 DEBUG: tourData =', tourData);
+
     if (new Date(tourData.end_date) < new Date(tourData.start_date)) {
         showTourError('La data di fine deve essere dopo la data di inizio');
         return;
     }
 
     try {
-        const { error } = await supabaseClient
+        console.log('🔍 DEBUG: Attempting to insert tour...');
+
+        const { data, error } = await supabaseClient
             .from('tours')
-            .insert([tourData]);
+            .insert([tourData])
+            .select();
 
         if (error) throw error;
+
+        console.log('✅ Tour created successfully:', data);
+        alert('✅ Tour creato con successo!');
 
         if (newTourModal) newTourModal.classList.remove('active');
         if (newTourForm) newTourForm.reset();
         loadTours();
 
     } catch (error) {
-        console.error('Create tour error:', error);
+        console.error('❌ Create tour error:', error);
 
         if (error.code === '23505') {
             showTourError('Codice tour già esistente');

@@ -5996,9 +5996,25 @@ async function autofillFromGoogleMaps() {
         return;
     }
 
-    if (!mapsLink.includes('google.com/maps') && !mapsLink.includes('maps.google.com') && !mapsLink.includes('goo.gl/maps')) {
-        alert('❌ Link non valido!\n\nDeve essere un link di Google Maps.\nEsempio: https://maps.google.com/...');
+    // VALIDAZIONE MOLTO PERMISSIVA - Accetta TUTTI i formati Google Maps
+    const isGoogleMaps =
+        mapsLink.includes('google.com/maps') ||
+        mapsLink.includes('maps.google.com') ||
+        mapsLink.includes('goo.gl') ||           // Link abbreviati
+        mapsLink.includes('maps.app.goo.gl') ||  // Nuovo formato 2024
+        mapsLink.includes('g.page') ||           // Google Business
+        (mapsLink.includes('google') && mapsLink.includes('maps'));
+
+    if (!isGoogleMaps) {
+        alert('❌ Link non valido!\n\nDeve essere un link di Google Maps.\n\nFormati accettati:\n- https://maps.google.com/...\n- https://goo.gl/maps/...\n- https://maps.app.goo.gl/...\n- https://g.page/...');
         return;
+    }
+
+    // AVVISO per link abbreviati
+    const isShortLink = mapsLink.includes('goo.gl') || mapsLink.includes('g.page');
+    if (isShortLink) {
+        console.log('⚠️ Link abbreviato rilevato');
+        alert('ℹ️ Hai incollato un link abbreviato.\n\nQuesti link potrebbero non contenere tutti i dati.\n\nPer migliori risultati:\n1. Apri il link nel browser\n2. Copia il link completo dalla barra indirizzi\n3. Incolla qui il link completo\n\nProvo comunque a estrarre i dati...');
     }
 
     try {
@@ -6080,7 +6096,11 @@ async function autofillFromGoogleMaps() {
         if (extracted.region) message += `📌 Regione: ${extracted.region}\n`;
 
         if (!extracted.name && !extracted.country) {
-            message = '⚠️ Nessun dato estratto dal link.\n\nAssicurati di incollare un link completo di Google Maps con il nome del luogo.';
+            if (isShortLink) {
+                message = '⚠️ Link abbreviato - Nessun dato estratto.\n\n📝 CONSIGLIO:\n1. Apri il link nel browser\n2. Lascia che si espanda automaticamente\n3. Copia il link completo dalla barra indirizzi\n4. Incolla qui il link completo\n\nIl link completo contiene tutte le informazioni necessarie.';
+            } else {
+                message = '⚠️ Nessun dato estratto dal link.\n\nAssicurati di incollare un link completo di Google Maps con il nome del luogo.';
+            }
         }
 
         alert(message);

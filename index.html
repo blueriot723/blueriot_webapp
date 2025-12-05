@@ -1594,15 +1594,21 @@ body {
                 <!-- 3. GOOGLE MAPS -->
                 <div class="form-group">
                     <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
-                    <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." oninput="setTimeout(() => autofillFromGoogleMaps(), 200)" onpaste="setTimeout(() => autofillFromGoogleMaps(), 200)" onchange="autofillFromGoogleMaps()">
-                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Incolla link → autofill automatico</small>
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+                        <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." oninput="setTimeout(() => autofillFromGoogleMaps(), 200)" onpaste="setTimeout(() => autofillFromGoogleMaps(), 200)" onchange="autofillFromGoogleMaps()" style="flex: 1;">
+                        <button type="button" class="btn btn-secondary" onclick="expandGoogleMapsLink()" style="padding: 12px 16px; white-space: nowrap;">🔗 Espandi</button>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Link abbreviato? Clicca "Espandi" → copia URL completo → incolla qui</small>
                 </div>
 
                 <!-- 4. APPLE MAPS -->
                 <div class="form-group">
                     <label for="sharedAppleMaps">Link Apple Maps 🍎</label>
-                    <input type="url" id="sharedAppleMaps" placeholder="https://maps.apple.com/..." oninput="setTimeout(() => autofillFromAppleMaps(), 200)" onpaste="setTimeout(() => autofillFromAppleMaps(), 200)" onchange="autofillFromAppleMaps()">
-                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Incolla link → autofill automatico</small>
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+                        <input type="url" id="sharedAppleMaps" placeholder="https://maps.apple.com/..." oninput="setTimeout(() => autofillFromAppleMaps(), 200)" onpaste="setTimeout(() => autofillFromAppleMaps(), 200)" onchange="autofillFromAppleMaps()" style="flex: 1;">
+                        <button type="button" class="btn btn-secondary" onclick="expandAppleMapsLink()" style="padding: 12px 16px; white-space: nowrap;">🔗 Espandi</button>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Link abbreviato? Clicca "Espandi" → copia URL completo → incolla qui</small>
                 </div>
 
                 <!-- 5. INDIRIZZO -->
@@ -6010,11 +6016,11 @@ async function autofillFromGoogleMaps() {
         return;
     }
 
-    // AVVISO per link abbreviati
+    // AVVISO per link abbreviati (grazie leggi EU anti-monopolio 🙄)
     const isShortLink = mapsLink.includes('goo.gl') || mapsLink.includes('g.page');
     if (isShortLink) {
         console.log('⚠️ Link abbreviato rilevato');
-        alert('ℹ️ Hai incollato un link abbreviato.\n\nQuesti link potrebbero non contenere tutti i dati.\n\nPer migliori risultati:\n1. Apri il link nel browser\n2. Copia il link completo dalla barra indirizzi\n3. Incolla qui il link completo\n\nProvo comunque a estrarre i dati...');
+        alert('⚠️ LINK ABBREVIATO RILEVATO!\n\nA causa delle leggi EU, Google ora usa link abbreviati che NON contengono dati.\n\n🔧 SOLUZIONE FACILE:\n1. Clicca il pulsante "🔗 Espandi" qui accanto\n2. Si aprirà Google Maps in nuova tab\n3. Copia l\'URL completo dalla barra indirizzi\n4. Torna qui e incolla nel campo\n5. ✅ Autofill funzionerà!\n\n(Provo comunque a estrarre dati, ma probabilmente fallirà...)');
     }
 
     try {
@@ -6097,9 +6103,9 @@ async function autofillFromGoogleMaps() {
 
         if (!extracted.name && !extracted.country) {
             if (isShortLink) {
-                message = '⚠️ Link abbreviato - Nessun dato estratto.\n\n📝 CONSIGLIO:\n1. Apri il link nel browser\n2. Lascia che si espanda automaticamente\n3. Copia il link completo dalla barra indirizzi\n4. Incolla qui il link completo\n\nIl link completo contiene tutte le informazioni necessarie.';
+                message = '❌ Come previsto: NESSUN dato estratto dal link abbreviato.\n\n🔧 SOLUZIONE:\n1. Clicca "🔗 Espandi" (pulsante qui accanto)\n2. Copia URL completo dalla nuova tab\n3. Torna qui e incolla\n4. ✅ Funzionerà!\n\n💡 I link abbreviati (goo.gl) sono solo redirect - non contengono informazioni.';
             } else {
-                message = '⚠️ Nessun dato estratto dal link.\n\nAssicurati di incollare un link completo di Google Maps con il nome del luogo.';
+                message = '⚠️ Nessun dato estratto dal link.\n\nAssicurati di incollare un link completo di Google Maps con il nome del luogo.\n\nIl link deve contenere "/place/" e coordinate "@"';
             }
         }
 
@@ -6241,6 +6247,51 @@ async function autofillFromAppleMaps() {
         console.error('Apple Maps autofill error:', error);
         alert('⚠️ Errore durante autofill:\n' + error.message);
     }
+}
+
+// ESPANDI LINK ABBREVIATI - Workaround per leggi EU anti-monopolio
+function expandGoogleMapsLink() {
+    const link = document.getElementById('sharedGoogleMaps').value.trim();
+
+    if (!link) {
+        alert('❌ Incolla prima un link Google Maps nel campo sopra!');
+        return;
+    }
+
+    // Apri in nuova tab
+    const newWindow = window.open(link, '_blank');
+
+    if (!newWindow) {
+        alert('❌ Popup bloccato!\n\nIl browser ha bloccato l\'apertura della nuova finestra.\n\nSoluzione:\n1. Permetti popup per questo sito\n2. Oppure apri il link manualmente\n3. Copia l\'URL completo dalla barra indirizzi\n4. Incolla qui');
+        return;
+    }
+
+    // Mostra istruzioni
+    setTimeout(() => {
+        alert('✅ Link aperto in nuova tab!\n\n📋 ISTRUZIONI:\n\n1. Aspetta che Google Maps carichi completamente\n2. Guarda la barra indirizzi in alto\n3. Copia l\'URL COMPLETO (quello lungo)\n4. Torna qui e incolla nel campo Google Maps\n5. Il sistema estrarrà automaticamente i dati\n\n💡 TIP: L\'URL completo contiene "/place/" e coordinate "@41.xxx,12.xxx"');
+    }, 500);
+}
+
+function expandAppleMapsLink() {
+    const link = document.getElementById('sharedAppleMaps').value.trim();
+
+    if (!link) {
+        alert('❌ Incolla prima un link Apple Maps nel campo sopra!');
+        return;
+    }
+
+    // Apri in nuova tab
+    const newWindow = window.open(link, '_blank');
+
+    if (!newWindow) {
+        alert('❌ Popup bloccato!\n\nIl browser ha bloccato l\'apertura della nuova finestra.\n\nSoluzione:\n1. Permetti popup per questo sito\n2. Oppure apri il link manualmente\n3. Copia l\'URL completo dalla barra indirizzi\n4. Incolla qui');
+        return;
+    }
+
+    // Mostra istruzioni
+    setTimeout(() => {
+        alert('✅ Link aperto in nuova tab!\n\n📋 ISTRUZIONI:\n\n1. Aspetta che Apple Maps carichi\n2. Guarda la barra indirizzi in alto\n3. Copia l\'URL COMPLETO\n4. Torna qui e incolla nel campo Apple Maps\n5. Il sistema estrarrà automaticamente i dati\n\n💡 L\'URL completo contiene parametri come "?address=" e "q="');
+    }, 500);
 }
 
 async function autofillFromAppleMaps() {

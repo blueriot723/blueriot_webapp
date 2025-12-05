@@ -846,6 +846,84 @@ body {
         margin-bottom: 40px;
     }
 }
+
+/* ===== TICKET SYSTEM STYLES ===== */
+.ticket-section {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    background: rgba(19, 24, 46, 0.5);
+}
+
+.ticket-section h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: var(--primary-blue);
+}
+
+.passenger-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: center;
+    padding: 12px;
+    background: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.passenger-row input {
+    flex: 1;
+    padding: 10px 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.passenger-row button {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.ticket-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: var(--card-bg);
+}
+
+.ticket-card h4 {
+    margin-bottom: 12px;
+    color: var(--primary-blue);
+    font-size: 18px;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.ticket-preview {
+    max-width: 300px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+#templatePreview img {
+    cursor: crosshair;
+}
+
+#templatePreview img.selecting {
+    cursor: crosshair;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+}
     </style>
 </head>
 <body>
@@ -1211,6 +1289,7 @@ body {
                 <button class="tab-btn" data-tab="ristoranti">🍽️ Ristoranti</button>
                 <button class="tab-btn" data-tab="hotel">🏨 Hotel</button>
                 <button class="tab-btn" data-tab="programma">📅 Programma</button>
+                <button class="tab-btn" data-tab="biglietti">🎫 Biglietti</button>
                 <button class="tab-btn" data-tab="emergenze">🚨 Emergenze</button>
                 <button class="tab-btn" data-tab="file">📄 File</button>
                 <button class="tab-btn" data-tab="link">🔗 Link</button>
@@ -1286,6 +1365,74 @@ body {
                     </div>
                     <div id="daysList">
                         <p class="loading">Clicca "Genera Giorni" per creare il programma</p>
+                    </div>
+                </div>
+
+                <!-- BIGLIETTI TAB -->
+                <div id="tabBiglietti" class="tab-pane">
+                    <!-- Step 1: Upload Template -->
+                    <div class="ticket-section">
+                        <h3>📄 Template Biglietto</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">Carica un biglietto vuoto (PDF o immagine). Il sistema aggiungerà automaticamente il nome di ogni passeggero.</p>
+
+                        <input type="file" id="ticketTemplateInput" accept=".pdf,.jpg,.jpeg,.png" style="display:none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('ticketTemplateInput').click()">
+                            📤 Carica Template Biglietto
+                        </button>
+
+                        <div id="templatePreview" style="display:none; margin-top: 16px;">
+                            <div style="position: relative; display: inline-block;">
+                                <img id="templateImage" style="max-width: 100%; border: 2px solid var(--primary-blue); border-radius: 8px;">
+                                <div id="namePositionMarker" style="position: absolute; width: 10px; height: 10px; background: red; border-radius: 50%; display: none;"></div>
+                            </div>
+                            <div style="margin-top: 12px; display: flex; gap: 12px;">
+                                <button class="btn btn-secondary" id="setNamePositionBtn">📍 Scegli Posizione Nome</button>
+                                <button class="btn btn-secondary" id="removeTemplateBtn">❌ Rimuovi Template</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Upload Logo (Optional) -->
+                    <div class="ticket-section">
+                        <h3>🎨 Logo Aggiuntivo (Opzionale)</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">Carica un logo da aggiungere su tutti i biglietti</p>
+
+                        <input type="file" id="logoInput" accept=".png,.jpg,.jpeg,.svg" style="display:none;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('logoInput').click()">
+                            📤 Carica Logo
+                        </button>
+
+                        <div id="logoPreview" style="display:none; margin-top: 12px;">
+                            <img id="logoImage" style="max-height: 80px; border: 1px solid var(--border-color); border-radius: 4px;">
+                            <button class="btn btn-secondary" id="removeLogoBtn" style="margin-left: 12px;">❌ Rimuovi</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Passenger List -->
+                    <div class="ticket-section">
+                        <h3>👥 Lista Passeggeri</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">Inserisci i nomi dei passeggeri. Il sistema genererà automaticamente un biglietto personalizzato per ciascuno.</p>
+
+                        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                            <button class="btn btn-primary" id="addPassengerBtn">+ Aggiungi Passeggero</button>
+                            <button class="btn btn-secondary" id="bulkAddPassengersBtn">📋 Inserimento Multiplo</button>
+                        </div>
+
+                        <div id="passengersList">
+                            <p style="color: var(--text-secondary);">Nessun passeggero ancora. Clicca "+ Aggiungi Passeggero" per iniziare.</p>
+                        </div>
+
+                        <button class="btn btn-success" id="generateTicketsBtn" style="margin-top: 20px; width: 100%; font-size: 18px; padding: 16px;">
+                            ⚡ Genera Biglietti Personalizzati
+                        </button>
+                    </div>
+
+                    <!-- Step 4: Generated Tickets -->
+                    <div class="ticket-section">
+                        <h3>✅ Biglietti Generati</h3>
+                        <div id="generatedTicketsList">
+                            <p style="color: var(--text-secondary);">I biglietti generati appariranno qui.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -2226,6 +2373,40 @@ body {
 
                 <div id="activityError" class="error-message"></div>
             </form>
+        </div>
+    </div>
+
+    <!-- BULK PASSENGER INPUT MODAL -->
+    <div id="bulkPassengerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Inserimento Multiplo Passeggeri</h2>
+                <button class="modal-close" id="closeBulkPassengerModal">&times;</button>
+            </div>
+
+            <div style="padding: 24px;">
+                <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                    Inserisci un nome per riga. Puoi opzionalmente includere email e telefono separati da virgole.
+                </p>
+                <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
+                    <strong>Formato:</strong><br>
+                    Nome Cognome<br>
+                    Nome Cognome, email@example.com<br>
+                    Nome Cognome, email@example.com, +39 123 456 7890
+                </p>
+
+                <textarea
+                    id="bulkPassengerInput"
+                    rows="15"
+                    placeholder="Mario Rossi&#10;Giulia Bianchi, giulia@email.com&#10;Luca Verdi, luca@email.com, +39 333 1234567"
+                    style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: 'Courier New', monospace; font-size: 14px; resize: vertical;"
+                ></textarea>
+
+                <div class="modal-actions" style="margin-top: 16px;">
+                    <button type="button" class="btn btn-secondary" id="cancelBulkPassenger">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="saveBulkPassengers">💾 Salva Tutti</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -6596,6 +6777,616 @@ async function handleSaveStay(e) {
         alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
 }
+
+// ===== TICKET SYSTEM FUNCTIONS =====
+
+let currentTemplate = null; // Stores template data
+let currentTemplatePosition = { x: null, y: null };
+let currentLogo = null; // Stores logo data
+
+// Template Upload Handler
+document.getElementById('ticketTemplateInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+        // Convert to base64
+        const base64 = await fileToBase64(file);
+
+        // Save template to memory
+        currentTemplate = {
+            file_url: base64,
+            file_name: file.name,
+            file_type: file.type
+        };
+
+        // Show preview
+        const imgEl = document.getElementById('templateImage');
+        imgEl.src = base64;
+        document.getElementById('templatePreview').style.display = 'block';
+
+        // Save to database
+        await saveTemplateToDatabase();
+
+        alert('✅ Template caricato!');
+    } catch (error) {
+        console.error('Template upload error:', error);
+        alert('❌ Errore caricamento template:\n' + error.message);
+    }
+});
+
+// Remove Template
+document.getElementById('removeTemplateBtn').addEventListener('click', () => {
+    currentTemplate = null;
+    currentTemplatePosition = { x: null, y: null };
+    document.getElementById('templatePreview').style.display = 'none';
+    document.getElementById('templateImage').src = '';
+    document.getElementById('namePositionMarker').style.display = 'none';
+});
+
+// Logo Upload Handler
+document.getElementById('logoInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+        const base64 = await fileToBase64(file);
+
+        currentLogo = {
+            file_url: base64,
+            file_name: file.name
+        };
+
+        const logoImg = document.getElementById('logoImage');
+        logoImg.src = base64;
+        document.getElementById('logoPreview').style.display = 'block';
+
+        await saveTemplateToDatabase(); // Update logo in DB
+
+        alert('✅ Logo caricato!');
+    } catch (error) {
+        console.error('Logo upload error:', error);
+        alert('❌ Errore caricamento logo');
+    }
+});
+
+// Remove Logo
+document.getElementById('removeLogoBtn').addEventListener('click', () => {
+    currentLogo = null;
+    document.getElementById('logoPreview').style.display = 'none';
+    document.getElementById('logoImage').src = '';
+    saveTemplateToDatabase(); // Update DB to remove logo
+});
+
+// Name Position Selector
+document.getElementById('setNamePositionBtn').addEventListener('click', () => {
+    const img = document.getElementById('templateImage');
+
+    img.classList.add('selecting');
+    alert('👆 Clicca sull\'immagine dove vuoi posizionare il nome del passeggero');
+
+    img.style.cursor = 'crosshair';
+    img.onclick = async (e) => {
+        const rect = img.getBoundingClientRect();
+        const x = Math.round((e.clientX - rect.left) / rect.width * img.naturalWidth);
+        const y = Math.round((e.clientY - rect.top) / rect.height * img.naturalHeight);
+
+        currentTemplatePosition = { x, y };
+
+        // Show marker
+        const marker = document.getElementById('namePositionMarker');
+        marker.style.left = (e.clientX - rect.left - 5) + 'px';
+        marker.style.top = (e.clientY - rect.top - 5) + 'px';
+        marker.style.display = 'block';
+
+        img.style.cursor = 'default';
+        img.classList.remove('selecting');
+        img.onclick = null;
+
+        // Save to DB
+        await saveTemplateToDatabase();
+
+        alert(`✅ Posizione salvata!\n\nX: ${x}, Y: ${y}`);
+    };
+});
+
+// Save template to database
+async function saveTemplateToDatabase() {
+    if (!currentEditingTour || !currentTemplate) return;
+
+    const templateData = {
+        tour_id: currentEditingTour.id,
+        template_name: currentTemplate.file_name || 'ticket_template',
+        template_file_url: currentTemplate.file_url,
+        logo_url: currentLogo ? currentLogo.file_url : null,
+        name_position_x: currentTemplatePosition.x,
+        name_position_y: currentTemplatePosition.y,
+        font_size: 24,
+        font_color: '#000000'
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('ticket_templates')
+            .upsert(templateData, { onConflict: 'tour_id' });
+
+        if (error) throw error;
+        console.log('Template saved to database');
+    } catch (error) {
+        console.error('Save template error:', error);
+    }
+}
+
+// Load template from database
+async function loadTemplateFromDatabase() {
+    if (!currentEditingTour) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('ticket_templates')
+            .select('*')
+            .eq('tour_id', currentEditingTour.id)
+            .single();
+
+        if (error || !data) return;
+
+        // Restore template
+        currentTemplate = {
+            file_url: data.template_file_url,
+            file_name: data.template_name
+        };
+
+        const imgEl = document.getElementById('templateImage');
+        imgEl.src = data.template_file_url;
+        document.getElementById('templatePreview').style.display = 'block';
+
+        // Restore position
+        if (data.name_position_x && data.name_position_y) {
+            currentTemplatePosition = {
+                x: data.name_position_x,
+                y: data.name_position_y
+            };
+            // Show marker at saved position
+            const marker = document.getElementById('namePositionMarker');
+            marker.style.display = 'block';
+            marker.style.left = (data.name_position_x / imgEl.naturalWidth * imgEl.width - 5) + 'px';
+            marker.style.top = (data.name_position_y / imgEl.naturalHeight * imgEl.height - 5) + 'px';
+        }
+
+        // Restore logo
+        if (data.logo_url) {
+            currentLogo = { file_url: data.logo_url };
+            document.getElementById('logoImage').src = data.logo_url;
+            document.getElementById('logoPreview').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Load template error:', error);
+    }
+}
+
+// Add Single Passenger
+document.getElementById('addPassengerBtn').addEventListener('click', () => {
+    const passengersList = document.getElementById('passengersList');
+
+    // Remove "no passengers" message if present
+    if (passengersList.querySelector('p')) {
+        passengersList.innerHTML = '';
+    }
+
+    const row = document.createElement('div');
+    row.className = 'passenger-row';
+    row.innerHTML = `
+        <input type="text" placeholder="Nome Completo *" class="passenger-name" required>
+        <input type="email" placeholder="Email (opzionale)" class="passenger-email">
+        <input type="tel" placeholder="Telefono (opzionale)" class="passenger-phone">
+        <button class="btn btn-primary" onclick="savePassengerRow(this)">💾</button>
+        <button class="btn btn-secondary" onclick="removePassengerRow(this)">❌</button>
+    `;
+
+    passengersList.appendChild(row);
+});
+
+// Save Passenger Row
+async function savePassengerRow(btn) {
+    const row = btn.parentElement;
+    const name = row.querySelector('.passenger-name').value.trim();
+    const email = row.querySelector('.passenger-email').value.trim();
+    const phone = row.querySelector('.passenger-phone').value.trim();
+
+    if (!name) {
+        alert('❌ Inserisci almeno il nome del passeggero');
+        return;
+    }
+
+    if (!currentEditingTour) {
+        alert('❌ Errore: Tour non identificato');
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('tour_passengers')
+            .insert({
+                tour_id: currentEditingTour.id,
+                full_name: name,
+                email: email || null,
+                phone: phone || null
+            })
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        // Make inputs readonly and change save button to edit
+        row.querySelectorAll('input').forEach(input => input.readOnly = true);
+        btn.textContent = '✏️';
+        btn.onclick = () => editPassengerRow(btn);
+
+        alert('✅ Passeggero salvato!');
+
+        // Store passenger ID in row
+        row.dataset.passengerId = data.id;
+    } catch (error) {
+        console.error('Save passenger error:', error);
+        alert('❌ Errore salvataggio:\n' + error.message);
+    }
+}
+
+// Edit Passenger Row
+function editPassengerRow(btn) {
+    const row = btn.parentElement;
+    row.querySelectorAll('input').forEach(input => input.readOnly = false);
+    btn.textContent = '💾';
+    btn.onclick = () => savePassengerRow(btn);
+}
+
+// Remove Passenger Row
+async function removePassengerRow(btn) {
+    const row = btn.parentElement;
+    const passengerId = row.dataset.passengerId;
+
+    if (passengerId) {
+        if (!confirm('Sei sicuro di voler eliminare questo passeggero?')) return;
+
+        try {
+            const { error } = await supabaseClient
+                .from('tour_passengers')
+                .delete()
+                .eq('id', passengerId);
+
+            if (error) throw error;
+        } catch (error) {
+            console.error('Delete passenger error:', error);
+            alert('❌ Errore eliminazione');
+            return;
+        }
+    }
+
+    row.remove();
+
+    // Check if list is empty
+    const passengersList = document.getElementById('passengersList');
+    if (passengersList.children.length === 0) {
+        passengersList.innerHTML = '<p style="color: var(--text-secondary);">Nessun passeggero ancora. Clicca "+ Aggiungi Passeggero" per iniziare.</p>';
+    }
+}
+
+// Bulk Add Passengers - Open Modal
+document.getElementById('bulkAddPassengersBtn').addEventListener('click', () => {
+    const modal = document.getElementById('bulkPassengerModal');
+    modal.classList.add('active');
+});
+
+// Close Bulk Modal
+document.getElementById('closeBulkPassengerModal').addEventListener('click', () => {
+    document.getElementById('bulkPassengerModal').classList.remove('active');
+});
+
+document.getElementById('cancelBulkPassenger').addEventListener('click', () => {
+    document.getElementById('bulkPassengerModal').classList.remove('active');
+});
+
+// Save Bulk Passengers
+document.getElementById('saveBulkPassengers').addEventListener('click', async () => {
+    const textarea = document.getElementById('bulkPassengerInput');
+    const lines = textarea.value.split('\n').filter(line => line.trim());
+
+    if (lines.length === 0) {
+        alert('❌ Nessun passeggero inserito');
+        return;
+    }
+
+    if (!currentEditingTour) {
+        alert('❌ Errore: Tour non identificato');
+        return;
+    }
+
+    const passengers = [];
+
+    lines.forEach(line => {
+        const parts = line.split(',').map(p => p.trim());
+        const name = parts[0];
+        const email = parts[1] || null;
+        const phone = parts[2] || null;
+
+        if (name) {
+            passengers.push({
+                tour_id: currentEditingTour.id,
+                full_name: name,
+                email: email,
+                phone: phone
+            });
+        }
+    });
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('tour_passengers')
+            .insert(passengers)
+            .select();
+
+        if (error) throw error;
+
+        alert(`✅ ${data.length} passeggeri aggiunti!`);
+
+        // Close modal and reload passengers
+        document.getElementById('bulkPassengerModal').classList.remove('active');
+        textarea.value = '';
+
+        loadPassengers();
+    } catch (error) {
+        console.error('Bulk add error:', error);
+        alert('❌ Errore:\n' + error.message);
+    }
+});
+
+// Load Passengers List
+async function loadPassengers() {
+    if (!currentEditingTour) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('tour_passengers')
+            .select('*')
+            .eq('tour_id', currentEditingTour.id)
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        const passengersList = document.getElementById('passengersList');
+        passengersList.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            passengersList.innerHTML = '<p style="color: var(--text-secondary);">Nessun passeggero ancora. Clicca "+ Aggiungi Passeggero" per iniziare.</p>';
+            return;
+        }
+
+        data.forEach(passenger => {
+            const row = document.createElement('div');
+            row.className = 'passenger-row';
+            row.dataset.passengerId = passenger.id;
+            row.innerHTML = `
+                <input type="text" value="${passenger.full_name}" class="passenger-name" readonly>
+                <input type="email" value="${passenger.email || ''}" class="passenger-email" readonly>
+                <input type="tel" value="${passenger.phone || ''}" class="passenger-phone" readonly>
+                <button class="btn btn-secondary" onclick="editPassengerRow(this)">✏️</button>
+                <button class="btn btn-secondary" onclick="removePassengerRow(this)">❌</button>
+            `;
+            passengersList.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Load passengers error:', error);
+    }
+}
+
+// Generate Tickets for All Passengers
+document.getElementById('generateTicketsBtn').addEventListener('click', async () => {
+    if (!currentTemplate) {
+        alert('❌ Carica prima un template biglietto!');
+        return;
+    }
+
+    if (!currentTemplatePosition.x || !currentTemplatePosition.y) {
+        alert('❌ Scegli prima la posizione del nome sul biglietto!');
+        return;
+    }
+
+    if (!currentEditingTour) {
+        alert('❌ Errore: Tour non identificato');
+        return;
+    }
+
+    try {
+        // Get all passengers
+        const { data: passengers, error } = await supabaseClient
+            .from('tour_passengers')
+            .select('*')
+            .eq('tour_id', currentEditingTour.id);
+
+        if (error) throw error;
+
+        if (!passengers || passengers.length === 0) {
+            alert('❌ Aggiungi almeno un passeggero prima di generare i biglietti');
+            return;
+        }
+
+        const confirmMsg = `Generare ${passengers.length} biglietti personalizzati?`;
+        if (!confirm(confirmMsg)) return;
+
+        alert(`⏳ Generazione di ${passengers.length} biglietti in corso...\n\nAttendi qualche secondo.`);
+
+        // Generate tickets
+        let successCount = 0;
+        for (const passenger of passengers) {
+            try {
+                const ticketBlob = await generateSingleTicket(passenger);
+                const ticketDataUrl = await blobToDataURL(ticketBlob);
+
+                // Update passenger with ticket URL
+                const { error: updateError } = await supabaseClient
+                    .from('tour_passengers')
+                    .update({
+                        ticket_generated: true,
+                        ticket_url: ticketDataUrl
+                    })
+                    .eq('id', passenger.id);
+
+                if (updateError) throw updateError;
+                successCount++;
+            } catch (err) {
+                console.error(`Error generating ticket for ${passenger.full_name}:`, err);
+            }
+        }
+
+        alert(`✅ ${successCount} biglietti generati con successo!`);
+        loadGeneratedTickets();
+    } catch (error) {
+        console.error('Generate tickets error:', error);
+        alert('❌ Errore generazione biglietti:\n' + error.message);
+    }
+});
+
+// Generate Single Ticket
+async function generateSingleTicket(passenger) {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const img = new Image();
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Draw template
+            ctx.drawImage(img, 0, 0);
+
+            // Draw logo if exists
+            if (currentLogo) {
+                const logo = new Image();
+                logo.src = currentLogo.file_url;
+                logo.onload = () => {
+                    // Draw logo in top-left corner (50x50)
+                    ctx.drawImage(logo, 30, 30, 80, 80);
+                    drawNameAndFinish();
+                };
+                logo.onerror = () => {
+                    console.warn('Logo load failed, continuing without logo');
+                    drawNameAndFinish();
+                };
+            } else {
+                drawNameAndFinish();
+            }
+
+            function drawNameAndFinish() {
+                // Draw passenger name
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = '#000000';
+                ctx.textAlign = 'center';
+                ctx.fillText(
+                    passenger.full_name,
+                    currentTemplatePosition.x,
+                    currentTemplatePosition.y
+                );
+
+                // Convert to blob
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('Canvas to blob failed'));
+                    }
+                }, 'image/png');
+            }
+        };
+
+        img.onerror = () => reject(new Error('Template image load failed'));
+        img.src = currentTemplate.file_url;
+    });
+}
+
+// Convert Blob to Data URL
+function blobToDataURL(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+// Load Generated Tickets
+async function loadGeneratedTickets() {
+    if (!currentEditingTour) return;
+
+    try {
+        const { data: passengers, error } = await supabaseClient
+            .from('tour_passengers')
+            .select('*')
+            .eq('tour_id', currentEditingTour.id)
+            .eq('ticket_generated', true)
+            .order('full_name', { ascending: true });
+
+        if (error) throw error;
+
+        const container = document.getElementById('generatedTicketsList');
+        container.innerHTML = '';
+
+        if (!passengers || passengers.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-secondary);">I biglietti generati appariranno qui.</p>';
+            return;
+        }
+
+        passengers.forEach(passenger => {
+            const card = document.createElement('div');
+            card.className = 'ticket-card';
+            card.innerHTML = `
+                <h4>${passenger.full_name}</h4>
+                <img src="${passenger.ticket_url}" class="ticket-preview" alt="${passenger.full_name} ticket">
+                <div class="ticket-actions">
+                    <a href="${passenger.ticket_url}" download="${passenger.full_name.replace(/\s+/g, '_')}_ticket.png" class="btn btn-primary">
+                        ⬇️ Scarica PNG
+                    </a>
+                    ${passenger.email ? `<button class="btn btn-secondary" onclick="sendTicketEmail('${passenger.id}')">📧 Invia Email</button>` : ''}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Load tickets error:', error);
+    }
+}
+
+// Send Ticket via Email (placeholder for future)
+function sendTicketEmail(passengerId) {
+    alert('📧 Funzione email in arrivo!\n\nPer ora scarica il biglietto e invialo manualmente.');
+}
+
+// Helper: File to Base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Initialize ticket system when opening biglietti tab
+function initTicketSystem() {
+    loadTemplateFromDatabase();
+    loadPassengers();
+    loadGeneratedTickets();
+}
+
+// Hook into tab switching to initialize ticket system
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        if (tab === 'biglietti') {
+            initTicketSystem();
+        }
+    });
+});
     </script>
 </body>
 </html>

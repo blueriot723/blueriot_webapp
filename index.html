@@ -2590,8 +2590,8 @@ function init() {
     // Set up event listeners
     setupEventListeners();
 
-    // Handle OAuth callback (if returning from Google)
-    handleOAuthCallback();
+    // Setup Supabase auth listener (handles OAuth automatically)
+    setupAuthListener();
 
     // Check if user is already logged in
     checkAuth();
@@ -3156,70 +3156,53 @@ async function handleGoogleLogin() {
     }
 }
 
-async function handleOAuthCallback() {
-    // Controlla se l'utente sta tornando da OAuth
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get('access_token');
+// Setup Supabase auth state listener (handles OAuth automatically)
+function setupAuthListener() {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        console.log('🔄 Auth state changed:', event);
 
-    if (!accessToken) {
-        // Non è un callback OAuth, ignora
-        return;
-    }
+        if (event === 'SIGNED_IN' && session) {
+            console.log('✅ User signed in:', session.user.id);
 
-    console.log('🔄 Callback OAuth rilevato, completamento login...');
+            try {
+                // Cerca il profilo TL nel database
+                const { data: tlData, error: tlError } = await supabaseClient
+                    .from('tl_users')
+                    .select('*')
+                    .eq('user_id', session.user.id)
+                    .single();
 
-    try {
-        // Ottieni la sessione corrente (già impostata da Supabase dopo OAuth)
-        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (tlError) {
+                    console.error('❌ DB error:', tlError);
+                    throw new Error(`DB: ${tlError.message} (${tlError.code})`);
+                }
 
-        if (sessionError) {
-            console.error('❌ Session error:', sessionError);
-            throw new Error(`Session: ${sessionError.message}`);
+                if (!tlData) {
+                    throw new Error('Profilo TL non trovato per questo account Google.\n\nContatta @blueriot per registrarti.');
+                }
+
+                console.log('✅ TL profile found');
+
+                // Pulisci l'URL dal hash OAuth
+                if (window.location.hash) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                // Mostra la dashboard
+                showDashboard(session.user, tlData);
+
+            } catch (error) {
+                console.error('💥 Profile lookup failed:', error);
+                alert('❌ LOGIN FALLITO:\n\n' + (error.message || 'Errore sconosciuto'));
+                await supabaseClient.auth.signOut();
+            }
         }
 
-        if (!session || !session.user) {
-            throw new Error('Sessione non valida dopo OAuth');
+        if (event === 'SIGNED_OUT') {
+            console.log('👋 User signed out');
+            location.reload();
         }
-
-        console.log('✅ OAuth Session OK, user:', session.user.id);
-
-        // DEBUG: Mostra info sessione (iPad-friendly)
-        alert(`🔍 DEBUG SESSIONE:\n\nUser ID: ${session.user.id}\nEmail: ${session.user.email}\nHas Token: ${!!session.access_token}\n\nPremi OK per continuare query...`);
-
-        // Cerca il profilo TL nel database
-        const { data: tlData, error: tlError } = await supabaseClient
-            .from('tl_users')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-
-        if (tlError) {
-            console.error('❌ DB error:', tlError);
-            // DEBUG: Mostra errore completo
-            alert(`🔍 DEBUG ERRORE DB:\n\nMessage: ${tlError.message}\nCode: ${tlError.code}\nDetails: ${tlError.details}\nHint: ${tlError.hint}\n\nUser ID cercato: ${session.user.id}`);
-            throw new Error(`DB: ${tlError.message} (${tlError.code})`);
-        }
-
-        if (!tlData) {
-            throw new Error('Profilo TL non trovato per questo account Google.\n\nContatta @blueriot per registrarti.');
-        }
-
-        console.log('✅ TL profile found via OAuth');
-
-        // Pulisci l'URL dal hash
-        window.history.replaceState({}, document.title, window.location.pathname);
-
-        // Mostra la dashboard
-        showDashboard(session.user, tlData);
-
-    } catch (error) {
-        console.error('💥 OAuth callback failed:', error);
-        alert('❌ LOGIN GOOGLE FALLITO:\n\n' + (error.message || 'Errore sconosciuto'));
-
-        // Pulisci l'URL e torna al login
-        window.history.replaceState({}, document.title, window.location.pathname);
-        window.location.reload();
-    }
+    });
 }
 
 function showDashboard(user, tlData) {

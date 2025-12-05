@@ -1591,6 +1591,18 @@ body {
                     <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma, Firenze, Parigi">
                 </div>
 
+                <!-- 2B. NAZIONE -->
+                <div class="form-group">
+                    <label for="sharedRestaurantCountry">Nazione</label>
+                    <input type="text" id="sharedRestaurantCountry" placeholder="es. Italy, France, Germany" value="Italy">
+                </div>
+
+                <!-- 2C. REGIONE -->
+                <div class="form-group">
+                    <label for="sharedRestaurantRegion">Regione</label>
+                    <input type="text" id="sharedRestaurantRegion" placeholder="es. Lazio, Toscana, Lombardia">
+                </div>
+
                 <!-- 3. GOOGLE MAPS -->
                 <div class="form-group">
                     <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
@@ -1601,6 +1613,13 @@ body {
                     <small style="color: var(--text-secondary); font-size: 12px;">💡 Link abbreviato? Clicca "Espandi" → copia URL completo → incolla qui</small>
                 </div>
 
+                <!-- 3B. GOOGLE MAPS PLUS CODE -->
+                <div class="form-group">
+                    <label for="sharedPlusCode">Plus Code (Google Maps)</label>
+                    <input type="text" id="sharedPlusCode" placeholder="es. 8FVC9G8F+6X">
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Codice breve per localizzazione precisa (si trova su Google Maps)</small>
+                </div>
+
                 <!-- 4. APPLE MAPS -->
                 <div class="form-group">
                     <label for="sharedAppleMaps">Link Apple Maps 🍎</label>
@@ -1609,6 +1628,13 @@ body {
                         <button type="button" class="btn btn-secondary" onclick="expandAppleMapsLink()" style="padding: 12px 16px; white-space: nowrap;">🔗 Espandi</button>
                     </div>
                     <small style="color: var(--text-secondary); font-size: 12px;">💡 Link abbreviato? Clicca "Espandi" → copia URL completo → incolla qui</small>
+                </div>
+
+                <!-- 4B. WHAT3WORDS -->
+                <div class="form-group">
+                    <label for="sharedWhat3Words">what3words</label>
+                    <input type="text" id="sharedWhat3Words" placeholder="es. ///compilato.contare.sapone">
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Indirizzo what3words a 3 parole (formato: ///parola.parola.parola)</small>
                 </div>
 
                 <!-- 5. INDIRIZZO -->
@@ -1709,8 +1735,6 @@ body {
 
                 <!-- HIDDEN FIELDS (still needed for database) -->
                 <input type="hidden" id="sharedType" value="restaurant">
-                <input type="hidden" id="sharedRestaurantCountry" value="Italy">
-                <input type="hidden" id="sharedRestaurantRegion" value="">
                 <input type="hidden" id="sharedSuitableForGroups" value="true">
                 <input type="hidden" id="sharedMinGroupSize" value="1">
                 <input type="hidden" id="sharedToursRelevant" value="">
@@ -6495,14 +6519,16 @@ async function deleteRestaurant(id, name) {
 async function handleSaveSharedRestaurant(e) {
     e.preventDefault();
 
-    alert('🔍 DEBUG: Submit triggered'); // DEBUG
+    console.log('🔍 DEBUG: handleSaveSharedRestaurant called');
+    console.log('🔍 Event:', e);
 
     if (!currentTL || !currentTL.id) {
+        console.error('❌ currentTL not set:', currentTL);
         alert('❌ Errore: TL non identificato');
         return;
     }
 
-    alert(`🔍 DEBUG: TL OK - ${currentTL.id}`); // DEBUG
+    console.log('✅ TL OK:', currentTL.id);
 
     // Parse tours_relevant from comma-separated string to array
     const toursRelevantStr = document.getElementById('sharedToursRelevant').value || '';
@@ -6537,7 +6563,9 @@ async function handleSaveSharedRestaurant(e) {
         contact_person: document.getElementById('sharedContactPerson').value || null, // NEW: Contact person name
         phone: phoneNumbers.length > 0 ? phoneNumbers : null, // Array of phone numbers
         google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
+        plus_code: document.getElementById('sharedPlusCode').value || null, // NEW: Google Plus Code
         apple_maps_link: document.getElementById('sharedAppleMaps').value || null, // NEW: Apple Maps support
+        what3words: document.getElementById('sharedWhat3Words').value || null, // NEW: what3words address
 
         // Hours
         opening_hours: document.getElementById('sharedOpeningHours').value || null,
@@ -6558,9 +6586,13 @@ async function handleSaveSharedRestaurant(e) {
         added_by: currentTL.id
     };
 
+    console.log('📦 Data to save:', tastesData);
+
     try {
         let result;
         const isEditing = window.currentEditingId;
+
+        console.log('💾 Saving to database... isEditing:', isEditing);
 
         if (isEditing) {
             // UPDATE existing restaurant
@@ -6575,8 +6607,11 @@ async function handleSaveSharedRestaurant(e) {
                 .insert([tastesData]);
         }
 
+        console.log('📊 Supabase result:', result);
+
         if (result.error) throw result.error;
 
+        console.log('✅ Save successful!');
         alert(isEditing ? '✅ Ristorante modificato!' : '✅ Locale aggiunto al database ΤΔSΤΞ5!');
 
         // Reset and close

@@ -6223,6 +6223,103 @@ async function autofillFromAppleMaps() {
     }
 }
 
+async function autofillFromAppleMaps() {
+    const mapsLink = document.getElementById('sharedAppleMaps').value;
+    if (!mapsLink || !mapsLink.includes('maps.apple.com')) return;
+
+    try {
+        // Extract place name from Apple Maps URL
+        let placeName = '';
+
+        // Apple Maps format: maps.apple.com/?address=...&q=PlaceName
+        const qMatch = mapsLink.match(/[?&]q=([^&]+)/);
+        if (qMatch) {
+            placeName = decodeURIComponent(qMatch[1].replace(/\+/g, ' '));
+
+            // Auto-fill name if empty
+            const nameInput = document.getElementById('sharedRestaurantName');
+            if (nameInput && !nameInput.value) {
+                nameInput.value = placeName;
+            }
+        }
+
+        // Extract address from Apple Maps URL
+        const addressMatch = mapsLink.match(/[?&]address=([^&]+)/);
+        if (addressMatch) {
+            const address = decodeURIComponent(addressMatch[1].replace(/\+/g, ' '));
+
+            // Auto-fill address if empty
+            const addressInput = document.getElementById('sharedRestaurantAddress');
+            if (addressInput && !addressInput.value) {
+                addressInput.value = address;
+            }
+
+            // Try to extract city from address (last part before postal code)
+            const cityMatch = address.match(/,\s*([^,\d]+)\s*\d/);
+            if (cityMatch) {
+                const cityInput = document.getElementById('sharedRestaurantCity');
+                if (cityInput && !cityInput.value) {
+                    cityInput.value = cityMatch[1].trim();
+                }
+            }
+        }
+
+        // Extract coordinates from ll parameter
+        const llMatch = mapsLink.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (llMatch) {
+            const lat = parseFloat(llMatch[1]);
+            const lng = parseFloat(llMatch[2]);
+
+            let country = '';
+            let region = '';
+
+            // Same geo-detection as Google Maps
+            if (lat >= 35 && lat <= 71 && lng >= -10 && lng <= 40) {
+                // Italy
+                if (lat >= 36 && lat <= 47 && lng >= 6 && lng <= 19) {
+                    country = 'Italy';
+                    if (lat >= 41.5 && lat <= 42.5 && lng >= 12 && lng <= 13) {
+                        region = 'Lazio';
+                    } else if (lat >= 43 && lat <= 44 && lng >= 11 && lng <= 12) {
+                        region = 'Toscana';
+                    } else if (lat >= 45 && lat <= 46 && lng >= 12 && lng <= 13) {
+                        region = 'Veneto';
+                    }
+                }
+                // France
+                else if (lat >= 41 && lat <= 51 && lng >= -5 && lng <= 9) {
+                    country = 'France';
+                    if (lat >= 48 && lat <= 49 && lng >= 2 && lng <= 3) {
+                        region = 'Île-de-France';
+                    }
+                }
+                // Spain
+                else if (lat >= 36 && lat <= 44 && lng >= -10 && lng <= 3) {
+                    country = 'Spain';
+                }
+            }
+
+            // Auto-fill country (hidden field)
+            const countryInput = document.getElementById('sharedRestaurantCountry');
+            if (countryInput && country) {
+                countryInput.value = country;
+            }
+
+            // Auto-fill region (hidden field)
+            const regionInput = document.getElementById('sharedRestaurantRegion');
+            if (regionInput && region) {
+                regionInput.value = region;
+            }
+        }
+
+        alert('✅ Autofill da Apple Maps completato! Controlla e completa i dati.');
+
+    } catch (error) {
+        console.error('Apple Maps autofill error:', error);
+        alert('⚠️ Autofill parziale. Completa manualmente i dati.');
+    }
+}
+
 async function editRestaurant(id) {
     try {
         // Find restaurant data

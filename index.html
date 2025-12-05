@@ -547,7 +547,8 @@ body {
 
 /* Form modals for databases (TASTES, ROUTES, STAY) */
 .modal-content.form-wide {
-    max-width: 700px;
+    max-width: 600px;
+    max-height: 90vh;
 }
 
 /* Form grids - responsive columns */
@@ -875,21 +876,21 @@ body {
             </div>
 
             <form id="loginForm" class="login-form">
-                <div class="form-group" style="display:none">
+                <div class="form-group">
                     <label for="email" data-i18n="login.email">Email</label>
-                    <input type="email" id="email" required data-i18n-placeholder="login.emailPlaceholder">
+                    <input type="email" id="email" data-i18n-placeholder="login.emailPlaceholder">
                 </div>
 
-                <div class="form-group" style="display:none">
+                <div class="form-group">
                     <label for="password" data-i18n="login.password">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••">
+                    <input type="password" id="password" placeholder="••••••••">
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="loginBtn" style="display:none">
-                    <span class="btn-text" data-i18n="login.loginButton">Accedi</span>
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <span class="btn-text" data-i18n="login.loginButton">Accedi con Email</span>
                 </button>
 
-                <div style="text-align: center; margin: 20px 0; color: #666; font-size: 14px; display:none">
+                <div style="text-align: center; margin: 20px 0; color: #666; font-size: 14px;">
                     <span>oppure</span>
                 </div>
 
@@ -1474,7 +1475,14 @@ body {
                     <div id="phoneNumbersList" style="display: flex; flex-direction: column; gap: 8px;">
                         <input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;">
                     </div>
-                    <button type="button" onclick="addPhoneField()" style="margin-top: 8px; padding: 8px 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 14px; cursor: pointer;">➕ Aggiungi numero</button>
+                    <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                        <button type="button" onclick="addPhoneField()" style="padding: 8px 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 14px; cursor: pointer; flex: 1; min-width: 140px;">➕ Aggiungi numero</button>
+                        <label for="vcardUpload" style="padding: 8px 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 14px; cursor: pointer; flex: 1; min-width: 140px; text-align: center; margin: 0; display: flex; align-items: center; justify-content: center;">
+                            📇 Importa vCard
+                        </label>
+                        <input type="file" id="vcardUpload" accept=".vcf,.vcard" onchange="handleVCardUpload(event)" style="display: none;">
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 11px; margin-top: 4px; display: block;">💡 Puoi condividere un contatto dal telefono come file .vcf e caricarlo qui</small>
                 </div>
 
                 <!-- 7. TIPO CUCINA -->
@@ -1513,18 +1521,24 @@ body {
                 <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
 
                 <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                        <input type="checkbox" id="sharedTlFree">
-                        <span>🆓 TL Free</span>
-                    </label>
+                    <!-- TL FREE e COMMISSIONE sulla stessa riga -->
+                    <div style="display: flex; gap: 32px; margin-bottom: 16px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="sharedTlFree">
+                            <span>🆓 TL FREE</span>
+                        </label>
 
-                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                        <input type="checkbox" id="sharedHasCommission">
-                        <span>💰 Commissione Disponibile</span>
-                    </label>
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="sharedHasCommission">
+                            <span>💰 COMMISSIONE</span>
+                        </label>
+                    </div>
 
-                    <label for="sharedDiscountPerc" style="display: block; margin-bottom: 8px;">💵 Sconto %</label>
-                    <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="es. 10" style="width: 100%; max-width: 200px;">
+                    <!-- SCONTO sotto -->
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <label for="sharedDiscountPerc" style="margin: 0; font-weight: 600;">💵 SCONTO:</label>
+                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="%" style="width: 100px; padding: 12px;">
+                    </div>
                 </div>
 
                 <!-- 12. DIMENSIONE GRUPPO MASSIMA (NO % SYMBOL!) -->
@@ -5686,9 +5700,81 @@ function addPhoneField() {
     newInput.type = 'tel';
     newInput.className = 'phone-input';
     newInput.placeholder = 'es. +39 06 1234567';
-    newInput.style.cssText = 'width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);';
+    newInput.style.cssText = 'width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;';
 
     phonesList.appendChild(newInput);
+}
+
+function handleVCardUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const vcardText = e.target.result;
+
+            // Parse vCard format
+            const lines = vcardText.split(/\r?\n/);
+            let name = '';
+            let phones = [];
+            let organization = '';
+
+            lines.forEach(line => {
+                // Extract name (FN = Full Name)
+                if (line.startsWith('FN:')) {
+                    name = line.substring(3).trim();
+                }
+                // Extract organization
+                if (line.startsWith('ORG:')) {
+                    organization = line.substring(4).trim();
+                }
+                // Extract phone numbers (TEL)
+                if (line.startsWith('TEL') || line.includes('TEL')) {
+                    const phoneMatch = line.match(/:([\d\s\+\-\(\)]+)$/);
+                    if (phoneMatch) {
+                        phones.push(phoneMatch[1].trim());
+                    }
+                }
+            });
+
+            // Populate contact person field
+            if (name) {
+                const contactInput = document.getElementById('sharedContactPerson');
+                if (contactInput) {
+                    contactInput.value = name + (organization ? ` (${organization})` : '');
+                }
+            }
+
+            // Populate phone numbers
+            if (phones.length > 0) {
+                const phonesList = document.getElementById('phoneNumbersList');
+                if (phonesList) {
+                    phonesList.innerHTML = ''; // Clear existing
+                    phones.forEach((phone, index) => {
+                        const phoneInput = document.createElement('input');
+                        phoneInput.type = 'tel';
+                        phoneInput.className = 'phone-input';
+                        phoneInput.value = phone;
+                        phoneInput.placeholder = 'es. +39 06 1234567';
+                        phoneInput.style.cssText = 'width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;';
+                        phonesList.appendChild(phoneInput);
+                    });
+                }
+            }
+
+            alert(`✅ vCard importata!\n\nNome: ${name}\nTelefoni: ${phones.length}`);
+
+        } catch (error) {
+            console.error('vCard parse error:', error);
+            alert('❌ Errore nel leggere il file vCard. Assicurati che sia un file .vcf valido.');
+        }
+
+        // Reset file input
+        event.target.value = '';
+    };
+
+    reader.readAsText(file);
 }
 
 async function autofillFromGoogleMaps() {

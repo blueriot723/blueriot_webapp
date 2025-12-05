@@ -351,9 +351,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(10, 14, 39, 0.9);
-    backdrop-filter: blur(8px);
-    z-index: 1000;
+    background: rgba(10, 14, 39, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -367,16 +367,19 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    width: 100%;
+    width: 90vw;
     max-width: 500px;
-    max-height: 85vh;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .modal-content form {
     overflow-y: auto;
+    overflow-x: hidden;
     flex: 1;
+    padding: 24px;
 }
 
 .modal-header {
@@ -547,7 +550,7 @@ body {
 
 /* Form modals for databases (TASTES, ROUTES, STAY) */
 .modal-content.form-wide {
-    max-width: 800px;
+    max-width: 900px;
 }
 
 /* Form grids - responsive columns */
@@ -584,6 +587,61 @@ body {
 .star-rating:hover,
 .star-rating.selected {
     opacity: 1;
+}
+
+/* ===== FORM IMPROVEMENTS ===== */
+/* Larger, more readable form inputs */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="url"],
+.form-group input[type="tel"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+    padding: 16px !important;
+    font-size: 16px !important;
+}
+
+/* Better label styling */
+.form-group label:not([style*="display: flex"]) {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    display: block;
+}
+
+/* Section headers with visual separation */
+#sharedRestaurantForm h3 {
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+#sharedRestaurantForm h3:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+/* Larger checkbox labels */
+.form-group label[style*="display: flex"] span,
+.form-group label input[type="checkbox"] + span {
+    font-size: 15px !important;
+}
+
+/* Full-width primary save button */
+#sharedRestaurantForm button[type="submit"] {
+    width: 100% !important;
+    padding: 18px !important;
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    flex: none !important;
+}
+
+/* Better spacing for form sections */
+#sharedRestaurantForm .form-group {
+    margin-bottom: 24px;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -820,21 +878,21 @@ body {
             </div>
 
             <form id="loginForm" class="login-form">
-                <div class="form-group" style="display:none">
+                <div class="form-group">
                     <label for="email" data-i18n="login.email">Email</label>
-                    <input type="email" id="email" required data-i18n-placeholder="login.emailPlaceholder">
+                    <input type="email" id="email" data-i18n-placeholder="login.emailPlaceholder">
                 </div>
 
-                <div class="form-group" style="display:none">
+                <div class="form-group">
                     <label for="password" data-i18n="login.password">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••">
+                    <input type="password" id="password" placeholder="••••••••">
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="loginBtn" style="display:none">
-                    <span class="btn-text" data-i18n="login.loginButton">Accedi</span>
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <span class="btn-text" data-i18n="login.loginButton">Accedi con Email</span>
                 </button>
 
-                <div style="text-align: center; margin: 20px 0; color: #666; font-size: 14px; display:none">
+                <div style="text-align: center; margin: 20px 0; color: #666; font-size: 14px;">
                     <span>oppure</span>
                 </div>
 
@@ -1374,181 +1432,142 @@ body {
             </div>
 
             <form id="sharedRestaurantForm">
-                <!-- BASIC INFO -->
-                <h3 style="margin: 0 0 16px; color: var(--primary-blue);">📋 Info Base</h3>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedRestaurantName">Nome Locale *</label>
-                        <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedType">Tipo *</label>
-                        <select id="sharedType" required>
-                            <option value="">Seleziona...</option>
-                            <option value="restaurant">🍝 Restaurant</option>
-                            <option value="bar">🍷 Bar</option>
-                            <option value="bakery">🥖 Bakery</option>
-                            <option value="quick_bite">🥪 Quick Bite</option>
-                            <option value="gelateria">🍨 Gelateria</option>
-                            <option value="aperitivo">🍹 Aperitivo</option>
-                            <option value="caffetteria">☕ Caffetteria</option>
-                        </select>
-                    </div>
+                <!-- 1. NOME RISTORANTE -->
+                <div class="form-group">
+                    <label for="sharedRestaurantName">Nome Locale *</label>
+                    <input type="text" id="sharedRestaurantName" required placeholder="es. Trattoria da Mario">
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedCuisineType">Tipo Cucina</label>
-                        <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedPriceRange">Fascia Prezzo</label>
-                        <select id="sharedPriceRange">
-                            <option value="">Seleziona...</option>
-                            <option value="€">€ - Economico</option>
-                            <option value="€€">€€ - Medio</option>
-                            <option value="€€€">€€€ - Alto</option>
-                            <option value="€€€€">€€€€ - Lusso</option>
-                        </select>
-                    </div>
+                <!-- 2. CITTÀ -->
+                <div class="form-group">
+                    <label for="sharedRestaurantCity">Città *</label>
+                    <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma, Firenze, Parigi">
                 </div>
 
-                <!-- LOCATION -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📍 Posizione</h3>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedRestaurantCountry">Paese *</label>
-                        <input type="text" id="sharedRestaurantCountry" required placeholder="es. Italy, France, Spain">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedRestaurantRegion">Regione</label>
-                        <input type="text" id="sharedRestaurantRegion" placeholder="es. Lazio, Toscana, Île-de-France">
-                    </div>
+                <!-- 3. GOOGLE MAPS -->
+                <div class="form-group">
+                    <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
+                    <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." oninput="setTimeout(() => autofillFromGoogleMaps(), 200)" onpaste="setTimeout(() => autofillFromGoogleMaps(), 200)" onchange="autofillFromGoogleMaps()">
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Incolla link → autofill automatico</small>
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedRestaurantCity">Città *</label>
-                        <input type="text" id="sharedRestaurantCity" required placeholder="es. Roma, Firenze, Parigi">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedRestaurantAddress">Indirizzo</label>
-                        <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
-                    </div>
+                <!-- 4. APPLE MAPS -->
+                <div class="form-group">
+                    <label for="sharedAppleMaps">Link Apple Maps 🍎</label>
+                    <input type="url" id="sharedAppleMaps" placeholder="https://maps.apple.com/..." oninput="setTimeout(() => autofillFromAppleMaps(), 200)" onpaste="setTimeout(() => autofillFromAppleMaps(), 200)" onchange="autofillFromAppleMaps()">
+                    <small style="color: var(--text-secondary); font-size: 12px;">💡 Incolla link → autofill automatico</small>
                 </div>
 
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedGoogleMaps">Link Google Maps 🔍</label>
-                        <input type="url" id="sharedGoogleMaps" placeholder="https://maps.google.com/..." onblur="autofillFromGoogleMaps()">
-                        <small style="color: var(--text-secondary); font-size: 11px;">Incolla il link e premi Tab per autofill</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Telefoni</label>
-                        <div id="phoneNumbersList" style="display: flex; flex-direction: column; gap: 8px;">
-                            <input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
-                        </div>
-                        <button type="button" onclick="addPhoneField()" style="margin-top: 8px; padding: 6px 12px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 12px; cursor: pointer;">➕ Aggiungi numero</button>
-                    </div>
+                <!-- 5. INDIRIZZO -->
+                <div class="form-group">
+                    <label for="sharedRestaurantAddress">Indirizzo</label>
+                    <input type="text" id="sharedRestaurantAddress" placeholder="es. Via Roma 123">
                 </div>
 
-                <!-- OPENING HOURS -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🕐 Orari</h3>
+                <!-- 6. TELEFONI SECTION -->
+                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">📞 Contatti</h3>
 
+                <div class="form-group">
+                    <label for="sharedContactPerson">Riferimento/Contatto</label>
+                    <input type="text" id="sharedContactPerson" placeholder="es. Mario Rossi, Responsabile sala">
+                </div>
+
+                <div class="form-group">
+                    <label>Numeri Telefono</label>
+                    <div id="phoneNumbersList" style="display: flex; flex-direction: column; gap: 8px;">
+                        <input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;">
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                        <button type="button" onclick="addPhoneField()" style="padding: 8px 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 14px; cursor: pointer; flex: 1; min-width: 140px;">➕ Aggiungi numero</button>
+                        <label for="vcardUpload" style="padding: 8px 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--primary-blue); font-size: 14px; cursor: pointer; flex: 1; min-width: 140px; text-align: center; margin: 0; display: flex; align-items: center; justify-content: center;">
+                            📇 Importa vCard
+                        </label>
+                        <input type="file" id="vcardUpload" accept=".vcf,.vcard" onchange="handleVCardUpload(event)" style="display: none;">
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 11px; margin-top: 4px; display: block;">💡 Puoi condividere un contatto dal telefono come file .vcf e caricarlo qui</small>
+                </div>
+
+                <!-- 7. TIPO CUCINA -->
+                <div class="form-group">
+                    <label for="sharedCuisineType">Tipo Cucina</label>
+                    <input type="text" id="sharedCuisineType" placeholder="es. Italiana, Pizzeria, Trattoria">
+                </div>
+
+                <!-- 8. FASCIA PREZZO -->
+                <div class="form-group">
+                    <label for="sharedPriceRange">Fascia Prezzo</label>
+                    <select id="sharedPriceRange">
+                        <option value="">Seleziona...</option>
+                        <option value="€">€ - Economico</option>
+                        <option value="€€">€€ - Medio</option>
+                        <option value="€€€">€€€ - Alto</option>
+                        <option value="€€€€">€€€€ - Lusso</option>
+                    </select>
+                </div>
+
+                <!-- 9. ORARI DI APERTURA (TEXTAREA) -->
                 <div class="form-group">
                     <label for="sharedOpeningHours">Orari di Apertura</label>
-                    <input type="text" id="sharedOpeningHours" placeholder="es. Lun-Ven 12:00-23:00, Sab-Dom 11:00-00:00">
+                    <textarea id="sharedOpeningHours" rows="3" placeholder="es. Lun-Ven 12:00-23:00&#10;Sab-Dom 11:00-00:00&#10;Chiuso Martedì" style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; font-size: 16px; resize: vertical;"></textarea>
                 </div>
 
+                <!-- 10. PRENOTAZIONE NECESSARIA -->
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sharedBookingNeeded">
-                        <span>📅 Prenotazione Necessaria</span>
-                    </label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="sharedBookingNeeded" style="width: 20px; height: 20px; margin: 0;">
+                        <label for="sharedBookingNeeded" style="margin: 0; font-size: 15px;">📅 Prenotazione Necessaria</label>
+                    </div>
                 </div>
 
-                <!-- TL BENEFITS -->
+                <!-- 11. VANTAGGI TL -->
                 <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🎁 Vantaggi TL</h3>
 
+                <div class="form-group" style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- TL FREE checkbox -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="sharedTlFree" style="width: 20px; height: 20px; margin: 0;">
+                        <label for="sharedTlFree" style="margin: 0; font-size: 15px;">🆓 TL Free</label>
+                    </div>
+
+                    <!-- COMMISSIONE checkbox -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="sharedHasCommission" style="width: 20px; height: 20px; margin: 0;">
+                        <label for="sharedHasCommission" style="margin: 0; font-size: 15px;">💰 Commissione</label>
+                    </div>
+
+                    <!-- SCONTO -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="sharedDiscountPerc" style="margin: 0; font-size: 15px; font-weight: 600;">💵 Sconto %:</label>
+                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="10" style="width: 80px; padding: 12px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;">
+                    </div>
+                </div>
+
+                <!-- 12. DIMENSIONE GRUPPO MASSIMA (NO % SYMBOL!) -->
                 <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                        <input type="checkbox" id="sharedTlFree">
-                        <span>🎁 Gratuity (TL Free)</span>
-                    </label>
-
-                    <div class="inline-field-group">
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="sharedHasCommission">
-                            <span>💰 Commission</span>
-                        </label>
-                        <input type="number" id="sharedCommissionPerc" min="0" max="100" placeholder="% (es. 10)">
-                    </div>
-
-                    <div class="inline-field-group">
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="sharedHasDiscount">
-                            <span>🏷️ Discount</span>
-                        </label>
-                        <input type="number" id="sharedDiscountPerc" min="0" max="100" placeholder="% (es. 15)">
-                    </div>
+                    <label for="sharedMaxGroupSize">Dimensione Gruppo Massima</label>
+                    <input type="number" id="sharedMaxGroupSize" min="1" max="99" placeholder="es. 15">
                 </div>
 
-                <!-- GROUP SUITABILITY -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">👥 Idoneità Gruppi</h3>
-
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="sharedSuitableForGroups" checked>
-                        <span>Adatto ai Gruppi</span>
-                    </label>
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedMinGroupSize">Min Persone Gruppo</label>
-                        <input type="number" id="sharedMinGroupSize" min="1" placeholder="es. 10">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedMaxGroupSize">Max Persone Gruppo</label>
-                        <input type="number" id="sharedMaxGroupSize" min="1" placeholder="es. 50">
-                    </div>
-                </div>
-
-                <!-- TOURS & TESTING -->
-                <h3 style="margin: 24px 0 16px; color: var(--primary-blue);">🗺️ Info Aggiuntive</h3>
-
-                <div class="form-group">
-                    <label for="sharedToursRelevant">Tour Rilevanti (separati da virgola)</label>
-                    <input type="text" id="sharedToursRelevant" placeholder="es. ZMXI, ZXXI, ZMXD">
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label for="sharedTestedBy">Testato da (TL)</label>
-                        <input type="text" id="sharedTestedBy" placeholder="es. Marco Rossi">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sharedTestedDate">Data Test</label>
-                        <input type="date" id="sharedTestedDate">
-                    </div>
-                </div>
-
+                <!-- 13. NOTE -->
                 <div class="form-group">
                     <label for="sharedNotes">Note</label>
-                    <textarea id="sharedNotes" rows="3" placeholder="Note utili per altri TL..." style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                    <textarea id="sharedNotes" rows="4" placeholder="Note utili per altri TL..." style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: inherit; font-size: 16px; resize: vertical;"></textarea>
                 </div>
 
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelSharedRestaurant">Annulla</button>
+                <!-- HIDDEN FIELDS (still needed for database) -->
+                <input type="hidden" id="sharedType" value="restaurant">
+                <input type="hidden" id="sharedRestaurantCountry" value="Italy">
+                <input type="hidden" id="sharedRestaurantRegion" value="">
+                <input type="hidden" id="sharedSuitableForGroups" value="true">
+                <input type="hidden" id="sharedMinGroupSize" value="1">
+                <input type="hidden" id="sharedToursRelevant" value="">
+                <input type="hidden" id="sharedTestedBy" value="">
+                <input type="hidden" id="sharedTestedDate" value="">
+                <input type="hidden" id="sharedCommissionPerc" value="0">
+                <input type="hidden" id="sharedHasDiscount" value="false">
+
+                <!-- 14. SAVE BUTTON (FULL WIDTH) -->
+                <div class="modal-actions" style="border-top: 1px solid var(--border-color); margin-top: 32px; padding-top: 24px;">
                     <button type="submit" class="btn btn-primary">💾 Salva in Database</button>
                 </div>
 
@@ -2590,8 +2609,8 @@ function init() {
     // Set up event listeners
     setupEventListeners();
 
-    // Handle OAuth callback (if returning from Google)
-    handleOAuthCallback();
+    // Setup Supabase auth listener (handles OAuth automatically)
+    setupAuthListener();
 
     // Check if user is already logged in
     checkAuth();
@@ -3066,6 +3085,11 @@ async function handleLogin(e) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
+    if (!email || !password) {
+        alert('❌ Inserisci email e password');
+        return;
+    }
+
     console.log('🎯 Login attempt:', email);
 
     if (loginBtn) {
@@ -3156,65 +3180,53 @@ async function handleGoogleLogin() {
     }
 }
 
-async function handleOAuthCallback() {
-    // Controlla se l'utente sta tornando da OAuth
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get('access_token');
+// Setup Supabase auth state listener (handles OAuth automatically)
+function setupAuthListener() {
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        console.log('🔄 Auth state changed:', event);
 
-    if (!accessToken) {
-        // Non è un callback OAuth, ignora
-        return;
-    }
+        if (event === 'SIGNED_IN' && session) {
+            console.log('✅ User signed in:', session.user.id);
 
-    console.log('🔄 Callback OAuth rilevato, completamento login...');
+            try {
+                // Cerca il profilo TL nel database
+                const { data: tlData, error: tlError } = await supabaseClient
+                    .from('tl_users')
+                    .select('*')
+                    .eq('user_id', session.user.id)
+                    .single();
 
-    try {
-        // Ottieni la sessione corrente (già impostata da Supabase dopo OAuth)
-        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+                if (tlError) {
+                    console.error('❌ DB error:', tlError);
+                    throw new Error(`DB: ${tlError.message} (${tlError.code})`);
+                }
 
-        if (sessionError) {
-            console.error('❌ Session error:', sessionError);
-            throw new Error(`Session: ${sessionError.message}`);
+                if (!tlData) {
+                    throw new Error('Profilo TL non trovato per questo account Google.\n\nContatta @blueriot per registrarti.');
+                }
+
+                console.log('✅ TL profile found');
+
+                // Pulisci l'URL dal hash OAuth
+                if (window.location.hash) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                // Mostra la dashboard
+                showDashboard(session.user, tlData);
+
+            } catch (error) {
+                console.error('💥 Profile lookup failed:', error);
+                alert('❌ LOGIN FALLITO:\n\n' + (error.message || 'Errore sconosciuto'));
+                await supabaseClient.auth.signOut();
+            }
         }
 
-        if (!session || !session.user) {
-            throw new Error('Sessione non valida dopo OAuth');
+        if (event === 'SIGNED_OUT') {
+            console.log('👋 User signed out');
+            location.reload();
         }
-
-        console.log('✅ OAuth Session OK, user:', session.user.id);
-
-        // Cerca il profilo TL nel database
-        const { data: tlData, error: tlError } = await supabaseClient
-            .from('tl_users')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-
-        if (tlError) {
-            console.error('❌ DB error:', tlError);
-            throw new Error(`DB: ${tlError.message} (${tlError.code})`);
-        }
-
-        if (!tlData) {
-            throw new Error('Profilo TL non trovato per questo account Google.\n\nContatta @blueriot per registrarti.');
-        }
-
-        console.log('✅ TL profile found via OAuth');
-
-        // Pulisci l'URL dal hash
-        window.history.replaceState({}, document.title, window.location.pathname);
-
-        // Mostra la dashboard
-        showDashboard(session.user, tlData);
-
-    } catch (error) {
-        console.error('💥 OAuth callback failed:', error);
-        alert('❌ LOGIN GOOGLE FALLITO:\n\n' + (error.message || 'Errore sconosciuto'));
-
-        // Pulisci l'URL e torna al login
-        window.history.replaceState({}, document.title, window.location.pathname);
-        window.location.reload();
-    }
+    });
 }
 
 function showDashboard(user, tlData) {
@@ -5694,87 +5706,317 @@ function addPhoneField() {
     newInput.type = 'tel';
     newInput.className = 'phone-input';
     newInput.placeholder = 'es. +39 06 1234567';
-    newInput.style.cssText = 'width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);';
+    newInput.style.cssText = 'width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;';
 
     phonesList.appendChild(newInput);
 }
 
+function handleVCardUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const vcardText = e.target.result;
+
+            // Parse vCard format
+            const lines = vcardText.split(/\r?\n/);
+            let name = '';
+            let phones = [];
+            let organization = '';
+
+            lines.forEach(line => {
+                // Extract name (FN = Full Name)
+                if (line.startsWith('FN:')) {
+                    name = line.substring(3).trim();
+                }
+                // Extract organization
+                if (line.startsWith('ORG:')) {
+                    organization = line.substring(4).trim();
+                }
+                // Extract phone numbers (TEL)
+                if (line.startsWith('TEL') || line.includes('TEL')) {
+                    const phoneMatch = line.match(/:([\d\s\+\-\(\)]+)$/);
+                    if (phoneMatch) {
+                        phones.push(phoneMatch[1].trim());
+                    }
+                }
+            });
+
+            // Populate contact person field
+            if (name) {
+                const contactInput = document.getElementById('sharedContactPerson');
+                if (contactInput) {
+                    contactInput.value = name + (organization ? ` (${organization})` : '');
+                }
+            }
+
+            // Populate phone numbers
+            if (phones.length > 0) {
+                const phonesList = document.getElementById('phoneNumbersList');
+                if (phonesList) {
+                    phonesList.innerHTML = ''; // Clear existing
+                    phones.forEach((phone, index) => {
+                        const phoneInput = document.createElement('input');
+                        phoneInput.type = 'tel';
+                        phoneInput.className = 'phone-input';
+                        phoneInput.value = phone;
+                        phoneInput.placeholder = 'es. +39 06 1234567';
+                        phoneInput.style.cssText = 'width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;';
+                        phonesList.appendChild(phoneInput);
+                    });
+                }
+            }
+
+            alert(`✅ vCard importata!\n\nNome: ${name}\nTelefoni: ${phones.length}`);
+
+        } catch (error) {
+            console.error('vCard parse error:', error);
+            alert('❌ Errore nel leggere il file vCard. Assicurati che sia un file .vcf valido.');
+        }
+
+        // Reset file input
+        event.target.value = '';
+    };
+
+    reader.readAsText(file);
+}
+
 async function autofillFromGoogleMaps() {
-    const mapsLink = document.getElementById('sharedGoogleMaps').value;
-    if (!mapsLink || !mapsLink.includes('google.com/maps')) return;
+    const mapsLink = document.getElementById('sharedGoogleMaps').value.trim();
+
+    console.log('🔍 Google Maps autofill triggered. URL:', mapsLink);
+
+    if (!mapsLink) {
+        console.log('❌ Empty URL');
+        return;
+    }
+
+    if (!mapsLink.includes('google.com/maps') && !mapsLink.includes('maps.google.com') && !mapsLink.includes('goo.gl/maps')) {
+        alert('❌ Link non valido!\n\nDeve essere un link di Google Maps.\nEsempio: https://maps.google.com/...');
+        return;
+    }
 
     try {
+        let extracted = {
+            name: '',
+            address: '',
+            city: '',
+            country: '',
+            region: ''
+        };
+
         // Extract place name from URL
-        let placeName = '';
         const placeMatch = mapsLink.match(/place\/([^/]+)/);
         if (placeMatch) {
-            placeName = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
+            extracted.name = decodeURIComponent(placeMatch[1].replace(/\+/g, ' '));
+            console.log('📍 Nome estratto:', extracted.name);
 
             // Auto-fill name if empty
             const nameInput = document.getElementById('sharedRestaurantName');
             if (nameInput && !nameInput.value) {
-                nameInput.value = placeName;
+                nameInput.value = extracted.name;
             }
         }
 
         // Extract coordinates
         const coordMatch = mapsLink.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
         if (coordMatch) {
-            const lat = coordMatch[1];
-            const lng = coordMatch[2];
+            const latitude = parseFloat(coordMatch[1]);
+            const longitude = parseFloat(coordMatch[2]);
 
-            // Try to detect country from coordinates (rough approximation)
-            const latitude = parseFloat(lat);
-            const longitude = parseFloat(lng);
-
-            let country = '';
-            let region = '';
+            console.log('🌍 Coordinate:', latitude, longitude);
 
             // Europe detection (very basic)
             if (latitude >= 35 && latitude <= 71 && longitude >= -10 && longitude <= 40) {
                 // Italy
                 if (latitude >= 36 && latitude <= 47 && longitude >= 6 && longitude <= 19) {
-                    country = 'Italy';
+                    extracted.country = 'Italy';
                     // Rough region detection for Italy
                     if (latitude >= 41.5 && latitude <= 42.5 && longitude >= 12 && longitude <= 13) {
-                        region = 'Lazio';
+                        extracted.region = 'Lazio';
                     } else if (latitude >= 43 && latitude <= 44 && longitude >= 11 && longitude <= 12) {
-                        region = 'Toscana';
+                        extracted.region = 'Toscana';
                     } else if (latitude >= 45 && latitude <= 46 && longitude >= 12 && longitude <= 13) {
-                        region = 'Veneto';
+                        extracted.region = 'Veneto';
                     }
                 }
                 // France
                 else if (latitude >= 41 && latitude <= 51 && longitude >= -5 && longitude <= 9) {
-                    country = 'France';
+                    extracted.country = 'France';
                     if (latitude >= 48 && latitude <= 49 && longitude >= 2 && longitude <= 3) {
-                        region = 'Île-de-France';
+                        extracted.region = 'Île-de-France';
                     }
                 }
                 // Spain
                 else if (latitude >= 36 && latitude <= 44 && longitude >= -10 && longitude <= 3) {
-                    country = 'Spain';
+                    extracted.country = 'Spain';
                 }
             }
 
+            console.log('🌍 Paese/Regione:', extracted.country, extracted.region);
+
             // Auto-fill country if detected and empty
             const countryInput = document.getElementById('sharedRestaurantCountry');
-            if (countryInput && !countryInput.value && country) {
-                countryInput.value = country;
+            if (countryInput && !countryInput.value && extracted.country) {
+                countryInput.value = extracted.country;
             }
 
             // Auto-fill region if detected and empty
             const regionInput = document.getElementById('sharedRestaurantRegion');
-            if (regionInput && !regionInput.value && region) {
-                regionInput.value = region;
+            if (regionInput && !regionInput.value && extracted.region) {
+                regionInput.value = extracted.region;
             }
         }
 
-        alert('✅ Autofill completato! Controlla e completa i dati mancanti.');
+        // Show what was extracted
+        let message = '✅ Google Maps - Dati estratti:\n\n';
+        if (extracted.name) message += `📍 Nome: ${extracted.name}\n`;
+        if (extracted.country) message += `🌍 Paese: ${extracted.country}\n`;
+        if (extracted.region) message += `📌 Regione: ${extracted.region}\n`;
+
+        if (!extracted.name && !extracted.country) {
+            message = '⚠️ Nessun dato estratto dal link.\n\nAssicurati di incollare un link completo di Google Maps con il nome del luogo.';
+        }
+
+        alert(message);
 
     } catch (error) {
         console.error('Autofill error:', error);
-        alert('⚠️ Autofill parziale. Completa manualmente i dati.');
+        alert('⚠️ Errore durante autofill:\n' + error.message);
+    }
+}
+
+async function autofillFromAppleMaps() {
+    const mapsLink = document.getElementById('sharedAppleMaps').value.trim();
+
+    console.log('🍎 Apple Maps autofill triggered. URL:', mapsLink);
+
+    if (!mapsLink) {
+        console.log('❌ Empty URL');
+        return;
+    }
+
+    if (!mapsLink.includes('maps.apple.com')) {
+        alert('❌ Link non valido!\n\nDeve essere un link di Apple Maps.\nEsempio: https://maps.apple.com/...');
+        return;
+    }
+
+    try {
+        let extracted = {
+            name: '',
+            address: '',
+            city: '',
+            country: '',
+            region: ''
+        };
+
+        // Extract place name from Apple Maps URL
+        // Apple Maps format: maps.apple.com/?address=...&q=PlaceName
+        const qMatch = mapsLink.match(/[?&]q=([^&]+)/);
+        if (qMatch) {
+            extracted.name = decodeURIComponent(qMatch[1].replace(/\+/g, ' '));
+            console.log('📍 Nome estratto:', extracted.name);
+
+            // Auto-fill name if empty
+            const nameInput = document.getElementById('sharedRestaurantName');
+            if (nameInput && !nameInput.value) {
+                nameInput.value = extracted.name;
+            }
+        }
+
+        // Extract address from Apple Maps URL
+        const addressMatch = mapsLink.match(/[?&]address=([^&]+)/);
+        if (addressMatch) {
+            extracted.address = decodeURIComponent(addressMatch[1].replace(/\+/g, ' '));
+            console.log('📍 Indirizzo estratto:', extracted.address);
+
+            // Auto-fill address if empty
+            const addressInput = document.getElementById('sharedRestaurantAddress');
+            if (addressInput && !addressInput.value) {
+                addressInput.value = extracted.address;
+            }
+
+            // Try to extract city from address (last part before postal code)
+            const cityMatch = extracted.address.match(/,\s*([^,\d]+)\s*\d/);
+            if (cityMatch) {
+                extracted.city = cityMatch[1].trim();
+                console.log('🏙️ Città estratta:', extracted.city);
+
+                const cityInput = document.getElementById('sharedRestaurantCity');
+                if (cityInput && !cityInput.value) {
+                    cityInput.value = extracted.city;
+                }
+            }
+        }
+
+        // Extract coordinates from ll parameter
+        const llMatch = mapsLink.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+        if (llMatch) {
+            const lat = parseFloat(llMatch[1]);
+            const lng = parseFloat(llMatch[2]);
+
+            console.log('🌍 Coordinate:', lat, lng);
+
+            // Same geo-detection as Google Maps
+            if (lat >= 35 && lat <= 71 && lng >= -10 && lng <= 40) {
+                // Italy
+                if (lat >= 36 && lat <= 47 && lng >= 6 && lng <= 19) {
+                    extracted.country = 'Italy';
+                    if (lat >= 41.5 && lat <= 42.5 && lng >= 12 && lng <= 13) {
+                        extracted.region = 'Lazio';
+                    } else if (lat >= 43 && lat <= 44 && lng >= 11 && lng <= 12) {
+                        extracted.region = 'Toscana';
+                    } else if (lat >= 45 && lat <= 46 && lng >= 12 && lng <= 13) {
+                        extracted.region = 'Veneto';
+                    }
+                }
+                // France
+                else if (lat >= 41 && lat <= 51 && lng >= -5 && lng <= 9) {
+                    extracted.country = 'France';
+                    if (lat >= 48 && lat <= 49 && lng >= 2 && lng <= 3) {
+                        extracted.region = 'Île-de-France';
+                    }
+                }
+                // Spain
+                else if (lat >= 36 && lat <= 44 && lng >= -10 && lng <= 3) {
+                    extracted.country = 'Spain';
+                }
+            }
+
+            console.log('🌍 Paese/Regione:', extracted.country, extracted.region);
+
+            // Auto-fill country (hidden field)
+            const countryInput = document.getElementById('sharedRestaurantCountry');
+            if (countryInput && extracted.country) {
+                countryInput.value = extracted.country;
+            }
+
+            // Auto-fill region (hidden field)
+            const regionInput = document.getElementById('sharedRestaurantRegion');
+            if (regionInput && extracted.region) {
+                regionInput.value = extracted.region;
+            }
+        }
+
+        // Show what was extracted
+        let message = '✅ Apple Maps - Dati estratti:\n\n';
+        if (extracted.name) message += `📍 Nome: ${extracted.name}\n`;
+        if (extracted.address) message += `📍 Indirizzo: ${extracted.address}\n`;
+        if (extracted.city) message += `🏙️ Città: ${extracted.city}\n`;
+        if (extracted.country) message += `🌍 Paese: ${extracted.country}\n`;
+        if (extracted.region) message += `📌 Regione: ${extracted.region}\n`;
+
+        if (!extracted.name && !extracted.address && !extracted.country) {
+            message = '⚠️ Nessun dato estratto dal link.\n\nAssicurati di incollare un link completo di Apple Maps.';
+        }
+
+        alert(message);
+
+    } catch (error) {
+        console.error('Apple Maps autofill error:', error);
+        alert('⚠️ Errore durante autofill:\n' + error.message);
     }
 }
 
@@ -5882,10 +6124,14 @@ async function deleteRestaurant(id, name) {
 async function handleSaveSharedRestaurant(e) {
     e.preventDefault();
 
+    alert('🔍 DEBUG: Submit triggered'); // DEBUG
+
     if (!currentTL || !currentTL.id) {
         alert('❌ Errore: TL non identificato');
         return;
     }
+
+    alert(`🔍 DEBUG: TL OK - ${currentTL.id}`); // DEBUG
 
     // Parse tours_relevant from comma-separated string to array
     const toursRelevantStr = document.getElementById('sharedToursRelevant').value || '';
@@ -5904,11 +6150,11 @@ async function handleSaveSharedRestaurant(e) {
         cuisine: document.getElementById('sharedCuisineType').value || null,
         price_range: document.getElementById('sharedPriceRange').value || null,
 
-        // TL benefits
+        // TL benefits (simplified - no useless percentages for commission)
         gratuity: document.getElementById('sharedTlFree').checked,
         commission: document.getElementById('sharedHasCommission').checked,
-        commission_percentage: document.getElementById('sharedCommissionPerc').value ? parseInt(document.getElementById('sharedCommissionPerc').value) : null,
-        discount: document.getElementById('sharedHasDiscount').checked,
+        commission_percentage: null, // Removed from form - nobody cares about exact %
+        discount: document.getElementById('sharedDiscountPerc').value ? true : false, // Has discount if % provided
         discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
 
         // Location (hierarchical structure)
@@ -5917,8 +6163,10 @@ async function handleSaveSharedRestaurant(e) {
         city: document.getElementById('sharedRestaurantCity').value,
         location: document.getElementById('sharedRestaurantCity').value, // Keep for backwards compatibility
         address: document.getElementById('sharedRestaurantAddress').value || null,
+        contact_person: document.getElementById('sharedContactPerson').value || null, // NEW: Contact person name
         phone: phoneNumbers.length > 0 ? phoneNumbers : null, // Array of phone numbers
         google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
+        apple_maps_link: document.getElementById('sharedAppleMaps').value || null, // NEW: Apple Maps support
 
         // Hours
         opening_hours: document.getElementById('sharedOpeningHours').value || null,

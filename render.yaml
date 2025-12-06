@@ -1,0 +1,43 @@
+# ═══════════════════════════════════════════════════
+# 🔴 Render Blueprint - NODΞ Backend API
+# ═══════════════════════════════════════════════════
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Quick Deploy:
+# 1. Go to https://dashboard.render.com
+# 2. Click "New +" → "Blueprint"
+# 3. Connect this repository
+# 4. Set SUPABASE_URL and SUPABASE_SERVICE_KEY
+# 5. Deploy!
+# ═══════════════════════════════════════════════════
+
+services:
+  # NODΞ Backend API
+  - type: web
+    name: blueriot-nodex-api
+    env: node
+    region: frankfurt  # EU Central - Change if needed (oregon, singapore, etc.)
+    plan: starter  # Uses your PRO plan - 512MB RAM
+    buildCommand: cd nodex/backend && npm install
+    startCommand: cd nodex/backend && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SUPABASE_URL
+        sync: false  # ⚠️ Set in Render dashboard: https://your-project.supabase.co
+      - key: SUPABASE_SERVICE_KEY
+        sync: false  # ⚠️ Set in Render dashboard (use service_role key, NOT anon key!)
+      - key: ALLOWED_ORIGINS
+        value: https://blueriot723.github.io  # Your GitHub Pages URL (comma-separated if multiple)
+    autoDeploy: true  # Auto-deploy when you push to main branch
+
+databases:
+  # Optional: If you want to use Render's PostgreSQL instead of Supabase
+  # Uncomment this section if migrating away from Supabase
+  # - name: blueriot-db
+  #   databaseName: blueriot_matrix
+  #   user: blueriot_user
+  #   plan: free

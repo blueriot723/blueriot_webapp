@@ -23,11 +23,11 @@ export class DashboardFrame extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `
-            <link rel="stylesheet" href="src/styles/base.css">
-            <link rel="stylesheet" href="src/styles/layout.css">
-            <link rel="stylesheet" href="src/styles/components.css">
-
             <style>
+                @import url('../styles/base.css');
+                @import url('../styles/layout.css');
+                @import url('../styles/components.css');
+
                 :host {
                     display: block;
                     min-height: 100vh;

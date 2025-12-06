@@ -16,11 +16,11 @@ export class NodePanel extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = \`
-            <link rel="stylesheet" href="src/styles/base.css">
-            <link rel="stylesheet" href="src/styles/layout.css">
-            <link rel="stylesheet" href="src/styles/components.css">
-
             <style>
+                @import url('../styles/base.css');
+                @import url('../styles/layout.css');
+                @import url('../styles/components.css');
+
                 .header-actions {
                     display: flex;
                     justify-content: space-between;

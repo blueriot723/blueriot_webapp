@@ -20,11 +20,11 @@ export class TastesPanel extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `
-            <link rel="stylesheet" href="src/styles/base.css">
-            <link rel="stylesheet" href="src/styles/layout.css">
-            <link rel="stylesheet" href="src/styles/components.css">
-
             <style>
+                @import url('../styles/base.css');
+                @import url('../styles/layout.css');
+                @import url('../styles/components.css');
+
                 :host {
                     display: block;
                 }
@@ -188,7 +188,7 @@ export class TastesPanel extends HTMLElement {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title" id="modalTitle">Aggiungi Locale</h3>
-                        <button class="modal-close" id="closeBtn">×</button>
+                        <button class="modal-close" id="closeBtn">ï¿½</button>
                     </div>
                     <div class="modal-body">
                         <form id="restaurantForm">
@@ -197,7 +197,7 @@ export class TastesPanel extends HTMLElement {
                                 <input type="text" class="form-input" id="name" required placeholder="es. Trattoria da Mario">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Città *</label>
+                                <label class="form-label">Cittï¿½ *</label>
                                 <input type="text" class="form-input" id="city" required placeholder="es. Roma">
                             </div>
                             <div class="form-group">
@@ -212,10 +212,10 @@ export class TastesPanel extends HTMLElement {
                                 <label class="form-label">Tipo</label>
                                 <select class="form-select" id="type">
                                     <option value="restaurant"><} Ristorante</option>
-                                    <option value="bar"> Bar/Caffè</option>
+                                    <option value="bar"> Bar/Caffï¿½</option>
                                     <option value="gelateria"><f Gelateria</option>
                                     <option value="pub"><z Pub</option>
-                                    <option value="other">=Í Altro</option>
+                                    <option value="other">=ï¿½ Altro</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -287,9 +287,9 @@ export class TastesPanel extends HTMLElement {
         for (const r of this.restaurants) {
             const typeLabel = this.getTypeLabel(r.type || 'restaurant');
             const cityText = r.city || 'N/A';
-            const addressHtml = r.address ? '<div class="restaurant-meta"><à ' + r.address + '</div>' : '';
-            const phoneHtml = r.phone ? '<div class="restaurant-meta">=Þ ' + r.phone + '</div>' : '';
-            const notesHtml = r.notes ? '<div class="restaurant-meta" style="margin-top: var(--spacing-md);">=¬ ' + r.notes + '</div>' : '';
+            const addressHtml = r.address ? '<div class="restaurant-meta"><ï¿½ ' + r.address + '</div>' : '';
+            const phoneHtml = r.phone ? '<div class="restaurant-meta">=ï¿½ ' + r.phone + '</div>' : '';
+            const notesHtml = r.notes ? '<div class="restaurant-meta" style="margin-top: var(--spacing-md);">=ï¿½ ' + r.notes + '</div>' : '';
 
             html.push('<div class="restaurant-card">');
             html.push('<div class="restaurant-header">');
@@ -299,10 +299,10 @@ export class TastesPanel extends HTMLElement {
             html.push('</div>');
             html.push('<div class="restaurant-actions">');
             html.push('<button class="btn btn-secondary btn-icon" data-id="' + r.id + '" data-action="edit"></button>');
-            html.push('<button class="btn btn-danger btn-icon" data-id="' + r.id + '" data-action="delete">=Ñ</button>');
+            html.push('<button class="btn btn-danger btn-icon" data-id="' + r.id + '" data-action="delete">=ï¿½</button>');
             html.push('</div>');
             html.push('</div>');
-            html.push('<div class="restaurant-meta">=Í ' + cityText + '</div>');
+            html.push('<div class="restaurant-meta">=ï¿½ ' + cityText + '</div>');
             html.push(addressHtml);
             html.push(phoneHtml);
             html.push(notesHtml);
@@ -327,10 +327,10 @@ export class TastesPanel extends HTMLElement {
     getTypeLabel(type) {
         const labels = {
             restaurant: '<} Ristorante',
-            bar: ' Bar/Caffè',
+            bar: ' Bar/Caffï¿½',
             gelateria: '<f Gelateria',
             pub: '<z Pub',
-            other: '=Í Altro'
+            other: '=ï¿½ Altro'
         };
         return labels[type] || type;
     }
@@ -378,7 +378,7 @@ export class TastesPanel extends HTMLElement {
         const saveBtn = this.shadowRoot.getElementById('saveBtn');
 
         if (!name || !city) {
-            error.textContent = 'Nome e Città sono obbligatori';
+            error.textContent = 'Nome e Cittï¿½ sono obbligatori';
             error.style.display = 'block';
             return;
         }

@@ -55,19 +55,16 @@ export class LoginPanel extends HTMLElement {
                     max-width: 120px;
                     height: auto;
                     margin-bottom: var(--spacing-md);
-                    filter: drop-shadow(0 0 12px rgba(255, 79, 216, 0.6));
+                    filter: drop-shadow(0 0 16px rgba(0, 234, 255, 0.8));
                 }
 
                 .logo-text {
-                    font-size: 20px;
+                    font-size: 18px;
                     font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 2px;
-                    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-fuchsia));
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    margin-bottom: var(--spacing-sm);
+                    color: var(--neon-cyan);
+                    text-shadow: 0 0 8px var(--neon-cyan);
                 }
 
                 .logo-subtitle {

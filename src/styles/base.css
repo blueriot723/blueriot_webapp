@@ -1,15 +1,17 @@
-/* ===== BLUERIOT SYNDICATE - TRON NEON THEME ===== */
+/* ===== BLUERIOT SYNDICATE - TRON NEON THEME V2 ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
 :root {
-    /* TRON Neon Colors */
-    --neon-cyan: #00F0FF;
+    /* TRON Neon Colors V2 - EXACT SPEC */
+    --neon-cyan: #00eaff;
     --neon-blue: #00C8FF;
-    --neon-fuchsia: #FF4FD8;
-    --neon-pink: #FF00FF;
+    --neon-pink: #ff4fd8;
+    --neon-fuchsia: #ff4fd8;
 
     /* Dark Background */
     --bg-pure-dark: #050505;
-    --bg-sidebar: #0B0F12;
+    --bg-sidebar: #0c0f13;
     --bg-card: #0D1117;
     --bg-input: #0A0E13;
 
@@ -68,6 +70,14 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Matrix-style Label */
+.matrixLabel {
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
@@ -97,14 +107,14 @@ a:hover {
     text-shadow: 0 0 8px var(--neon-cyan);
 }
 
-/* TRON Neon Effects */
+/* TRON Neon Effects V2 - EXACT SPEC */
 .neon-box {
-    border: 1px solid rgba(0, 200, 255, 0.4);
+    border: 1px solid rgba(0, 234, 255, 0.4);
     border-radius: var(--radius-md);
     box-shadow:
-        0 0 12px rgba(0, 200, 255, 0.5),
-        0 0 32px rgba(0, 200, 255, 0.25),
-        inset 0 0 16px rgba(0, 200, 255, 0.15);
+        0 0 12px rgba(0, 234, 255, 0.5),
+        0 0 32px rgba(0, 234, 255, 0.25),
+        inset 0 0 16px rgba(0, 234, 255, 0.25);
 }
 
 .neon-box-fuchsia {
@@ -124,25 +134,25 @@ a:hover {
 
 .neon-glow-fuchsia {
     text-shadow:
-        0 0 8px var(--neon-fuchsia),
-        0 0 16px var(--neon-fuchsia);
+        0 0 6px var(--neon-pink),
+        0 0 16px var(--neon-pink);
 }
 
 .logo-glow {
-    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6));
+    filter: drop-shadow(0 0 16px rgba(0, 234, 255, 0.8));
 }
 
-/* TRON Frame (broken angles) */
+/* TRON Frame (broken angles) V2 - EXACT SPEC */
 .tron-frame {
     position: relative;
     background: var(--bg-card);
-    border: 1px solid rgba(0, 200, 255, 0.3);
+    border: 1px solid rgba(0, 234, 255, 0.3);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
     box-shadow:
-        0 0 12px rgba(0, 200, 255, 0.4),
-        0 0 32px rgba(0, 200, 255, 0.2),
-        inset 0 0 24px rgba(0, 200, 255, 0.1);
+        0 0 12px rgba(0, 234, 255, 0.5),
+        0 0 32px rgba(0, 234, 255, 0.25),
+        inset 0 0 16px rgba(0, 234, 255, 0.25);
 }
 
 .tron-frame::before {
@@ -225,16 +235,16 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 200, 255, 0.3);
+    background: rgba(0, 234, 255, 0.3);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 200, 255, 0.5);
+    background: rgba(0, 234, 255, 0.5);
 }
 
 /* Selection */
 ::selection {
-    background: rgba(0, 240, 255, 0.3);
+    background: rgba(0, 234, 255, 0.3);
     color: var(--text-primary);
 }

@@ -62,23 +62,20 @@ export class DashboardFrame extends HTMLElement {
                     border-bottom: 1px solid rgba(255, 79, 216, 0.1);
                 }
 
+                .logo-img {
+                    max-width: 100px;
+                    height: auto;
+                    margin-bottom: var(--spacing-md);
+                    filter: drop-shadow(0 0 16px rgba(0, 234, 255, 0.8));
+                }
+
                 .logo-text {
-                    font-size: 20px;
+                    font-size: 18px;
                     font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 2px;
-                    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-fuchsia));
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    margin-bottom: var(--spacing-xs);
-                }
-
-                .logo-subtitle {
-                    font-size: 11px;
-                    color: var(--text-muted);
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
+                    color: var(--neon-cyan);
+                    text-shadow: 0 0 8px var(--neon-cyan);
                 }
 
                 .sidebar-menu {
@@ -112,21 +109,43 @@ export class DashboardFrame extends HTMLElement {
                 }
 
                 .sidebar-menu-item.active {
-                    color: var(--neon-fuchsia);
+                    color: var(--neon-pink);
                     background: rgba(255, 79, 216, 0.1);
                     border-color: rgba(255, 79, 216, 0.4);
                     box-shadow:
                         0 0 12px rgba(255, 79, 216, 0.4),
                         inset 0 0 16px rgba(255, 79, 216, 0.1);
                     text-shadow:
-                        0 0 8px var(--neon-fuchsia),
-                        0 0 16px var(--neon-fuchsia);
+                        0 0 6px var(--neon-pink),
+                        0 0 16px var(--neon-pink);
                 }
 
                 .sidebar-menu-icon {
                     font-size: 18px;
                     width: 24px;
                     text-align: center;
+                }
+
+                /* Matrix Label Style */
+                .matrixLabel {
+                    font-family: 'Share Tech Mono', monospace;
+                    letter-spacing: 0.5px;
+                    font-weight: 600;
+                }
+
+                /* Sub-menu items (indented) */
+                .sidebar-menu-item.sub-item {
+                    margin-left: var(--spacing-2xl);
+                    font-size: 13px;
+                    padding-left: var(--spacing-lg);
+                    border-left: 2px solid rgba(255, 79, 216, 0.2);
+                }
+
+                .sidebar-menu-item.sub-item::before {
+                    content: '└─';
+                    margin-right: var(--spacing-sm);
+                    color: var(--neon-pink);
+                    opacity: 0.5;
                 }
 
                 .sidebar-footer {
@@ -222,17 +241,45 @@ export class DashboardFrame extends HTMLElement {
                     color: var(--neon-cyan);
                     font-weight: 600;
                     text-transform: uppercase;
+                    text-shadow: 0 0 8px rgba(0, 234, 255, 0.6);
                 }
 
                 .content-wrapper {
                     background: var(--bg-card);
-                    border: 1px solid rgba(0, 200, 255, 0.3);
+                    border: 1px solid rgba(0, 234, 255, 0.3);
                     border-radius: var(--radius-lg);
                     padding: var(--spacing-2xl);
                     box-shadow:
-                        0 0 24px rgba(0, 200, 255, 0.4),
-                        0 0 48px rgba(0, 200, 255, 0.2),
-                        inset 0 0 32px rgba(0, 200, 255, 0.1);
+                        0 0 12px rgba(0, 234, 255, 0.5),
+                        0 0 32px rgba(0, 234, 255, 0.25),
+                        inset 0 0 16px rgba(0, 234, 255, 0.25);
+                    position: relative;
+                }
+
+                /* TRON corner cuts */
+                .content-wrapper::before,
+                .content-wrapper::after {
+                    content: '';
+                    position: absolute;
+                    width: 20px;
+                    height: 20px;
+                    border: 1px solid var(--neon-cyan);
+                }
+
+                .content-wrapper::before {
+                    top: -1px;
+                    left: -1px;
+                    border-right: none;
+                    border-bottom: none;
+                    box-shadow: -2px -2px 8px rgba(0, 234, 255, 0.4);
+                }
+
+                .content-wrapper::after {
+                    bottom: -1px;
+                    right: -1px;
+                    border-left: none;
+                    border-top: none;
+                    box-shadow: 2px 2px 8px rgba(0, 234, 255, 0.4);
                 }
 
                 .page-title {
@@ -294,29 +341,28 @@ export class DashboardFrame extends HTMLElement {
                 <!-- Sidebar 20% -->
                 <aside class="sidebar" id="sidebar">
                     <div class="sidebar-logo">
-                        <div class="logo-text">🔷 BLUERIOT</div>
-                        <div class="logo-subtitle">Syndicate Dashboard</div>
+                        <img src="blueriot-logo.png" alt="BlueRiot Logo" class="logo-img">
+                        <div class="logo-text">BLUERIOT</div>
                     </div>
 
                     <nav class="sidebar-menu">
                         <button class="sidebar-menu-item active" data-view="tastes">
                             <span class="sidebar-menu-icon">🍽️</span>
-                            <span>Tastes</span>
+                            <span class="matrixLabel">ΤΔSΤΞ5</span>
                         </button>
                         <button class="sidebar-menu-item" data-view="routes">
                             <span class="sidebar-menu-icon">🗺️</span>
-                            <span>Routes</span>
+                            <span class="matrixLabel">R0UT35</span>
                         </button>
                         <button class="sidebar-menu-item" data-view="stay">
                             <span class="sidebar-menu-icon">🏨</span>
-                            <span>Stay</span>
+                            <span class="matrixLabel">SΤΔΥ</span>
                         </button>
                         <button class="sidebar-menu-item" data-view="node">
                             <span class="sidebar-menu-icon">📍</span>
-                            <span>Node</span>
+                            <span class="matrixLabel">NODΞ</span>
                         </button>
-                        <div style="height: 1px; background: rgba(255, 79, 216, 0.1); margin: var(--spacing-md);"></div>
-                        <button class="sidebar-menu-item" data-view="pdfocr">
+                        <button class="sidebar-menu-item sub-item" data-view="pdfocr">
                             <span class="sidebar-menu-icon">📄</span>
                             <span>PDF OCR</span>
                         </button>
@@ -339,11 +385,11 @@ export class DashboardFrame extends HTMLElement {
                     <div class="breadcrumb">
                         <span>Dashboard</span>
                         <span class="breadcrumb-separator">▸</span>
-                        <span class="breadcrumb-current" id="breadcrumbCurrent">Tastes</span>
+                        <span class="breadcrumb-current" id="breadcrumbCurrent">ΤΔSΤΞ5</span>
                     </div>
 
                     <div class="content-wrapper">
-                        <h1 class="page-title" id="pageTitle">TASTES</h1>
+                        <h1 class="page-title" id="pageTitle">ΤΔSΤΞ5</h1>
                         <div id="contentArea">
                             <!-- Dynamic content will be loaded here -->
                             <p style="color: var(--text-secondary);">Loading content...</p>
@@ -403,13 +449,22 @@ export class DashboardFrame extends HTMLElement {
             }
         });
 
+        // Matrix labels mapping
+        const matrixLabels = {
+            'tastes': 'ΤΔSΤΞ5',
+            'routes': 'R0UT35',
+            'stay': 'SΤΔΥ',
+            'node': 'NODΞ',
+            'pdfocr': 'PDF OCR'
+        };
+
         // Update breadcrumb
         const breadcrumb = this.shadowRoot.getElementById('breadcrumbCurrent');
-        breadcrumb.textContent = view.charAt(0).toUpperCase() + view.slice(1);
+        breadcrumb.textContent = matrixLabels[view] || view.toUpperCase();
 
         // Update page title
         const pageTitle = this.shadowRoot.getElementById('pageTitle');
-        pageTitle.textContent = view.toUpperCase();
+        pageTitle.textContent = matrixLabels[view] || view.toUpperCase();
 
         // Load content component
         const contentArea = this.shadowRoot.getElementById('contentArea');

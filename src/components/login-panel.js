@@ -212,7 +212,6 @@ export class LoginPanel extends HTMLElement {
                     <div class="login-logo">
                         <img src="blueriot-logo.png" alt="BlueRiot Logo" class="logo-img">
                         <div class="logo-text">BLUERIOT</div>
-                        <div class="logo-subtitle">Syndicate</div>
                     </div>
 
                     <div class="language-selector">
@@ -229,7 +228,7 @@ export class LoginPanel extends HTMLElement {
                     <div class="login-card">
                         <div class="login-header">
                             <h1 class="login-title">TL Dashboard</h1>
-                            <p class="login-subtitle">Accedi con le tue credenziali BlueRiot Syndicate</p>
+                            <p class="login-subtitle">Accedi con le tue credenziali</p>
                         </div>
 
                         <div class="login-form">

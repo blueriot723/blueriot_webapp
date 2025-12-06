@@ -15,8 +15,8 @@ class AuthManager {
      * Initialize Supabase client
      */
     init() {
-        const SUPABASE_URL = 'https://wnplvbbubjkumikbejog.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InducGx2YmJ1YmprdW1pa2Jlam9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM1OTIxMzYsImV4cCI6MjA0OTE2ODEzNn0.aMLuCG3Js9BbOQsP7SdZDl3tRDlGaIaZlFx8IaV-k9M';
+        const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
 
         this.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 

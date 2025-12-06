@@ -1136,6 +1136,7 @@ input[readonly] {
     </style>
 
     <!-- PDF.js Library for PDF parsing -->
+    <!-- TEMPORANEAMENTE DISABILITATO PER DEBUG
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         // Configure PDF.js worker
@@ -1143,6 +1144,7 @@ input[readonly] {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
     </script>
+    -->
 </head>
 <body>
     <!-- LOGIN SCREEN -->
@@ -8276,6 +8278,13 @@ function closePdfUploadModal() {
 }
 
 async function processPdfFile() {
+    // Check if PDF.js is loaded
+    if (typeof pdfjsLib === 'undefined') {
+        alert('❌ ERRORE: PDF.js library non caricata!\n\nRicarica la pagina e riprova.');
+        console.error('PDF.js library not found');
+        return;
+    }
+
     const fileInput = document.getElementById('pdfFileInput');
     const file = fileInput.files[0];
 

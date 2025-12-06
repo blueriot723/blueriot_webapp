@@ -1,6 +1,6 @@
 /**
- * Login Panel Component
- * Handles both email/password and Google OAuth login
+ * Login Panel Component - TRON Design
+ * 20% sidebar (logo + language) + 80% login form
  */
 import { auth } from '../utils/auth.js';
 
@@ -8,6 +8,7 @@ export class LoginPanel extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
+        this.currentLang = 'it';
         this.render();
     }
 
@@ -17,216 +18,187 @@ export class LoginPanel extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="src/styles/base.css">
+            <link rel="stylesheet" href="src/styles/layout.css">
+            <link rel="stylesheet" href="src/styles/components.css">
+
             <style>
                 :host {
                     display: block;
                     min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: #000;
                 }
 
                 .login-container {
+                    display: flex;
                     width: 100%;
-                    max-width: 400px;
-                    padding: 24px;
+                    min-height: 100vh;
                 }
 
-                .login-header {
+                .login-sidebar {
+                    width: 20%;
+                    min-width: 240px;
+                    background: var(--bg-sidebar);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: var(--spacing-2xl) var(--spacing-lg);
+                    border-right: 1px solid rgba(0, 200, 255, 0.2);
+                }
+
+                .login-logo {
                     text-align: center;
-                    margin-bottom: 32px;
+                    margin-bottom: var(--spacing-2xl);
                 }
 
-                .logo {
-                    width: 120px;
-                    height: 120px;
-                    margin-bottom: 16px;
+                .logo-text {
+                    font-size: 24px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-fuchsia));
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    margin-bottom: var(--spacing-sm);
                 }
 
-                h1 {
-                    font-size: 28px;
-                    color: #fff;
-                    margin-bottom: 8px;
+                .logo-subtitle {
+                    font-size: 12px;
+                    color: var(--text-muted);
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
                 }
 
-                .subtitle {
-                    color: #8B9DC3;
-                    font-size: 14px;
-                }
-
-                .login-form {
-                    background: #13182E;
-                    border: 1px solid #1E2749;
-                    border-radius: 12px;
-                    padding: 24px;
-                }
-
-                .form-group {
-                    margin-bottom: 16px;
-                }
-
-                label {
-                    display: block;
-                    margin-bottom: 8px;
-                    color: #8B9DC3;
-                    font-size: 14px;
-                    font-weight: 600;
-                }
-
-                input {
-                    width: 100%;
-                    padding: 12px 16px;
-                    background: #0A0E27;
-                    border: 2px solid #1E2749;
-                    border-radius: 8px;
-                    color: #fff;
-                    font-size: 16px;
-                    font-family: inherit;
-                    transition: border-color 0.15s ease;
-                }
-
-                input:focus {
-                    outline: none;
-                    border-color: #00F0FF;
-                }
-
-                input::placeholder {
-                    color: #8B9DC3;
-                    opacity: 0.5;
-                }
-
-                .btn {
-                    width: 100%;
-                    padding: 12px 24px;
-                    border: 2px solid transparent;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.15s ease;
+                .login-main {
+                    flex: 1;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 8px;
+                    padding: var(--spacing-2xl);
+                    background: var(--bg-pure-dark);
                 }
 
-                .btn:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
+                .login-card {
+                    width: 100%;
+                    max-width: 480px;
                 }
 
-                .btn-primary {
-                    background: #00F0FF;
-                    color: #000;
-                    border-color: #00F0FF;
+                .login-header {
+                    margin-bottom: var(--spacing-2xl);
                 }
 
-                .btn-primary:hover:not(:disabled) {
-                    background: transparent;
-                    color: #00F0FF;
+                .login-title {
+                    font-size: 32px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin-bottom: var(--spacing-sm);
+                    color: var(--neon-cyan);
+                    text-shadow: 0 0 16px var(--neon-cyan);
                 }
 
-                .btn-google {
-                    background: white;
-                    color: #333;
-                    border-color: white;
-                    margin-top: 16px;
+                .login-subtitle {
+                    color: var(--text-secondary);
+                    font-size: 16px;
                 }
 
-                .btn-google:hover:not(:disabled) {
-                    background: #f5f5f5;
-                }
-
-                .divider {
-                    text-align: center;
-                    margin: 24px 0;
-                    color: #8B9DC3;
-                    font-size: 14px;
-                    position: relative;
-                }
-
-                .divider::before,
-                .divider::after {
-                    content: '';
-                    position: absolute;
-                    top: 50%;
-                    width: 40%;
-                    height: 1px;
-                    background: #1E2749;
-                }
-
-                .divider::before { left: 0; }
-                .divider::after { right: 0; }
-
-                .error-message {
-                    color: #FF4757;
-                    font-size: 14px;
-                    margin-top: 16px;
-                    padding: 12px;
-                    background: rgba(255, 71, 87, 0.1);
-                    border: 1px solid #FF4757;
-                    border-radius: 8px;
-                    display: none;
-                }
-
-                .error-message.active {
-                    display: block;
+                .login-form {
+                    background: var(--bg-card);
+                    border: 1px solid rgba(0, 200, 255, 0.3);
+                    border-radius: var(--radius-lg);
+                    padding: var(--spacing-2xl);
+                    box-shadow:
+                        0 0 24px rgba(0, 200, 255, 0.4),
+                        0 0 48px rgba(0, 200, 255, 0.2),
+                        inset 0 0 32px rgba(0, 200, 255, 0.1);
                 }
 
                 .login-footer {
+                    margin-top: var(--spacing-xl);
                     text-align: center;
-                    margin-top: 24px;
-                    color: #8B9DC3;
+                    color: var(--text-muted);
                     font-size: 14px;
                 }
 
                 .login-footer a {
-                    color: #00F0FF;
+                    color: var(--neon-cyan);
                     text-decoration: none;
+                }
+
+                @media (max-width: 768px) {
+                    .login-sidebar {
+                        width: 100%;
+                        min-height: auto;
+                        padding: var(--spacing-lg);
+                    }
+
+                    .login-container {
+                        flex-direction: column;
+                    }
                 }
             </style>
 
             <div class="login-container">
-                <div class="login-header">
-                    <h1>🔷 BlueRiot TL Dashboard</h1>
-                    <p class="subtitle">Accedi con le tue credenziali</p>
+                <!-- Sidebar 20% -->
+                <div class="login-sidebar">
+                    <div class="login-logo">
+                        <div class="logo-text">🔷 BLUERIOT</div>
+                        <div class="logo-subtitle">Syndicate</div>
+                    </div>
+
+                    <div class="language-selector">
+                        <button class="language-btn ${this.currentLang === 'it' ? 'active' : ''}" data-lang="it">IT</button>
+                        <button class="language-btn ${this.currentLang === 'en' ? 'active' : ''}" data-lang="en">EN</button>
+                        <button class="language-btn ${this.currentLang === 'es' ? 'active' : ''}" data-lang="es">ES</button>
+                        <button class="language-btn ${this.currentLang === 'de' ? 'active' : ''}" data-lang="de">DE</button>
+                        <button class="language-btn ${this.currentLang === 'fr' ? 'active' : ''}" data-lang="fr">FR</button>
+                    </div>
                 </div>
 
-                <div class="login-form">
-                    <form id="emailLoginForm">
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" required placeholder="tuo@email.com">
+                <!-- Main Content 80% -->
+                <div class="login-main">
+                    <div class="login-card">
+                        <div class="login-header">
+                            <h1 class="login-title">TL Dashboard</h1>
+                            <p class="login-subtitle">Accedi con le tue credenziali BlueRiot Syndicate</p>
                         </div>
 
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" required placeholder="••••••••">
+                        <div class="login-form">
+                            <form id="emailLoginForm">
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="email" class="form-input" required placeholder="tuo@email.com">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" id="password" class="form-input" required placeholder="••••••••">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                                    Accedi
+                                </button>
+
+                                <div class="alert alert-error" id="errorMessage" style="display: none; margin-top: 16px;"></div>
+                            </form>
+
+                            <div class="divider">oppure</div>
+
+                            <button type="button" class="btn btn-google btn-block" id="googleLoginBtn">
+                                <svg width="18" height="18" viewBox="0 0 18 18">
+                                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                                    <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
+                                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                                </svg>
+                                Accedi con Google
+                            </button>
                         </div>
 
-                        <button type="submit" class="btn btn-primary" id="loginBtn">
-                            Accedi
-                        </button>
-
-                        <div class="error-message" id="errorMessage"></div>
-                    </form>
-
-                    <div class="divider">oppure</div>
-
-                    <button type="button" class="btn btn-google" id="googleLoginBtn">
-                        <svg width="18" height="18" viewBox="0 0 18 18">
-                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
-                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                            <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
-                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                        </svg>
-                        Accedi con Google
-                    </button>
-                </div>
-
-                <div class="login-footer">
-                    <p>Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
+                        <div class="login-footer">
+                            <p>Problemi di accesso? Contatta <a href="https://t.me/blueriot">@blueriot</a></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -238,6 +210,16 @@ export class LoginPanel extends HTMLElement {
         const loginBtn = this.shadowRoot.getElementById('loginBtn');
         const errorMessage = this.shadowRoot.getElementById('errorMessage');
 
+        // Language selector
+        this.shadowRoot.querySelectorAll('.language-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.currentLang = btn.dataset.lang;
+                this.shadowRoot.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // TODO: Update text based on language
+            });
+        });
+
         // Email login
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -247,14 +229,14 @@ export class LoginPanel extends HTMLElement {
 
             loginBtn.disabled = true;
             loginBtn.textContent = 'Accesso in corso...';
-            errorMessage.classList.remove('active');
+            errorMessage.style.display = 'none';
 
             try {
                 await auth.signInWithEmail(email, password);
             } catch (error) {
                 console.error('Login error:', error);
                 errorMessage.textContent = error.message || 'Errore durante il login';
-                errorMessage.classList.add('active');
+                errorMessage.style.display = 'block';
             } finally {
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Accedi';
@@ -265,14 +247,14 @@ export class LoginPanel extends HTMLElement {
         googleBtn.addEventListener('click', async () => {
             googleBtn.disabled = true;
             googleBtn.textContent = 'Reindirizzamento a Google...';
-            errorMessage.classList.remove('active');
+            errorMessage.style.display = 'none';
 
             try {
                 await auth.signInWithGoogle();
             } catch (error) {
                 console.error('Google login error:', error);
                 errorMessage.textContent = error.message || 'Errore Google login';
-                errorMessage.classList.add('active');
+                errorMessage.style.display = 'block';
                 googleBtn.disabled = false;
                 googleBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18">...</svg> Accedi con Google';
             }

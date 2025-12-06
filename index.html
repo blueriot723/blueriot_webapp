@@ -8077,13 +8077,13 @@ function populateTastesFilters() {
     const countrySelect = document.getElementById('tastesFilterCountry');
 
     if (citySelect) {
-        citySelect.innerHTML = '<option value="">Tutte le città</option>' +
-            cities.map(city => `<option value="${city}">${city}</option>`).join('');
+        const cityOptions = cities.map(city => '<option value="' + city + '">' + city + '</option>').join('');
+        citySelect.innerHTML = '<option value="">Tutte le città</option>' + cityOptions;
     }
 
     if (countrySelect) {
-        countrySelect.innerHTML = '<option value="">Tutti i paesi</option>' +
-            countries.map(country => `<option value="${country}">${country}</option>`).join('');
+        const countryOptions = countries.map(country => '<option value="' + country + '">' + country + '</option>').join('');
+        countrySelect.innerHTML = '<option value="">Tutti i paesi</option>' + countryOptions;
     }
 }
 
@@ -8149,24 +8149,29 @@ function renderTastesRestaurants(restaurants) {
         return;
     }
 
-    container.innerHTML = restaurants.map(restaurant => `
-        <div class="tastes-restaurant-card" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 12px; background: var(--card-bg);">
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <div style="flex: 1;">
-                    <h3 style="margin: 0 0 8px 0; color: var(--text-color);">${restaurant.name || 'Senza nome'}</h3>
-                    <p style="margin: 4px 0; color: #888; font-size: 14px;">
-                        📍 ${restaurant.address || 'N/A'}${restaurant.city ? ', ' + restaurant.city : ''}
-                    </p>
-                    ${restaurant.country ? `<p style="margin: 4px 0; color: #888; font-size: 14px;">🌍 ${restaurant.country}</p>` : ''}
-                    ${restaurant.tl_free ? '<span class="badge badge-success" style="margin-right: 8px;">TL FREE</span>' : ''}
-                    ${restaurant.commission && parseFloat(restaurant.commission) > 0 ? `<span class="badge badge-info">Commission: ${restaurant.commission}%</span>` : ''}
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="addTastesToTour('${restaurant.id}')" style="white-space: nowrap;">
-                    ➕ Aggiungi
-                </button>
-            </div>
-        </div>
-    `).join('');
+    const cardsHtml = restaurants.map(restaurant => {
+        const name = restaurant.name || 'Senza nome';
+        const address = restaurant.address || 'N/A';
+        const city = restaurant.city ? ', ' + restaurant.city : '';
+        const countryHtml = restaurant.country ? '<p style="margin: 4px 0; color: #888; font-size: 14px;">🌍 ' + restaurant.country + '</p>' : '';
+        const tlFreeHtml = restaurant.tl_free ? '<span class="badge badge-success" style="margin-right: 8px;">TL FREE</span>' : '';
+        const commissionHtml = (restaurant.commission && parseFloat(restaurant.commission) > 0) ? '<span class="badge badge-info">Commission: ' + restaurant.commission + '%</span>' : '';
+
+        return '<div class="tastes-restaurant-card" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 12px; background: var(--card-bg);">' +
+            '<div style="display: flex; justify-content: space-between; align-items: start;">' +
+                '<div style="flex: 1;">' +
+                    '<h3 style="margin: 0 0 8px 0; color: var(--text-color);">' + name + '</h3>' +
+                    '<p style="margin: 4px 0; color: #888; font-size: 14px;">📍 ' + address + city + '</p>' +
+                    countryHtml +
+                    tlFreeHtml +
+                    commissionHtml +
+                '</div>' +
+                '<button class="btn btn-primary btn-sm" onclick="addTastesToTour(\'' + restaurant.id + '\')" style="white-space: nowrap;">➕ Aggiungi</button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+
+    container.innerHTML = cardsHtml;
 }
 
 async function addTastesToTour(tastesId) {
@@ -8437,29 +8442,51 @@ async function savePdfExtraction(filename, rawText, extractedData) {
 function displayExtractionResults(data) {
     const summaryDiv = document.getElementById('extractedDataSummary');
 
-    const html = `
-        <div style="display: grid; gap: 16px;">
-            <div class="data-card">
-                <h4>📅 Giorni Trovati</h4>
-                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.days.length}</p>
-            </div>
-            <div class="data-card">
-                <h4>🏨 Hotel Trovati</h4>
-                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.hotels.length}</p>
-                ${data.hotels.length > 0 ? '<ul class="extraction-results">' + data.hotels.slice(0, 5).map(h => `<li>${h.name}</li>`).join('') + (data.hotels.length > 5 ? `<li>...e altri ${data.hotels.length - 5}</li>` : '') + '</ul>' : ''}
-            </div>
-            <div class="data-card">
-                <h4>🍽 Ristoranti Trovati</h4>
-                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.restaurants.length}</p>
-                ${data.restaurants.length > 0 ? '<ul class="extraction-results">' + data.restaurants.slice(0, 5).map(r => `<li>${r.name}</li>`).join('') + (data.restaurants.length > 5 ? `<li>...e altri ${data.restaurants.length - 5}</li>` : '') + '</ul>' : ''}
-            </div>
-            <div class="data-card">
-                <h4>📍 Città Trovate</h4>
-                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.cities.length}</p>
-                ${data.cities.length > 0 ? '<p style="color: #888; margin-top: 8px;">' + data.cities.slice(0, 10).join(', ') + (data.cities.length > 10 ? '...' : '') + '</p>' : ''}
-            </div>
-        </div>
-    `;
+    // Build hotel list HTML
+    let hotelListHtml = '';
+    if (data.hotels.length > 0) {
+        const hotelItems = data.hotels.slice(0, 5).map(h => '<li>' + h.name + '</li>').join('');
+        const moreHotels = data.hotels.length > 5 ? '<li>...e altri ' + (data.hotels.length - 5) + '</li>' : '';
+        hotelListHtml = '<ul class="extraction-results">' + hotelItems + moreHotels + '</ul>';
+    }
+
+    // Build restaurant list HTML
+    let restaurantListHtml = '';
+    if (data.restaurants.length > 0) {
+        const restaurantItems = data.restaurants.slice(0, 5).map(r => '<li>' + r.name + '</li>').join('');
+        const moreRestaurants = data.restaurants.length > 5 ? '<li>...e altri ' + (data.restaurants.length - 5) + '</li>' : '';
+        restaurantListHtml = '<ul class="extraction-results">' + restaurantItems + moreRestaurants + '</ul>';
+    }
+
+    // Build cities HTML
+    let citiesHtml = '';
+    if (data.cities.length > 0) {
+        const cityList = data.cities.slice(0, 10).join(', ');
+        const moreCities = data.cities.length > 10 ? '...' : '';
+        citiesHtml = '<p style="color: #888; margin-top: 8px;">' + cityList + moreCities + '</p>';
+    }
+
+    const html = '<div style="display: grid; gap: 16px;">' +
+        '<div class="data-card">' +
+            '<h4>📅 Giorni Trovati</h4>' +
+            '<p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">' + data.days.length + '</p>' +
+        '</div>' +
+        '<div class="data-card">' +
+            '<h4>🏨 Hotel Trovati</h4>' +
+            '<p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">' + data.hotels.length + '</p>' +
+            hotelListHtml +
+        '</div>' +
+        '<div class="data-card">' +
+            '<h4>🍽 Ristoranti Trovati</h4>' +
+            '<p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">' + data.restaurants.length + '</p>' +
+            restaurantListHtml +
+        '</div>' +
+        '<div class="data-card">' +
+            '<h4>📍 Città Trovate</h4>' +
+            '<p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">' + data.cities.length + '</p>' +
+            citiesHtml +
+        '</div>' +
+    '</div>';
 
     summaryDiv.innerHTML = html;
 }

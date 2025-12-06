@@ -70,6 +70,16 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Screen Management */
+[data-screen] {
+    display: none;
+    min-height: 100vh;
+}
+
+[data-screen].active {
+    display: block;
+}
+
 /* Matrix-style Label */
 .matrixLabel {
     font-family: 'Share Tech Mono', monospace;

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueRiot - Test Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00eaff;
+            --neon-fuchsia: #ff4fd8;
+            --bg-dark: #050505;
+            --bg-sidebar: #0c0f13;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--bg-dark);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar 20% */
+        .sidebar {
+            width: 20%;
+            min-width: 260px;
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 48px 24px;
+            border-right: 1px solid rgba(0, 234, 255, 0.15);
+        }
+
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .logo-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .logo-container img {
+            width: 180px;
+            height: auto;
+            display: block;
+        }
+
+        .matrix-logo {
+            width: 140px;
+            height: auto;
+            filter: drop-shadow(0 0 12px rgba(0, 234, 255, 0.6));
+        }
+
+        /* Language Buttons */
+        .lang-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 140px;
+        }
+
+        .lang-btn {
+            position: relative;
+            width: 100%;
+            height: 48px;
+            background: rgba(10, 14, 39, 0.9);
+            border: none;
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%);
+        }
+
+        .lang-btn::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 4px;
+            height: 50%;
+            background: linear-gradient(180deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
+            box-shadow: 0 0 12px var(--neon-cyan);
+        }
+
+        .lang-btn.active::before,
+        .lang-btn:hover::before {
+            background: linear-gradient(180deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
+            box-shadow: 0 0 12px var(--neon-fuchsia);
+        }
+
+        /* Main Area 80% */
+        .main-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            position: relative;
+        }
+
+        .main-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 20%, var(--neon-cyan) 80%, transparent 100%);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-option {
+            position: relative;
+            background: rgba(10, 14, 39, 0.7);
+            padding: 24px;
+            margin-bottom: 20px;
+            clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%, 0 30%);
+        }
+
+        .login-option::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 50%;
+            background: linear-gradient(180deg, transparent 0%, var(--neon-cyan) 20%, var(--neon-cyan) 100%);
+            box-shadow: 0 0 12px var(--neon-cyan);
+        }
+
+        .login-option:hover::before {
+            background: linear-gradient(180deg, transparent 0%, var(--neon-fuchsia) 20%, var(--neon-fuchsia) 100%);
+            box-shadow: 0 0 12px var(--neon-fuchsia);
+        }
+
+        .google-btn {
+            width: 100%;
+            height: 50px;
+            background: white;
+            color: #444;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .google-btn:hover {
+            background: #f8f8f8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .email-btn {
+            width: 100%;
+            height: 50px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid rgba(0, 234, 255, 0.3);
+            color: white;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .email-btn:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.3);
+        }
+
+        .email-form {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .email-form.show {
+            display: block;
+        }
+
+        .input {
+            width: 100%;
+            height: 48px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            border-radius: 4px;
+            padding: 0 16px;
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 48px;
+            background: var(--neon-cyan);
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
+        }
+
+        .status {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--neon-cyan);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                padding: 24px;
+            }
+            .logo-section {
+                flex-direction: row;
+            }
+            .logo-container img {
+                width: 100px;
+            }
+            .matrix-logo {
+                width: 80px;
+            }
+            .lang-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+                max-width: none;
+            }
+            .lang-btn {
+                width: 60px;
+                height: 40px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <img src="blueriot-logo.png" alt="BlueRiot" onerror="this.style.display='none'">
+                </div>
+                <img src="matrix.svg" alt="Matrix" class="matrix-logo" onerror="this.src='matrix.png'">
+            </div>
+
+            <div class="lang-buttons">
+                <button class="lang-btn active">IT</button>
+                <button class="lang-btn">EN</button>
+                <button class="lang-btn">ES</button>
+                <button class="lang-btn">DE</button>
+                <button class="lang-btn">FR</button>
+            </div>
+        </div>
+
+        <!-- Main Area -->
+        <div class="main-area">
+            <div class="login-box">
+                <!-- Google -->
+                <div class="login-option">
+                    <button class="google-btn" onclick="loginGoogle()">
+                        <svg width="20" height="20" viewBox="0 0 18 18">
+                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                            <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
+                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                        </svg>
+                        Sign in with Google
+                    </button>
+                </div>
+
+                <!-- Email -->
+                <div class="login-option">
+                    <button class="email-btn" onclick="toggleEmail()">
+                        ▼ EMAIL LOGIN
+                    </button>
+                    <div class="email-form" id="emailForm">
+                        <input type="email" class="input" placeholder="email@example.com" id="email">
+                        <input type="password" class="input" placeholder="Password" id="password">
+                        <button class="submit-btn" onclick="loginEmail()">ACCEDI</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status" id="status">✓ Page loaded</div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2b214dHpjbmN6dmJjc2N5YmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMxNzA3MTksImV4cCI6MjA0ODc0NjcxOX0.YOUR_KEY_HERE';
+
+        let supabase;
+
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            document.getElementById('status').textContent = '✓ Supabase connected';
+        } catch(e) {
+            document.getElementById('status').textContent = '✗ Supabase error: ' + e.message;
+        }
+
+        function toggleEmail() {
+            const form = document.getElementById('emailForm');
+            form.classList.toggle('show');
+        }
+
+        async function loginGoogle() {
+            document.getElementById('status').textContent = '⏳ Redirecting to Google...';
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.href }
+                });
+                if (error) throw error;
+            } catch(e) {
+                document.getElementById('status').textContent = '✗ Error: ' + e.message;
+            }
+        }
+
+        async function loginEmail() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                document.getElementById('status').textContent = '✗ Enter email and password';
+                return;
+            }
+
+            document.getElementById('status').textContent = '⏳ Logging in...';
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                document.getElementById('status').textContent = '✓ Logged in!';
+            } catch(e) {
+                document.getElementById('status').textContent = '✗ Error: ' + e.message;
+            }
+        }
+
+        // Language buttons
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

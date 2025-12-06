@@ -17,6 +17,7 @@
     <script type="module">
         import { router } from './src/utils/router.js';
         import { auth } from './src/utils/auth.js';
+        import { gestures } from './src/utils/gestures.js';
         import './src/components/login-panel.js';
         import './src/components/dashboard-frame.js';
 
@@ -27,6 +28,9 @@
 
             // Initialize auth manager
             auth.init();
+
+            // Initialize gesture navigation
+            gestures.init();
 
             // Register routes
             router.register('login', async () => {

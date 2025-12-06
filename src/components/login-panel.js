@@ -42,7 +42,8 @@ export class LoginPanel extends HTMLElement {
                     flex-direction: column;
                     align-items: center;
                     padding: var(--spacing-2xl) var(--spacing-lg);
-                    border-right: 1px solid rgba(0, 200, 255, 0.2);
+                    border-right: 1px solid rgba(255, 79, 216, 0.2);
+                    box-shadow: 0 0 24px rgba(255, 79, 216, 0.15);
                 }
 
                 .login-logo {
@@ -50,8 +51,15 @@ export class LoginPanel extends HTMLElement {
                     margin-bottom: var(--spacing-2xl);
                 }
 
+                .logo-img {
+                    max-width: 120px;
+                    height: auto;
+                    margin-bottom: var(--spacing-md);
+                    filter: drop-shadow(0 0 12px rgba(255, 79, 216, 0.6));
+                }
+
                 .logo-text {
-                    font-size: 24px;
+                    font-size: 20px;
                     font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 2px;
@@ -125,15 +133,75 @@ export class LoginPanel extends HTMLElement {
                     text-decoration: none;
                 }
 
+                .language-selector {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: var(--spacing-sm);
+                    justify-content: center;
+                    width: 100%;
+                    max-width: 200px;
+                }
+
+                .language-btn {
+                    flex: 0 0 auto;
+                    min-width: 50px;
+                    padding: 10px 14px;
+                    background: transparent;
+                    border: 1px solid rgba(255, 79, 216, 0.3);
+                    border-radius: var(--radius-sm);
+                    color: var(--text-secondary);
+                    font-size: 13px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: all var(--transition-fast);
+                }
+
+                .language-btn:hover {
+                    border-color: var(--neon-fuchsia);
+                    color: var(--neon-fuchsia);
+                    box-shadow: 0 0 8px rgba(255, 79, 216, 0.4);
+                }
+
+                .language-btn.active {
+                    background: rgba(255, 79, 216, 0.1);
+                    border-color: var(--neon-fuchsia);
+                    color: var(--neon-fuchsia);
+                    box-shadow: 0 0 12px rgba(255, 79, 216, 0.5);
+                }
+
                 @media (max-width: 768px) {
                     .login-sidebar {
-                        width: 100%;
-                        min-height: auto;
-                        padding: var(--spacing-lg);
+                        display: none;
                     }
 
                     .login-container {
                         flex-direction: column;
+                    }
+
+                    .login-main {
+                        width: 100%;
+                        padding: var(--spacing-lg);
+                    }
+                }
+
+                @media (min-width: 769px) and (max-width: 1024px) {
+                    .login-sidebar {
+                        width: 25%;
+                    }
+
+                    .logo-img {
+                        max-width: 100px;
+                    }
+
+                    .language-selector {
+                        max-width: 180px;
+                    }
+
+                    .language-btn {
+                        min-width: 45px;
+                        padding: 8px 10px;
+                        font-size: 12px;
                     }
                 }
             </style>
@@ -142,7 +210,8 @@ export class LoginPanel extends HTMLElement {
                 <!-- Sidebar 20% -->
                 <div class="login-sidebar">
                     <div class="login-logo">
-                        <div class="logo-text">🔷 BLUERIOT</div>
+                        <img src="blueriot-logo.png" alt="BlueRiot Logo" class="logo-img">
+                        <div class="logo-text">BLUERIOT</div>
                         <div class="logo-subtitle">Syndicate</div>
                     </div>
 

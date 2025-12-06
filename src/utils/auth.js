@@ -20,6 +20,9 @@ class AuthManager {
 
         this.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Expose globally for components
+        window.supabaseClient = this.supabase;
+
         // Setup auth state listener
         this.supabase.auth.onAuthStateChange(async (event, session) => {
             console.log('🔐 Auth state changed:', event);
@@ -136,6 +139,21 @@ class AuthManager {
      */
     getUser() {
         return this.currentUser;
+    }
+
+    /**
+     * Get current user (async version)
+     */
+    async getCurrentUser() {
+        if (this.currentUser) return this.currentUser;
+
+        const { data: { session } } = await this.supabase.auth.getSession();
+        if (session) {
+            this.currentUser = session.user;
+            return session.user;
+        }
+
+        return null;
     }
 
     /**

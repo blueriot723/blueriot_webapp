@@ -1134,6 +1134,15 @@ input[readonly] {
     border-bottom: none;
 }
     </style>
+
+    <!-- PDF.js Library for PDF parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Configure PDF.js worker
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
 </head>
 <body>
     <!-- LOGIN SCREEN -->
@@ -1546,9 +1555,12 @@ input[readonly] {
 
                 <!-- RISTORANTI TAB -->
                 <div id="tabRistoranti" class="tab-pane">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
                         <h3>Ristoranti del Tour</h3>
-                        <button class="btn btn-primary" id="addRestaurantBtn">+ Aggiungi</button>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary" id="addFromTastesBtn" style="white-space: nowrap;">🍽 Scegli da TASTES</button>
+                            <button class="btn btn-primary" id="addRestaurantBtn">+ Nuovo</button>
+                        </div>
                     </div>
                     <div id="restaurantsList">
                         <p class="loading">Nessun ristorante ancora</p>
@@ -1969,6 +1981,91 @@ input[readonly] {
 
                 <div id="searchResultsList" style="max-height: 400px; overflow-y: auto;">
                     <p class="loading">Usa i filtri per cercare</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TASTES PICKER MODAL (NODE Integration) -->
+    <div id="tastesPickerModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2>🍽 Seleziona da TASTES Database</h2>
+                <button class="modal-close" onclick="closeTastesPicker()">&times;</button>
+            </div>
+
+            <div style="padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+                <!-- Search bar -->
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="tastesSearchInput"
+                           placeholder="🔍 Cerca per nome, città, regione, nazione..."
+                           style="width: 100%; padding: 14px; font-size: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">
+                </div>
+
+                <!-- Filters -->
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <select id="tastesCityFilter" style="padding: 10px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary);">
+                        <option value="">Tutte le città</option>
+                    </select>
+                    <select id="tastesCountryFilter" style="padding: 10px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary);">
+                        <option value="">Tutte le nazioni</option>
+                    </select>
+                    <label style="display: flex; align-items: center; gap: 6px; padding: 10px; background: var(--card-bg); border-radius: 6px; cursor: pointer;">
+                        <input type="checkbox" id="tastesTlFreeFilter" style="width: 18px; height: 18px;">
+                        <span>Solo TL Free</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 6px; padding: 10px; background: var(--card-bg); border-radius: 6px; cursor: pointer;">
+                        <input type="checkbox" id="tastesCommissionFilter" style="width: 18px; height: 18px;">
+                        <span>Solo Commissione</span>
+                    </label>
+                </div>
+
+                <!-- Restaurant list -->
+                <div id="tastesRestaurantList" style="flex: 1; overflow-y: auto;">
+                    <p class="loading">Caricamento ristoranti TASTES...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF UPLOAD MODAL -->
+    <div id="pdfUploadModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>📄 Carica Itinerario PDF</h2>
+                <button class="modal-close" onclick="closePdfUploadModal()">&times;</button>
+            </div>
+
+            <div style="padding: 24px;">
+                <p style="color: #888; margin-bottom: 20px;">
+                    Carica il PDF dell'itinerario del tour. Il sistema estrarrà automaticamente:<br>
+                    • 📅 Giorni e tappe<br>
+                    • 🏨 Hotel e strutture<br>
+                    • 🍽 Ristoranti<br>
+                    • 📍 Città e località
+                </p>
+
+                <div class="form-group">
+                    <label for="pdfFileInput">Seleziona PDF</label>
+                    <input type="file" id="pdfFileInput" accept=".pdf" style="width: 100%; padding: 12px; background: var(--card-bg); border: 2px dashed var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer;">
+                </div>
+
+                <div id="pdfUploadProgress" style="display: none; margin: 20px 0;">
+                    <div class="progress-bar" style="width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden;">
+                        <div id="pdfProgressBar" style="width: 0%; height: 100%; background: var(--primary-blue); transition: width 0.3s;"></div>
+                    </div>
+                    <p id="pdfProgressText" style="text-align: center; margin-top: 8px; color: #888;">Caricamento...</p>
+                </div>
+
+                <div id="pdfExtractionResults" style="display: none; margin-top: 24px; padding: 20px; background: var(--dark-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <h3 style="margin-bottom: 16px;">✅ Estrazione Completata</h3>
+                    <div id="extractedDataSummary"></div>
+                    <button class="btn btn-primary" style="margin-top: 16px; width: 100%;" onclick="applyExtractedData()">📥 Applica Dati Estratti</button>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 24px;">
+                    <button type="button" class="btn btn-secondary" onclick="closePdfUploadModal()">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="processPdfBtn" onclick="processPdfFile()">🔍 Analizza PDF</button>
                 </div>
             </div>
         </div>
@@ -3928,7 +4025,7 @@ function setupModalButtons() {
     // Upload PDF button
     const uploadPdfBtn = document.getElementById('uploadPdfBtn');
     if (uploadPdfBtn) {
-        uploadPdfBtn.onclick = () => alert('🚧 Upload PDF in arrivo! (Phase 3)');
+        uploadPdfBtn.onclick = openPdfUploadModal;
     }
 
     // Publish site button
@@ -3941,6 +4038,12 @@ function setupModalButtons() {
     const addRestaurantBtn = document.getElementById('addRestaurantBtn');
     if (addRestaurantBtn) {
         addRestaurantBtn.onclick = openAddRestaurantForm;
+    }
+
+    // Add from TASTES button (NODE integration)
+    const addFromTastesBtn = document.getElementById('addFromTastesBtn');
+    if (addFromTastesBtn) {
+        addFromTastesBtn.onclick = showTastesRestaurantPicker;
     }
 
     // Add hotel button
@@ -7928,6 +8031,488 @@ document.addEventListener('touchend', (e) => {
         }
     }
 }, {passive: true});
+
+// =====================================================
+// PART 4: NODE + TASTES INTEGRATION
+// =====================================================
+
+let allTastesRestaurants = [];
+
+async function showTastesRestaurantPicker() {
+    showSaveSpinner('Caricamento ristoranti TASTES...');
+
+    try {
+        const { data: tastesRestaurants, error } = await supabaseClient
+            .from('blueriot_tastes')
+            .select('*')
+            .order('name', { ascending: true });
+
+        if (error) throw error;
+
+        allTastesRestaurants = tastesRestaurants || [];
+
+        if (allTastesRestaurants.length === 0) {
+            hideSaveSpinner();
+            alert('📭 Il database TASTES è ancora vuoto!\n\nAggiungi ristoranti nella sezione TASTES prima di usare questa funzione.');
+            return;
+        }
+
+        populateTastesFilters();
+        renderTastesRestaurants(allTastesRestaurants);
+        openModal('tastesPickerModal');
+        setupTastesFilters();
+        hideSaveSpinner();
+    } catch (error) {
+        hideSaveSpinner();
+        console.error('Load TASTES restaurants error:', error);
+        alert('❌ Errore caricamento ristoranti TASTES');
+    }
+}
+
+function populateTastesFilters() {
+    const cities = [...new Set(allTastesRestaurants.map(r => r.city).filter(Boolean))].sort();
+    const countries = [...new Set(allTastesRestaurants.map(r => r.country).filter(Boolean))].sort();
+
+    const citySelect = document.getElementById('tastesFilterCity');
+    const countrySelect = document.getElementById('tastesFilterCountry');
+
+    if (citySelect) {
+        citySelect.innerHTML = '<option value="">Tutte le città</option>' +
+            cities.map(city => `<option value="${city}">${city}</option>`).join('');
+    }
+
+    if (countrySelect) {
+        countrySelect.innerHTML = '<option value="">Tutti i paesi</option>' +
+            countries.map(country => `<option value="${country}">${country}</option>`).join('');
+    }
+}
+
+function setupTastesFilters() {
+    const searchInput = document.getElementById('tastesSearchInput');
+    const cityFilter = document.getElementById('tastesFilterCity');
+    const countryFilter = document.getElementById('tastesFilterCountry');
+    const tlFreeFilter = document.getElementById('tastesFilterTLFree');
+    const commissionFilter = document.getElementById('tastesFilterCommission');
+
+    function applyFilters() {
+        let filtered = [...allTastesRestaurants];
+
+        // Search filter
+        const searchTerm = searchInput?.value.toLowerCase().trim() || '';
+        if (searchTerm) {
+            filtered = filtered.filter(r =>
+                r.name?.toLowerCase().includes(searchTerm) ||
+                r.city?.toLowerCase().includes(searchTerm) ||
+                r.address?.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        // City filter
+        const selectedCity = cityFilter?.value || '';
+        if (selectedCity) {
+            filtered = filtered.filter(r => r.city === selectedCity);
+        }
+
+        // Country filter
+        const selectedCountry = countryFilter?.value || '';
+        if (selectedCountry) {
+            filtered = filtered.filter(r => r.country === selectedCountry);
+        }
+
+        // TL Free filter
+        if (tlFreeFilter?.checked) {
+            filtered = filtered.filter(r => r.tl_free === true);
+        }
+
+        // Commission filter
+        if (commissionFilter?.checked) {
+            filtered = filtered.filter(r => r.commission && parseFloat(r.commission) > 0);
+        }
+
+        renderTastesRestaurants(filtered);
+    }
+
+    // Wire up event listeners
+    searchInput?.addEventListener('input', applyFilters);
+    cityFilter?.addEventListener('change', applyFilters);
+    countryFilter?.addEventListener('change', applyFilters);
+    tlFreeFilter?.addEventListener('change', applyFilters);
+    commissionFilter?.addEventListener('change', applyFilters);
+}
+
+function renderTastesRestaurants(restaurants) {
+    const container = document.getElementById('tastesRestaurantList');
+    if (!container) return;
+
+    if (restaurants.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #888; padding: 40px;">Nessun ristorante trovato con questi filtri.</p>';
+        return;
+    }
+
+    container.innerHTML = restaurants.map(restaurant => `
+        <div class="tastes-restaurant-card" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 12px; background: var(--card-bg);">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div style="flex: 1;">
+                    <h3 style="margin: 0 0 8px 0; color: var(--text-color);">${restaurant.name || 'Senza nome'}</h3>
+                    <p style="margin: 4px 0; color: #888; font-size: 14px;">
+                        📍 ${restaurant.address || 'N/A'}${restaurant.city ? ', ' + restaurant.city : ''}
+                    </p>
+                    ${restaurant.country ? `<p style="margin: 4px 0; color: #888; font-size: 14px;">🌍 ${restaurant.country}</p>` : ''}
+                    ${restaurant.tl_free ? '<span class="badge badge-success" style="margin-right: 8px;">TL FREE</span>' : ''}
+                    ${restaurant.commission && parseFloat(restaurant.commission) > 0 ? `<span class="badge badge-info">Commission: ${restaurant.commission}%</span>` : ''}
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="addTastesToTour('${restaurant.id}')" style="white-space: nowrap;">
+                    ➕ Aggiungi
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function addTastesToTour(tastesId) {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Errore: nessun tour selezionato');
+        return;
+    }
+
+    const restaurant = allTastesRestaurants.find(r => r.id === tastesId);
+    if (!restaurant) {
+        alert('❌ Ristorante non trovato');
+        return;
+    }
+
+    showSaveSpinner('Aggiunta ristorante al tour...');
+
+    try {
+        // Copy TASTES restaurant to tour_restaurants
+        const newTourRestaurant = {
+            tour_id: currentTourDetail.id,
+            name: restaurant.name,
+            address: restaurant.address,
+            city: restaurant.city,
+            region: restaurant.region,
+            country: restaurant.country,
+            phone: restaurant.phone,
+            email: restaurant.email,
+            website: restaurant.website,
+            cuisine_type: restaurant.cuisine_type,
+            price_range: restaurant.price_range,
+            tl_free: restaurant.tl_free || false,
+            commission: restaurant.commission,
+            notes: restaurant.notes,
+            plus_code: restaurant.plus_code,
+            what3words: restaurant.what3words,
+            google_maps_url: restaurant.google_maps_url
+        };
+
+        const { error } = await supabaseClient
+            .from('tour_restaurants')
+            .insert([newTourRestaurant]);
+
+        if (error) throw error;
+
+        hideSaveSpinner();
+        alert(`✅ ${restaurant.name} aggiunto al tour!`);
+
+        // Refresh the tour restaurants list
+        await loadTourRestaurants();
+
+        closeTastesPicker();
+    } catch (error) {
+        hideSaveSpinner();
+        console.error('Add TASTES to tour error:', error);
+        alert('❌ Errore durante aggiunta ristorante');
+    }
+}
+
+function closeTastesPicker() {
+    closeModal('tastesPickerModal');
+
+    // Reset filters
+    const searchInput = document.getElementById('tastesSearchInput');
+    const cityFilter = document.getElementById('tastesFilterCity');
+    const countryFilter = document.getElementById('tastesFilterCountry');
+    const tlFreeFilter = document.getElementById('tastesFilterTLFree');
+    const commissionFilter = document.getElementById('tastesFilterCommission');
+
+    if (searchInput) searchInput.value = '';
+    if (cityFilter) cityFilter.value = '';
+    if (countryFilter) countryFilter.value = '';
+    if (tlFreeFilter) tlFreeFilter.checked = false;
+    if (commissionFilter) commissionFilter.checked = false;
+}
+
+// =====================================================
+// PART 5: PDF OCR ENGINE
+// =====================================================
+
+let extractedPdfData = null;
+
+function openPdfUploadModal() {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        alert('❌ Seleziona prima un tour!');
+        return;
+    }
+
+    // Reset modal state
+    document.getElementById('pdfFileInput').value = '';
+    document.getElementById('pdfUploadProgress').style.display = 'none';
+    document.getElementById('pdfExtractionResults').style.display = 'none';
+    document.getElementById('pdfProgressBar').style.width = '0%';
+    extractedPdfData = null;
+
+    openModal('pdfUploadModal');
+}
+
+function closePdfUploadModal() {
+    closeModal('pdfUploadModal');
+    document.getElementById('pdfFileInput').value = '';
+    extractedPdfData = null;
+}
+
+async function processPdfFile() {
+    const fileInput = document.getElementById('pdfFileInput');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('❌ Seleziona un file PDF!');
+        return;
+    }
+
+    if (file.type !== 'application/pdf') {
+        alert('❌ Il file deve essere un PDF!');
+        return;
+    }
+
+    const progressDiv = document.getElementById('pdfUploadProgress');
+    const progressBar = document.getElementById('pdfProgressBar');
+    const progressText = document.getElementById('pdfProgressText');
+    const resultsDiv = document.getElementById('pdfExtractionResults');
+
+    progressDiv.style.display = 'block';
+    resultsDiv.style.display = 'none';
+    progressBar.style.width = '0%';
+    progressText.textContent = 'Caricamento PDF...';
+
+    try {
+        // Read PDF file
+        const arrayBuffer = await file.arrayBuffer();
+        progressBar.style.width = '20%';
+        progressText.textContent = 'Analisi PDF in corso...';
+
+        // Load PDF with PDF.js
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        progressBar.style.width = '40%';
+        progressText.textContent = `Estrazione testo (${pdf.numPages} pagine)...`;
+
+        // Extract text from all pages
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + '\n\n';
+
+            // Update progress
+            const progress = 40 + (i / pdf.numPages) * 40;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `Estrazione pagina ${i}/${pdf.numPages}...`;
+        }
+
+        progressBar.style.width = '80%';
+        progressText.textContent = 'Analisi contenuto...';
+
+        // Parse extracted text
+        extractedPdfData = parseTourItinerary(fullText);
+
+        // Save raw OCR text to database
+        await savePdfExtraction(file.name, fullText, extractedPdfData);
+
+        progressBar.style.width = '100%';
+        progressText.textContent = '✅ Estrazione completata!';
+
+        // Show results
+        displayExtractionResults(extractedPdfData);
+        resultsDiv.style.display = 'block';
+
+    } catch (error) {
+        console.error('PDF processing error:', error);
+        progressDiv.style.display = 'none';
+        alert('❌ Errore durante l\'elaborazione del PDF: ' + error.message);
+    }
+}
+
+function parseTourItinerary(text) {
+    const data = {
+        days: [],
+        hotels: [],
+        restaurants: [],
+        cities: []
+    };
+
+    // Patterns for extraction
+    const dayPattern = /(?:giorno|day)\s*(\d+)[:\s]*([^\n]+)/gi;
+    const hotelPattern = /(?:hotel|albergo)[:\s]*([^\n,]+)/gi;
+    const restaurantPattern = /(?:ristorante|pranzo|cena|restaurant)[:\s]*([^\n,]+)/gi;
+    const cityPattern = /(?:città|city|località)[:\s]*([^\n,]+)/gi;
+
+    // Extract days
+    let match;
+    while ((match = dayPattern.exec(text)) !== null) {
+        data.days.push({
+            day_number: parseInt(match[1]),
+            description: match[2].trim()
+        });
+    }
+
+    // Extract hotels
+    const hotelSet = new Set();
+    while ((match = hotelPattern.exec(text)) !== null) {
+        const hotelName = match[1].trim();
+        if (hotelName.length > 3 && hotelName.length < 100) {
+            hotelSet.add(hotelName);
+        }
+    }
+    data.hotels = Array.from(hotelSet).map(name => ({ name }));
+
+    // Extract restaurants
+    const restaurantSet = new Set();
+    while ((match = restaurantPattern.exec(text)) !== null) {
+        const restaurantName = match[1].trim();
+        if (restaurantName.length > 3 && restaurantName.length < 100) {
+            restaurantSet.add(restaurantName);
+        }
+    }
+    data.restaurants = Array.from(restaurantSet).map(name => ({ name }));
+
+    // Extract cities (also check against CITY_DATABASE)
+    const citySet = new Set();
+    while ((match = cityPattern.exec(text)) !== null) {
+        const cityName = match[1].trim();
+        if (cityName.length > 2 && cityName.length < 50) {
+            citySet.add(cityName);
+        }
+    }
+
+    // Also scan for known cities in the database
+    const textLower = text.toLowerCase();
+    Object.keys(CITY_DATABASE).forEach(city => {
+        if (textLower.includes(city)) {
+            citySet.add(city.charAt(0).toUpperCase() + city.slice(1));
+        }
+    });
+
+    data.cities = Array.from(citySet);
+
+    return data;
+}
+
+async function savePdfExtraction(filename, rawText, extractedData) {
+    if (!currentTourDetail || !currentTourDetail.id) {
+        console.error('No current tour');
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('tour_pdf_extractions')
+            .upsert({
+                tour_id: currentTourDetail.id,
+                pdf_filename: filename,
+                raw_ocr_text: rawText,
+                extracted_data: extractedData,
+                extraction_status: 'completed',
+                extraction_date: new Date().toISOString()
+            }, {
+                onConflict: 'tour_id'
+            });
+
+        if (error) throw error;
+        console.log('✅ PDF extraction saved to database');
+    } catch (error) {
+        console.error('Error saving PDF extraction:', error);
+    }
+}
+
+function displayExtractionResults(data) {
+    const summaryDiv = document.getElementById('extractedDataSummary');
+
+    const html = `
+        <div style="display: grid; gap: 16px;">
+            <div class="data-card">
+                <h4>📅 Giorni Trovati</h4>
+                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.days.length}</p>
+            </div>
+            <div class="data-card">
+                <h4>🏨 Hotel Trovati</h4>
+                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.hotels.length}</p>
+                ${data.hotels.length > 0 ? '<ul class="extraction-results">' + data.hotels.slice(0, 5).map(h => `<li>${h.name}</li>`).join('') + (data.hotels.length > 5 ? `<li>...e altri ${data.hotels.length - 5}</li>` : '') + '</ul>' : ''}
+            </div>
+            <div class="data-card">
+                <h4>🍽 Ristoranti Trovati</h4>
+                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.restaurants.length}</p>
+                ${data.restaurants.length > 0 ? '<ul class="extraction-results">' + data.restaurants.slice(0, 5).map(r => `<li>${r.name}</li>`).join('') + (data.restaurants.length > 5 ? `<li>...e altri ${data.restaurants.length - 5}</li>` : '') + '</ul>' : ''}
+            </div>
+            <div class="data-card">
+                <h4>📍 Città Trovate</h4>
+                <p style="font-size: 24px; font-weight: 700; color: var(--primary-blue);">${data.cities.length}</p>
+                ${data.cities.length > 0 ? '<p style="color: #888; margin-top: 8px;">' + data.cities.slice(0, 10).join(', ') + (data.cities.length > 10 ? '...' : '') + '</p>' : ''}
+            </div>
+        </div>
+    `;
+
+    summaryDiv.innerHTML = html;
+}
+
+async function applyExtractedData() {
+    if (!extractedPdfData || !currentTourDetail) {
+        alert('❌ Nessun dato da applicare');
+        return;
+    }
+
+    showSaveSpinner('Applicazione dati estratti...');
+
+    try {
+        // Add hotels
+        for (const hotel of extractedPdfData.hotels) {
+            await supabaseClient
+                .from('hotels')
+                .insert({
+                    tour_id: currentTourDetail.id,
+                    name: hotel.name,
+                    city: null,
+                    region: null,
+                    country: null
+                });
+        }
+
+        // Add restaurants
+        for (const restaurant of extractedPdfData.restaurants) {
+            await supabaseClient
+                .from('tour_restaurants')
+                .insert({
+                    tour_id: currentTourDetail.id,
+                    name: restaurant.name,
+                    city: null,
+                    region: null,
+                    country: null
+                });
+        }
+
+        hideSaveSpinner();
+        alert(`✅ Dati applicati!\n\n🏨 ${extractedPdfData.hotels.length} hotel aggiunti\n🍽 ${extractedPdfData.restaurants.length} ristoranti aggiunti`);
+
+        // Reload data
+        await loadTourHotels();
+        await loadTourRestaurants();
+
+        closePdfUploadModal();
+    } catch (error) {
+        hideSaveSpinner();
+        console.error('Error applying extracted data:', error);
+        alert('❌ Errore durante l\'applicazione dei dati');
+    }
+}
 
     </script>
 </body>

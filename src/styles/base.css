@@ -1,16 +1,27 @@
-/* ===== BLUERIOT BASE STYLES ===== */
+/* ===== BLUERIOT SYNDICATE - TRON NEON THEME ===== */
 
 :root {
-    /* Colors */
-    --primary-blue: #00F0FF;
-    --secondary-blue: #0A7AFF;
-    --dark-bg: #0A0E27;
-    --card-bg: #13182E;
+    /* TRON Neon Colors */
+    --neon-cyan: #00F0FF;
+    --neon-blue: #00C8FF;
+    --neon-fuchsia: #FF4FD8;
+    --neon-pink: #FF00FF;
+
+    /* Dark Background */
+    --bg-pure-dark: #050505;
+    --bg-sidebar: #0B0F12;
+    --bg-card: #0D1117;
+    --bg-input: #0A0E13;
+
+    /* Text */
     --text-primary: #FFFFFF;
     --text-secondary: #8B9DC3;
+    --text-muted: #525866;
+
+    /* Status Colors */
     --error: #FF4757;
     --success: #00FF88;
-    --border-color: #1E2749;
+    --warning: #FFC107;
 
     /* Spacing */
     --spacing-xs: 4px;
@@ -18,15 +29,22 @@
     --spacing-md: 16px;
     --spacing-lg: 24px;
     --spacing-xl: 32px;
+    --spacing-2xl: 48px;
 
-    /* Border radius */
+    /* Border Radius */
     --radius-sm: 4px;
     --radius-md: 8px;
     --radius-lg: 12px;
+    --radius-xl: 16px;
+
+    /* Sidebar */
+    --sidebar-width: 20%;
+    --sidebar-width-mobile: 280px;
 
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
 }
 
 * {
@@ -35,25 +53,31 @@
     box-sizing: border-box;
 }
 
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #000000;
+    background: var(--bg-pure-dark);
     color: var(--text-primary);
     line-height: 1.6;
-    min-height: 100vh;
-    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.2;
     margin-bottom: var(--spacing-md);
 }
 
-h1 { font-size: 32px; }
-h2 { font-size: 24px; }
-h3 { font-size: 20px; }
+h1 { font-size: 32px; letter-spacing: 0.5px; }
+h2 { font-size: 24px; letter-spacing: 0.3px; }
+h3 { font-size: 20px; letter-spacing: 0.2px; }
 h4 { font-size: 18px; }
 h5 { font-size: 16px; }
 h6 { font-size: 14px; }
@@ -63,31 +87,154 @@ p {
 }
 
 a {
-    color: var(--primary-blue);
+    color: var(--neon-cyan);
     text-decoration: none;
-    transition: opacity var(--transition-fast);
+    transition: all var(--transition-fast);
 }
 
 a:hover {
-    opacity: 0.8;
+    color: var(--neon-blue);
+    text-shadow: 0 0 8px var(--neon-cyan);
+}
+
+/* TRON Neon Effects */
+.neon-box {
+    border: 1px solid rgba(0, 200, 255, 0.4);
+    border-radius: var(--radius-md);
+    box-shadow:
+        0 0 12px rgba(0, 200, 255, 0.5),
+        0 0 32px rgba(0, 200, 255, 0.25),
+        inset 0 0 16px rgba(0, 200, 255, 0.15);
+}
+
+.neon-box-fuchsia {
+    border: 1px solid rgba(255, 79, 216, 0.4);
+    border-radius: var(--radius-md);
+    box-shadow:
+        0 0 12px rgba(255, 79, 216, 0.5),
+        0 0 32px rgba(255, 79, 216, 0.25),
+        inset 0 0 16px rgba(255, 79, 216, 0.15);
+}
+
+.neon-glow-cyan {
+    text-shadow:
+        0 0 8px var(--neon-cyan),
+        0 0 16px var(--neon-cyan);
+}
+
+.neon-glow-fuchsia {
+    text-shadow:
+        0 0 8px var(--neon-fuchsia),
+        0 0 16px var(--neon-fuchsia);
+}
+
+.logo-glow {
+    filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6));
+}
+
+/* TRON Frame (broken angles) */
+.tron-frame {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 200, 255, 0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow:
+        0 0 12px rgba(0, 200, 255, 0.4),
+        0 0 32px rgba(0, 200, 255, 0.2),
+        inset 0 0 24px rgba(0, 200, 255, 0.1);
+}
+
+.tron-frame::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--neon-cyan) 20%,
+        var(--neon-cyan) 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.tron-frame::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--neon-blue) 20%,
+        var(--neon-blue) 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 8px var(--neon-blue);
 }
 
 /* Utilities */
 .text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-cyan { color: var(--neon-cyan); }
+.text-fuchsia { color: var(--neon-fuchsia); }
 .text-error { color: var(--error); }
 .text-success { color: var(--success); }
-.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
 
+.uppercase { text-transform: uppercase; }
+.semibold { font-weight: 600; }
+.bold { font-weight: 700; }
+
+/* Spacing */
 .mt-xs { margin-top: var(--spacing-xs); }
 .mt-sm { margin-top: var(--spacing-sm); }
 .mt-md { margin-top: var(--spacing-md); }
 .mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
 
 .mb-xs { margin-bottom: var(--spacing-xs); }
 .mb-sm { margin-bottom: var(--spacing-sm); }
 .mb-md { margin-bottom: var(--spacing-md); }
 .mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
 
-.hidden {
-    display: none !important;
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+.hidden { display: none !important; }
+.visible { display: block !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-pure-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 200, 255, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 200, 255, 0.5);
+}
+
+/* Selection */
+::selection {
+    background: rgba(0, 240, 255, 0.3);
+    color: var(--text-primary);
 }

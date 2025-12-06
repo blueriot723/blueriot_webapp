@@ -1,5 +1,5 @@
 /**
- * Login Panel Component - New Cyberpunk Design
+ * Login Panel Component - Cyberpunk TRON Design
  * 20% sidebar (logos + language) + 80% login area
  */
 import { auth } from '../utils/auth.js';
@@ -20,21 +20,42 @@ export class LoginPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('../styles/base.css');
-                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 
+                /* CSS Variables - must be defined here for Shadow DOM */
                 :host {
+                    --neon-cyan: #00eaff;
+                    --neon-blue: #00C8FF;
+                    --neon-pink: #ff4fd8;
+                    --neon-fuchsia: #ff4fd8;
+                    --bg-pure-dark: #050505;
+                    --bg-sidebar: #0c0f13;
+                    --bg-card: #0D1117;
+                    --bg-input: #0A0E13;
+                    --text-primary: #FFFFFF;
+                    --text-secondary: #8B9DC3;
+                    --text-muted: #525866;
+                    --error: #FF4757;
+
                     display: block;
                     min-height: 100vh;
+                    background: var(--bg-pure-dark);
+                }
+
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
                 }
 
                 .login-container {
                     display: flex;
                     width: 100%;
                     min-height: 100vh;
+                    background: var(--bg-pure-dark);
                 }
 
-                /* Sidebar 20% */
+                /* ===== SIDEBAR 20% ===== */
                 .login-sidebar {
                     width: 20%;
                     min-width: 260px;
@@ -43,42 +64,40 @@ export class LoginPanel extends HTMLElement {
                     flex-direction: column;
                     align-items: center;
                     justify-content: space-between;
-                    padding: var(--spacing-2xl) var(--spacing-lg);
-                    border-right: 1px solid rgba(0, 240, 255, 0.1);
+                    padding: 48px 24px;
+                    border-right: 1px solid rgba(0, 234, 255, 0.15);
                 }
 
                 .logo-section {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    gap: var(--spacing-lg);
+                    gap: 24px;
+                }
+
+                .logo-container {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 12px;
+                    box-shadow:
+                        0 0 20px rgba(255, 255, 255, 0.3),
+                        0 0 40px rgba(255, 255, 255, 0.1);
                 }
 
                 .blueriot-logo {
-                    width: 150px;
+                    width: 180px;
                     height: auto;
-                    background: white;
-                    padding: 10px;
-                    border-radius: 8px;
-                    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
-                }
-
-                .syndicate-text {
-                    color: white;
-                    font-size: 14px;
-                    font-weight: 700;
-                    letter-spacing: 3px;
-                    text-align: center;
-                    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+                    display: block;
                 }
 
                 .matrix-logo {
-                    width: 120px;
+                    width: 140px;
                     height: auto;
-                    margin-top: 20px;
-                    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6));
+                    margin-top: 16px;
+                    filter: drop-shadow(0 0 12px rgba(0, 234, 255, 0.6));
                 }
 
+                /* ===== LANGUAGE BUTTONS with 45deg neon ===== */
                 .language-buttons {
                     display: flex;
                     flex-direction: column;
@@ -89,17 +108,20 @@ export class LoginPanel extends HTMLElement {
 
                 .lang-btn {
                     position: relative;
-                    width: 120px;
-                    height: 50px;
-                    background: rgba(10, 14, 39, 0.8);
+                    width: 100%;
+                    height: 48px;
+                    background: rgba(10, 14, 39, 0.9);
                     border: none;
                     color: var(--text-primary);
-                    font-size: 18px;
+                    font-family: 'Share Tech Mono', monospace;
+                    font-size: 16px;
                     font-weight: 700;
+                    letter-spacing: 2px;
                     cursor: pointer;
-                    clip-path: polygon(0 0, 100% 0, 95% 15%, 95% 85%, 100% 100%, 0 100%);
                     overflow: hidden;
                     transition: all 0.3s ease;
+                    /* 45 degree cut on right side */
+                    clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%);
                 }
 
                 .lang-btn::before {
@@ -107,80 +129,100 @@ export class LoginPanel extends HTMLElement {
                     position: absolute;
                     right: 0;
                     top: 0;
-                    bottom: 0;
                     width: 4px;
+                    height: 50%;
                     background: linear-gradient(180deg,
-                        rgba(0, 240, 255, 1) 0%,
-                        rgba(0, 240, 255, 1) 50%,
-                        rgba(0, 240, 255, 0) 100%
+                        var(--neon-cyan) 0%,
+                        var(--neon-cyan) 80%,
+                        transparent 100%
                     );
-                    box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+                    box-shadow: 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-cyan);
                 }
 
-                .lang-btn.active::before {
-                    background: linear-gradient(180deg,
-                        rgba(255, 0, 255, 1) 0%,
-                        rgba(255, 0, 255, 1) 50%,
-                        rgba(255, 0, 255, 0) 100%
-                    );
-                    box-shadow: 0 0 15px rgba(255, 0, 255, 1);
-                }
-
+                .lang-btn.active::before,
                 .lang-btn:hover::before {
-                    box-shadow: 0 0 20px currentColor;
+                    background: linear-gradient(180deg,
+                        var(--neon-fuchsia) 0%,
+                        var(--neon-fuchsia) 80%,
+                        transparent 100%
+                    );
+                    box-shadow: 0 0 12px var(--neon-fuchsia), 0 0 24px var(--neon-fuchsia);
                 }
 
-                /* Main Login Area 80% */
+                .lang-btn.active {
+                    background: rgba(255, 79, 216, 0.1);
+                }
+
+                /* ===== MAIN LOGIN AREA 80% ===== */
                 .login-main {
                     flex: 1;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding: var(--spacing-2xl);
+                    padding: 48px;
                     background: var(--bg-pure-dark);
+                    position: relative;
+                }
+
+                /* Top neon border line */
+                .login-main::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 2px;
+                    background: linear-gradient(90deg,
+                        transparent 0%,
+                        var(--neon-cyan) 20%,
+                        var(--neon-cyan) 80%,
+                        transparent 100%
+                    );
+                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
                 }
 
                 .login-content {
                     width: 100%;
-                    max-width: 500px;
+                    max-width: 450px;
                 }
 
+                /* ===== LOGIN OPTIONS with left neon 45deg ===== */
                 .login-option {
                     position: relative;
-                    background: rgba(10, 14, 39, 0.6);
-                    border-radius: 12px;
+                    background: rgba(10, 14, 39, 0.7);
                     padding: 24px;
                     margin-bottom: 20px;
-                    clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%, 0 15%);
+                    /* 45 degree cut on left side */
+                    clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%, 0 30%);
                 }
 
-                .neon-left::before {
+                .login-option::before {
                     content: '';
                     position: absolute;
                     left: 0;
                     top: 0;
-                    bottom: 0;
                     width: 4px;
+                    height: 50%;
                     background: linear-gradient(180deg,
-                        rgba(0, 240, 255, 0) 0%,
-                        rgba(0, 240, 255, 1) 25%,
-                        rgba(0, 240, 255, 1) 75%,
-                        rgba(0, 240, 255, 0) 100%
+                        transparent 0%,
+                        var(--neon-cyan) 20%,
+                        var(--neon-cyan) 100%
                     );
-                    box-shadow: 0 0 15px rgba(0, 240, 255, 0.8);
+                    box-shadow: 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-cyan);
                 }
 
                 .login-option:hover::before,
-                .login-option:focus-within::before {
+                .login-option:focus-within::before,
+                .login-option.active::before {
                     background: linear-gradient(180deg,
-                        rgba(255, 0, 255, 0) 0%,
-                        rgba(255, 0, 255, 1) 25%,
-                        rgba(255, 0, 255, 1) 75%,
-                        rgba(255, 0, 255, 0) 100%
+                        transparent 0%,
+                        var(--neon-fuchsia) 20%,
+                        var(--neon-fuchsia) 100%
                     );
-                    box-shadow: 0 0 20px rgba(255, 0, 255, 1);
+                    box-shadow: 0 0 12px var(--neon-fuchsia), 0 0 24px var(--neon-fuchsia);
                 }
 
+                /* ===== GOOGLE BUTTON - Official Style ===== */
                 .google-signin-btn {
                     width: 100%;
                     height: 50px;
@@ -188,122 +230,126 @@ export class LoginPanel extends HTMLElement {
                     color: #444;
                     border: 1px solid #ddd;
                     border-radius: 4px;
+                    font-family: 'Roboto', sans-serif;
                     font-size: 16px;
                     font-weight: 500;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 10px;
-                    transition: all 0.2s;
+                    gap: 12px;
+                    transition: all 0.2s ease;
                 }
 
                 .google-signin-btn:hover {
                     background: #f8f8f8;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
                 }
 
-                .divider {
-                    text-align: center;
-                    margin: 24px 0;
-                    color: var(--text-muted);
-                    font-size: 14px;
-                    position: relative;
+                .google-signin-btn svg {
+                    flex-shrink: 0;
                 }
 
-                .divider::before,
-                .divider::after {
-                    content: '';
-                    position: absolute;
-                    top: 50%;
-                    width: 40%;
-                    height: 1px;
-                    background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent);
-                }
-
-                .divider::before {
-                    left: 0;
-                }
-
-                .divider::after {
-                    right: 0;
-                }
-
+                /* ===== EMAIL TOGGLE BUTTON ===== */
                 .email-toggle-btn {
                     width: 100%;
                     height: 50px;
-                    background: rgba(0, 240, 255, 0.1);
-                    border: 1px solid rgba(0, 240, 255, 0.3);
-                    color: var(--neon-cyan);
-                    border-radius: 8px;
+                    background: rgba(10, 14, 39, 0.9);
+                    border: 1px solid rgba(0, 234, 255, 0.3);
+                    color: var(--text-primary);
+                    border-radius: 4px;
+                    font-family: 'Share Tech Mono', monospace;
                     font-size: 16px;
                     font-weight: 600;
+                    letter-spacing: 1px;
                     cursor: pointer;
-                    transition: all 0.2s;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 10px;
+                    gap: 12px;
+                    transition: all 0.3s ease;
                 }
 
                 .email-toggle-btn:hover {
-                    background: rgba(0, 240, 255, 0.2);
-                    border-color: rgba(0, 240, 255, 0.6);
+                    border-color: var(--neon-cyan);
+                    box-shadow: 0 0 15px rgba(0, 234, 255, 0.3);
                 }
 
+                .email-toggle-btn.expanded {
+                    border-color: var(--neon-fuchsia);
+                    box-shadow: 0 0 15px rgba(255, 79, 216, 0.3);
+                }
+
+                .toggle-icon {
+                    transition: transform 0.3s ease;
+                }
+
+                .toggle-icon.rotated {
+                    transform: rotate(180deg);
+                }
+
+                /* ===== EMAIL FORM ===== */
                 .email-form {
-                    display: none;
-                    margin-top: 20px;
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: max-height 0.3s ease, margin-top 0.3s ease;
                 }
 
                 .email-form.expanded {
-                    display: block;
+                    max-height: 200px;
+                    margin-top: 20px;
                 }
 
                 .login-input {
                     width: 100%;
-                    height: 45px;
-                    background: rgba(26, 31, 58, 0.8);
-                    border: 1px solid var(--border-color);
-                    border-radius: 6px;
+                    height: 48px;
+                    background: rgba(10, 14, 39, 0.9);
+                    border: 1px solid rgba(0, 234, 255, 0.2);
+                    border-radius: 4px;
                     padding: 0 16px;
                     color: var(--text-primary);
+                    font-family: 'Share Tech Mono', monospace;
                     font-size: 15px;
                     margin-bottom: 12px;
-                    transition: all 0.2s;
+                    transition: all 0.2s ease;
+                }
+
+                .login-input::placeholder {
+                    color: var(--text-muted);
                 }
 
                 .login-input:focus {
                     outline: none;
                     border-color: var(--neon-cyan);
-                    box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
+                    box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
                 }
 
                 .login-submit-btn {
                     width: 100%;
-                    height: 50px;
+                    height: 48px;
                     background: var(--neon-cyan);
                     border: none;
-                    border-radius: 8px;
-                    color: var(--bg-pure-dark);
+                    border-radius: 4px;
+                    color: #000;
+                    font-family: 'Share Tech Mono', monospace;
                     font-size: 16px;
                     font-weight: 700;
+                    letter-spacing: 1px;
                     cursor: pointer;
-                    margin-top: 8px;
-                    transition: all 0.2s;
+                    transition: all 0.2s ease;
                 }
 
                 .login-submit-btn:hover {
-                    background: rgba(0, 240, 255, 0.9);
-                    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+                    box-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
                 }
 
+                /* ===== ERROR MESSAGE ===== */
                 .error-message {
                     display: none;
                     padding: 12px;
                     background: rgba(255, 71, 87, 0.1);
                     border: 1px solid rgba(255, 71, 87, 0.3);
-                    border-radius: 6px;
+                    border-radius: 4px;
                     color: var(--error);
                     font-size: 14px;
                     margin-top: 16px;
@@ -313,7 +359,7 @@ export class LoginPanel extends HTMLElement {
                     display: block;
                 }
 
-                /* Mobile responsive */
+                /* ===== MOBILE RESPONSIVE ===== */
                 @media (max-width: 768px) {
                     .login-container {
                         flex-direction: column;
@@ -322,13 +368,18 @@ export class LoginPanel extends HTMLElement {
                     .login-sidebar {
                         width: 100%;
                         min-width: 100%;
-                        padding: var(--spacing-lg);
+                        padding: 24px;
+                        flex-direction: row;
+                        justify-content: space-between;
                     }
 
                     .logo-section {
                         flex-direction: row;
-                        justify-content: space-around;
-                        width: 100%;
+                        gap: 16px;
+                    }
+
+                    .logo-container {
+                        padding: 12px;
                     }
 
                     .blueriot-logo {
@@ -343,18 +394,18 @@ export class LoginPanel extends HTMLElement {
                     .language-buttons {
                         flex-direction: row;
                         flex-wrap: wrap;
-                        max-width: 100%;
-                        justify-content: center;
+                        max-width: none;
+                        gap: 8px;
                     }
 
                     .lang-btn {
-                        width: 70px;
+                        width: 60px;
                         height: 40px;
                         font-size: 14px;
                     }
 
                     .login-main {
-                        padding: var(--spacing-lg);
+                        padding: 24px;
                     }
                 }
             </style>
@@ -363,12 +414,10 @@ export class LoginPanel extends HTMLElement {
                 <!-- Sidebar 20% -->
                 <div class="login-sidebar">
                     <div class="logo-section">
-                        <div>
-                            <img src="blueriot-logo.png" alt="BlueRiot Logo" class="blueriot-logo">
-                            <div class="syndicate-text">SYNDICATE</div>
+                        <div class="logo-container">
+                            <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
                         </div>
-                        <!-- TEST: commentato per debug -->
-                        <!-- <img src="matrix.svg" alt="Matrix" class="matrix-logo"> -->
+                        <img src="matrix.svg" alt="Matrix" class="matrix-logo">
                     </div>
 
                     <div class="language-buttons">
@@ -384,7 +433,7 @@ export class LoginPanel extends HTMLElement {
                 <div class="login-main">
                     <div class="login-content">
                         <!-- Google Sign-In -->
-                        <div class="login-option neon-left">
+                        <div class="login-option" id="googleOption">
                             <button class="google-signin-btn" id="googleSigninBtn">
                                 <svg width="20" height="20" viewBox="0 0 18 18">
                                     <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
@@ -396,21 +445,17 @@ export class LoginPanel extends HTMLElement {
                             </button>
                         </div>
 
-                        <div class="divider">
-                            <span>oppure</span>
-                        </div>
-
                         <!-- Email Login Expandable -->
-                        <div class="login-option neon-left">
+                        <div class="login-option" id="emailOption">
                             <button class="email-toggle-btn" id="emailToggleBtn">
-                                <span id="emailToggleIcon">▼</span>
-                                Email Login
+                                <span class="toggle-icon" id="emailToggleIcon">&#9660;</span>
+                                EMAIL LOGIN
                             </button>
 
                             <div class="email-form" id="emailForm">
-                                <input type="email" id="emailInput" placeholder="user@email.com" class="login-input" required>
+                                <input type="email" id="emailInput" placeholder="email@example.com" class="login-input" required>
                                 <input type="password" id="passwordInput" placeholder="Password" class="login-input" required>
-                                <button class="login-submit-btn" id="emailLoginBtn">Accedi</button>
+                                <button class="login-submit-btn" id="emailLoginBtn">ACCEDI</button>
                             </div>
 
                             <div class="error-message" id="errorMessage"></div>
@@ -435,23 +480,24 @@ export class LoginPanel extends HTMLElement {
         const emailToggleBtn = this.shadowRoot.getElementById('emailToggleBtn');
         const emailForm = this.shadowRoot.getElementById('emailForm');
         const emailToggleIcon = this.shadowRoot.getElementById('emailToggleIcon');
+        const emailOption = this.shadowRoot.getElementById('emailOption');
 
         emailToggleBtn.addEventListener('click', () => {
             this.emailFormExpanded = !this.emailFormExpanded;
-            if (this.emailFormExpanded) {
-                emailForm.classList.add('expanded');
-                emailToggleIcon.textContent = '▲';
-            } else {
-                emailForm.classList.remove('expanded');
-                emailToggleIcon.textContent = '▼';
-            }
+            emailForm.classList.toggle('expanded', this.emailFormExpanded);
+            emailToggleBtn.classList.toggle('expanded', this.emailFormExpanded);
+            emailToggleIcon.classList.toggle('rotated', this.emailFormExpanded);
+            emailOption.classList.toggle('active', this.emailFormExpanded);
         });
 
         // Google Sign-in
         const googleBtn = this.shadowRoot.getElementById('googleSigninBtn');
+        const googleOption = this.shadowRoot.getElementById('googleOption');
+
         googleBtn.addEventListener('click', async () => {
+            googleOption.classList.add('active');
             googleBtn.disabled = true;
-            googleBtn.textContent = 'Reindirizzamento a Google...';
+            googleBtn.textContent = 'Reindirizzamento...';
 
             try {
                 await auth.signInWithGoogle();
@@ -459,7 +505,13 @@ export class LoginPanel extends HTMLElement {
                 console.error('Google login error:', error);
                 this.showError(error.message || 'Errore Google login');
                 googleBtn.disabled = false;
-                googleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 18 18">...</svg> Sign in with Google';
+                googleBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 18 18">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                    <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
+                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                </svg> Sign in with Google`;
+                googleOption.classList.remove('active');
             }
         });
 
@@ -475,7 +527,7 @@ export class LoginPanel extends HTMLElement {
             }
 
             emailLoginBtn.disabled = true;
-            emailLoginBtn.textContent = 'Accesso in corso...';
+            emailLoginBtn.textContent = 'ACCESSO...';
 
             try {
                 await auth.signInWithEmail(email, password);
@@ -483,7 +535,7 @@ export class LoginPanel extends HTMLElement {
                 console.error('Email login error:', error);
                 this.showError(error.message || 'Errore login');
                 emailLoginBtn.disabled = false;
-                emailLoginBtn.textContent = 'Accedi';
+                emailLoginBtn.textContent = 'ACCEDI';
             }
         });
     }

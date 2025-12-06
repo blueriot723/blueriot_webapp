@@ -315,6 +315,11 @@ export class DashboardFrame extends HTMLElement {
                             <span class="sidebar-menu-icon">📍</span>
                             <span>Node</span>
                         </button>
+                        <div style="height: 1px; background: rgba(255, 79, 216, 0.1); margin: var(--spacing-md);"></div>
+                        <button class="sidebar-menu-item" data-view="pdfocr">
+                            <span class="sidebar-menu-icon">📄</span>
+                            <span>PDF OCR</span>
+                        </button>
                     </nav>
 
                     <div class="sidebar-footer">
@@ -412,8 +417,8 @@ export class DashboardFrame extends HTMLElement {
 
         try {
             if (view === 'tastes') {
-                await import('./tastes-panel.js');
-                contentArea.innerHTML = '<tastes-panel></tastes-panel>';
+                await import('./tastes-panel-v2.js');
+                contentArea.innerHTML = '<tastes-panel-v2></tastes-panel-v2>';
             } else if (view === 'routes') {
                 await import('./routes-panel.js');
                 contentArea.innerHTML = '<routes-panel></routes-panel>';
@@ -423,6 +428,9 @@ export class DashboardFrame extends HTMLElement {
             } else if (view === 'node') {
                 await import('./node-panel.js');
                 contentArea.innerHTML = '<node-panel></node-panel>';
+            } else if (view === 'pdfocr') {
+                await import('./pdf-ocr-panel.js');
+                contentArea.innerHTML = '<pdf-ocr-panel></pdf-ocr-panel>';
             } else {
                 contentArea.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: var(--spacing-2xl);">Unknown view</p>';
             }

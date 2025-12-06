@@ -3136,8 +3136,13 @@ function setupEventListeners() {
 
     // Google OAuth login
     const googleLoginBtn = document.getElementById('googleLoginBtn');
+    console.log('🔍 Setting up Google login button:', googleLoginBtn);
     if (googleLoginBtn) {
+        console.log('✅ Google button found! Adding click listener...');
         googleLoginBtn.addEventListener('click', handleGoogleLogin);
+        console.log('✅ Click listener added to Google button');
+    } else {
+        console.error('❌ Google login button NOT FOUND in DOM!');
     }
 
     // Logout
@@ -3663,14 +3668,20 @@ async function handleLogin(e) {
 }
 
 async function handleGoogleLogin() {
+    console.log('🔵 GOOGLE LOGIN BUTTON CLICKED!');
+
     const googleLoginBtn = document.getElementById('googleLoginBtn');
+    console.log('🔍 Button element:', googleLoginBtn);
 
     if (googleLoginBtn) {
         googleLoginBtn.disabled = true;
         googleLoginBtn.innerHTML = '<span class="btn-text">Reindirizzamento a Google...</span>';
     }
 
+    console.log('🔍 Supabase client:', supabaseClient);
+
     try {
+        console.log('🚀 Calling signInWithOAuth...');
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'google',
             options: {
@@ -3678,9 +3689,11 @@ async function handleGoogleLogin() {
             }
         });
 
+        console.log('✅ OAuth response:', { data, error });
+
         if (error) {
             console.error('❌ OAuth error:', error);
-            throw new Error(`OAuth: ${error.message}`);
+            throw new Error('OAuth: ' + error.message);
         }
 
         // Il browser verrà reindirizzato a Google

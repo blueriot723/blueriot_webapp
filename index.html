@@ -924,6 +924,215 @@ body {
     cursor: crosshair;
     box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
 }
+
+/* ===== LOADING SPINNER ===== */
+.save-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 40px;
+    border-radius: 16px;
+    border: 2px solid var(--primary-blue);
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
+    text-align: center;
+}
+
+.spinner-ring {
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--primary-blue);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.save-spinner p {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ===== MODAL SCROLL LOCK ===== */
+body.modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+}
+
+/* ===== ENHANCED MODAL BACKDROP ===== */
+.modal::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 14, 39, 0.98);
+    backdrop-filter: blur(12px);
+    z-index: -1;
+}
+
+/* ===== TASTES PICKER STYLES ===== */
+.tastes-restaurant-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: var(--card-bg);
+    transition: all 0.2s ease;
+}
+
+.tastes-restaurant-card:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+}
+
+.restaurant-info h3 {
+    margin: 0 0 8px 0;
+    color: var(--primary-blue);
+    font-size: 18px;
+}
+
+.restaurant-info p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.restaurant-info .location {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.restaurant-info .rating {
+    color: #FFD700;
+}
+
+.restaurant-info .notes {
+    font-style: italic;
+    margin-top: 8px;
+}
+
+.badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-success {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00FF88;
+    border: 1px solid #00FF88;
+}
+
+.badge-info {
+    background: rgba(0, 240, 255, 0.2);
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+}
+
+.badge-warning {
+    background: rgba(255, 193, 7, 0.2);
+    color: #FFC107;
+    border: 1px solid #FFC107;
+}
+
+/* ===== AUTO-FILLED FIELD STYLING ===== */
+input.auto-filled {
+    border-color: #00FF88 !important;
+    background: rgba(0, 255, 136, 0.05) !important;
+}
+
+input[readonly] {
+    background: rgba(26, 31, 58, 0.5) !important;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* ===== PDF PROGRESS BAR ===== */
+.progress-bar {
+    height: 24px;
+    background: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.extraction-results {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.extraction-results h4 {
+    color: var(--primary-blue);
+    margin-bottom: 16px;
+}
+
+.extraction-results h5 {
+    color: var(--text-primary);
+    margin: 16px 0 8px 0;
+}
+
+.extraction-results ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.extraction-results li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.extraction-results li:last-child {
+    border-bottom: none;
+}
     </style>
 </head>
 <body>
@@ -2810,6 +3019,11 @@ function init() {
     // Set up event listeners
     setupEventListeners();
 
+    // Setup city autofill for all forms
+    setupCityAutofill('sharedRestaurantCity', 'sharedRestaurantRegion', 'sharedRestaurantCountry'); // TASTES form
+    setupCityAutofill('restaurantCity', 'restaurantRegion', 'restaurantCountry'); // NODE restaurant form
+    setupCityAutofill('hotelCity', 'hotelRegion', 'hotelCountry'); // Hotel form
+
     // Setup Supabase auth listener (handles OAuth automatically)
     setupAuthListener();
 
@@ -3845,6 +4059,8 @@ async function saveDashboardData() {
         return;
     }
 
+    showSaveSpinner('Salvataggio...');
+
     try {
         const { error } = await supabaseClient
             .from('tours')
@@ -3858,9 +4074,11 @@ async function saveDashboardData() {
         document.getElementById('totalPassengers').textContent = totalPassengers;
         updatePercentage();
 
+        hideSaveSpinner();
         alert('✅ Dati salvati!');
 
     } catch (error) {
+        hideSaveSpinner();
         console.error('Save dashboard data error:', error);
         alert('❌ Errore salvataggio:\n\n' + (error.message || 'Errore sconosciuto'));
     }
@@ -6111,16 +6329,12 @@ async function deleteRestaurant(id, name) {
 async function handleSaveSharedRestaurant(e) {
     e.preventDefault();
 
-    console.log('🔍 DEBUG: handleSaveSharedRestaurant called');
-    console.log('🔍 Event:', e);
-
     if (!currentTL || !currentTL.id) {
-        console.error('❌ currentTL not set:', currentTL);
         alert('❌ Errore: TL non identificato');
         return;
     }
 
-    console.log('✅ TL OK:', currentTL.id);
+    showSaveSpinner('Salvataggio ristorante...');
 
     // Parse tours_relevant from comma-separated string to array
     const toursRelevantStr = document.getElementById('sharedToursRelevant').value || '';
@@ -6139,25 +6353,25 @@ async function handleSaveSharedRestaurant(e) {
         cuisine: document.getElementById('sharedCuisineType').value || null,
         price_range: document.getElementById('sharedPriceRange').value || null,
 
-        // TL benefits (simplified - no useless percentages for commission)
+        // TL benefits
         gratuity: document.getElementById('sharedTlFree').checked,
         commission: document.getElementById('sharedHasCommission').checked,
-        commission_percentage: null, // Removed from form - nobody cares about exact %
-        discount: document.getElementById('sharedDiscountPerc').value ? true : false, // Has discount if % provided
+        commission_percentage: null,
+        discount: document.getElementById('sharedDiscountPerc').value ? true : false,
         discount_percentage: document.getElementById('sharedDiscountPerc').value ? parseInt(document.getElementById('sharedDiscountPerc').value) : null,
 
         // Location (hierarchical structure)
         country: document.getElementById('sharedRestaurantCountry').value,
         region: document.getElementById('sharedRestaurantRegion').value || null,
         city: document.getElementById('sharedRestaurantCity').value,
-        location: document.getElementById('sharedRestaurantCity').value, // Keep for backwards compatibility
+        location: document.getElementById('sharedRestaurantCity').value,
         address: document.getElementById('sharedRestaurantAddress').value || null,
-        contact_person: document.getElementById('sharedContactPerson').value || null, // NEW: Contact person name
-        phone: phoneNumbers.length > 0 ? phoneNumbers : null, // Array of phone numbers
+        contact_person: document.getElementById('sharedContactPerson').value || null,
+        phone: phoneNumbers.length > 0 ? phoneNumbers : null,
         google_maps_link: document.getElementById('sharedGoogleMaps').value || null,
-        plus_code: document.getElementById('sharedPlusCode').value || null, // NEW: Google Plus Code
-        apple_maps_link: document.getElementById('sharedAppleMaps').value || null, // NEW: Apple Maps support
-        what3words: document.getElementById('sharedWhat3Words').value || null, // NEW: what3words address
+        plus_code: document.getElementById('sharedPlusCode').value || null,
+        apple_maps_link: document.getElementById('sharedAppleMaps').value || null,
+        what3words: document.getElementById('sharedWhat3Words').value || null,
 
         // Hours
         opening_hours: document.getElementById('sharedOpeningHours').value || null,
@@ -6178,36 +6392,28 @@ async function handleSaveSharedRestaurant(e) {
         added_by: currentTL.id
     };
 
-    console.log('📦 Data to save:', tastesData);
-
     try {
         let result;
         const isEditing = window.currentEditingId;
 
-        console.log('💾 Saving to database... isEditing:', isEditing);
-
         if (isEditing) {
-            // UPDATE existing restaurant
             result = await supabaseClient
                 .from('blueriot_tastes')
                 .update(tastesData)
                 .eq('id', isEditing);
         } else {
-            // INSERT new restaurant
             result = await supabaseClient
                 .from('blueriot_tastes')
                 .insert([tastesData]);
         }
 
-        console.log('📊 Supabase result:', result);
-
         if (result.error) throw result.error;
 
-        console.log('✅ Save successful!');
+        hideSaveSpinner();
         alert(isEditing ? '✅ Ristorante modificato!' : '✅ Locale aggiunto al database ΤΔSΤΞ5!');
 
         // Reset and close
-        if (sharedRestaurantModal) sharedRestaurantModal.classList.remove('active');
+        closeModal('sharedRestaurantModal');
         if (sharedRestaurantForm) sharedRestaurantForm.reset();
 
         // Reset modal title and editing mode
@@ -6218,12 +6424,13 @@ async function handleSaveSharedRestaurant(e) {
         // Reload phone field (reset to 1)
         const phonesList = document.getElementById('phoneNumbersList');
         if (phonesList) {
-            phonesList.innerHTML = '<input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 14px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary);">';
+            phonesList.innerHTML = '<input type="tel" class="phone-input" placeholder="es. +39 06 1234567" style="width: 100%; padding: 16px; background: var(--dark-bg); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 16px;">';
         }
 
         loadSharedRestaurants();
 
     } catch (error) {
+        hideSaveSpinner();
         console.error('Save TASTES error:', error);
         alert('❌ Errore:\n\n' + (error.message || 'Errore sconosciuto'));
     }
@@ -7204,6 +7411,524 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         }
     });
 });
+
+// =====================================================
+// PART 1: GLOBAL SPINNER & MODAL UTILITIES
+// =====================================================
+
+function showSaveSpinner(message = 'Salvataggio...') {
+    let spinner = document.getElementById('globalSaveSpinner');
+    if (!spinner) {
+        spinner = document.createElement('div');
+        spinner.id = 'globalSaveSpinner';
+        spinner.className = 'save-spinner';
+        spinner.innerHTML = `
+            <div class="spinner-ring"></div>
+            <p id="spinnerMessage">${message}</p>
+        `;
+        document.body.appendChild(spinner);
+    } else {
+        document.getElementById('spinnerMessage').textContent = message;
+        spinner.style.display = 'block';
+    }
+}
+
+function hideSaveSpinner() {
+    const spinner = document.getElementById('globalSaveSpinner');
+    if (spinner) {
+        spinner.style.display = 'none';
+    }
+}
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+        // Add to history for back button support
+        if (history.state?.modal !== modalId) {
+            history.pushState({ modal: modalId }, '', `#${modalId}`);
+        }
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
+// Back button support for modals
+window.addEventListener('popstate', (event) => {
+    // Close all open modals when user goes back
+    document.querySelectorAll('.modal.active').forEach(m => {
+        m.classList.remove('active');
+    });
+    document.body.classList.remove('modal-open');
+});
+
+// =====================================================
+// PART 2: COMPREHENSIVE CITY DATABASE (200+ cities)
+// =====================================================
+
+const CITY_DATABASE = {
+    // ========== ITALY ==========
+
+    // Veneto
+    'venezia': { region: 'Veneto', country: 'Italia' },
+    'venice': { region: 'Veneto', country: 'Italia' },
+    'verona': { region: 'Veneto', country: 'Italia' },
+    'padova': { region: 'Veneto', country: 'Italia' },
+    'padua': { region: 'Veneto', country: 'Italia' },
+    'vicenza': { region: 'Veneto', country: 'Italia' },
+    'treviso': { region: 'Veneto', country: 'Italia' },
+    'rovigo': { region: 'Veneto', country: 'Italia' },
+    'belluno': { region: 'Veneto', country: 'Italia' },
+
+    // Toscana
+    'firenze': { region: 'Toscana', country: 'Italia' },
+    'florence': { region: 'Toscana', country: 'Italia' },
+    'pisa': { region: 'Toscana', country: 'Italia' },
+    'siena': { region: 'Toscana', country: 'Italia' },
+    'lucca': { region: 'Toscana', country: 'Italia' },
+    'arezzo': { region: 'Toscana', country: 'Italia' },
+    'grosseto': { region: 'Toscana', country: 'Italia' },
+    'livorno': { region: 'Toscana', country: 'Italia' },
+    'pistoia': { region: 'Toscana', country: 'Italia' },
+    'prato': { region: 'Toscana', country: 'Italia' },
+    'massa': { region: 'Toscana', country: 'Italia' },
+    'carrara': { region: 'Toscana', country: 'Italia' },
+
+    // Lazio
+    'roma': { region: 'Lazio', country: 'Italia' },
+    'rome': { region: 'Lazio', country: 'Italia' },
+    'frosinone': { region: 'Lazio', country: 'Italia' },
+    'latina': { region: 'Lazio', country: 'Italia' },
+    'rieti': { region: 'Lazio', country: 'Italia' },
+    'viterbo': { region: 'Lazio', country: 'Italia' },
+
+    // Lombardia
+    'milano': { region: 'Lombardia', country: 'Italia' },
+    'milan': { region: 'Lombardia', country: 'Italia' },
+    'bergamo': { region: 'Lombardia', country: 'Italia' },
+    'brescia': { region: 'Lombardia', country: 'Italia' },
+    'como': { region: 'Lombardia', country: 'Italia' },
+    'cremona': { region: 'Lombardia', country: 'Italia' },
+    'lecco': { region: 'Lombardia', country: 'Italia' },
+    'lodi': { region: 'Lombardia', country: 'Italia' },
+    'mantova': { region: 'Lombardia', country: 'Italia' },
+    'mantua': { region: 'Lombardia', country: 'Italia' },
+    'monza': { region: 'Lombardia', country: 'Italia' },
+    'pavia': { region: 'Lombardia', country: 'Italia' },
+    'sondrio': { region: 'Lombardia', country: 'Italia' },
+    'varese': { region: 'Lombardia', country: 'Italia' },
+
+    // Campania
+    'napoli': { region: 'Campania', country: 'Italia' },
+    'naples': { region: 'Campania', country: 'Italia' },
+    'salerno': { region: 'Campania', country: 'Italia' },
+    'avellino': { region: 'Campania', country: 'Italia' },
+    'benevento': { region: 'Campania', country: 'Italia' },
+    'caserta': { region: 'Campania', country: 'Italia' },
+    'sorrento': { region: 'Campania', country: 'Italia' },
+    'positano': { region: 'Campania', country: 'Italia' },
+    'amalfi': { region: 'Campania', country: 'Italia' },
+    'pompei': { region: 'Campania', country: 'Italia' },
+    'pompeii': { region: 'Campania', country: 'Italia' },
+
+    // Piemonte
+    'torino': { region: 'Piemonte', country: 'Italia' },
+    'turin': { region: 'Piemonte', country: 'Italia' },
+    'alessandria': { region: 'Piemonte', country: 'Italia' },
+    'asti': { region: 'Piemonte', country: 'Italia' },
+    'biella': { region: 'Piemonte', country: 'Italia' },
+    'cuneo': { region: 'Piemonte', country: 'Italia' },
+    'novara': { region: 'Piemonte', country: 'Italia' },
+    'verbania': { region: 'Piemonte', country: 'Italia' },
+    'vercelli': { region: 'Piemonte', country: 'Italia' },
+
+    // Liguria
+    'genova': { region: 'Liguria', country: 'Italia' },
+    'genoa': { region: 'Liguria', country: 'Italia' },
+    'imperia': { region: 'Liguria', country: 'Italia' },
+    'la spezia': { region: 'Liguria', country: 'Italia' },
+    'savona': { region: 'Liguria', country: 'Italia' },
+    'portofino': { region: 'Liguria', country: 'Italia' },
+    'cinque terre': { region: 'Liguria', country: 'Italia' },
+
+    // Emilia-Romagna
+    'bologna': { region: 'Emilia-Romagna', country: 'Italia' },
+    'ferrara': { region: 'Emilia-Romagna', country: 'Italia' },
+    'forli': { region: 'Emilia-Romagna', country: 'Italia' },
+    'modena': { region: 'Emilia-Romagna', country: 'Italia' },
+    'parma': { region: 'Emilia-Romagna', country: 'Italia' },
+    'piacenza': { region: 'Emilia-Romagna', country: 'Italia' },
+    'ravenna': { region: 'Emilia-Romagna', country: 'Italia' },
+    'reggio emilia': { region: 'Emilia-Romagna', country: 'Italia' },
+    'rimini': { region: 'Emilia-Romagna', country: 'Italia' },
+
+    // Sicilia
+    'palermo': { region: 'Sicilia', country: 'Italia' },
+    'catania': { region: 'Sicilia', country: 'Italia' },
+    'messina': { region: 'Sicilia', country: 'Italia' },
+    'siracusa': { region: 'Sicilia', country: 'Italia' },
+    'syracuse': { region: 'Sicilia', country: 'Italia' },
+    'agrigento': { region: 'Sicilia', country: 'Italia' },
+    'caltanissetta': { region: 'Sicilia', country: 'Italia' },
+    'enna': { region: 'Sicilia', country: 'Italia' },
+    'ragusa': { region: 'Sicilia', country: 'Italia' },
+    'trapani': { region: 'Sicilia', country: 'Italia' },
+    'taormina': { region: 'Sicilia', country: 'Italia' },
+
+    // Puglia
+    'bari': { region: 'Puglia', country: 'Italia' },
+    'brindisi': { region: 'Puglia', country: 'Italia' },
+    'foggia': { region: 'Puglia', country: 'Italia' },
+    'lecce': { region: 'Puglia', country: 'Italia' },
+    'taranto': { region: 'Puglia', country: 'Italia' },
+
+    // Sardegna
+    'cagliari': { region: 'Sardegna', country: 'Italia' },
+    'sassari': { region: 'Sardegna', country: 'Italia' },
+    'nuoro': { region: 'Sardegna', country: 'Italia' },
+    'oristano': { region: 'Sardegna', country: 'Italia' },
+    'olbia': { region: 'Sardegna', country: 'Italia' },
+
+    // Trentino-Alto Adige
+    'trento': { region: 'Trentino-Alto Adige', country: 'Italia' },
+    'bolzano': { region: 'Trentino-Alto Adige', country: 'Italia' },
+    'bozen': { region: 'Trentino-Alto Adige', country: 'Italia' },
+    'merano': { region: 'Trentino-Alto Adige', country: 'Italia' },
+
+    // Friuli-Venezia Giulia
+    'trieste': { region: 'Friuli-Venezia Giulia', country: 'Italia' },
+    'udine': { region: 'Friuli-Venezia Giulia', country: 'Italia' },
+    'gorizia': { region: 'Friuli-Venezia Giulia', country: 'Italia' },
+    'pordenone': { region: 'Friuli-Venezia Giulia', country: 'Italia' },
+
+    // Calabria
+    'catanzaro': { region: 'Calabria', country: 'Italia' },
+    'cosenza': { region: 'Calabria', country: 'Italia' },
+    'crotone': { region: 'Calabria', country: 'Italia' },
+    'reggio calabria': { region: 'Calabria', country: 'Italia' },
+    'vibo valentia': { region: 'Calabria', country: 'Italia' },
+
+    // Basilicata
+    'potenza': { region: 'Basilicata', country: 'Italia' },
+    'matera': { region: 'Basilicata', country: 'Italia' },
+
+    // Molise
+    'campobasso': { region: 'Molise', country: 'Italia' },
+    'isernia': { region: 'Molise', country: 'Italia' },
+
+    // Abruzzo
+    "l'aquila": { region: 'Abruzzo', country: 'Italia' },
+    'chieti': { region: 'Abruzzo', country: 'Italia' },
+    'pescara': { region: 'Abruzzo', country: 'Italia' },
+    'teramo': { region: 'Abruzzo', country: 'Italia' },
+
+    // Marche
+    'ancona': { region: 'Marche', country: 'Italia' },
+    'ascoli piceno': { region: 'Marche', country: 'Italia' },
+    'fermo': { region: 'Marche', country: 'Italia' },
+    'macerata': { region: 'Marche', country: 'Italia' },
+    'pesaro': { region: 'Marche', country: 'Italia' },
+    'urbino': { region: 'Marche', country: 'Italia' },
+
+    // Umbria
+    'perugia': { region: 'Umbria', country: 'Italia' },
+    'terni': { region: 'Umbria', country: 'Italia' },
+    'assisi': { region: 'Umbria', country: 'Italia' },
+
+    // Valle d'Aosta
+    'aosta': { region: "Valle d'Aosta", country: 'Italia' },
+
+    // ========== FRANCE ==========
+
+    'paris': { region: 'Île-de-France', country: 'France' },
+    'lyon': { region: 'Auvergne-Rhône-Alpes', country: 'France' },
+    'marseille': { region: 'Provence-Alpes-Côte d\'Azur', country: 'France' },
+    'nice': { region: 'Provence-Alpes-Côte d\'Azur', country: 'France' },
+    'nizza': { region: 'Provence-Alpes-Côte d\'Azur', country: 'France' },
+    'toulouse': { region: 'Occitanie', country: 'France' },
+    'bordeaux': { region: 'Nouvelle-Aquitaine', country: 'France' },
+    'nantes': { region: 'Pays de la Loire', country: 'France' },
+    'strasbourg': { region: 'Grand Est', country: 'France' },
+    'lille': { region: 'Hauts-de-France', country: 'France' },
+    'rennes': { region: 'Bretagne', country: 'France' },
+    'reims': { region: 'Grand Est', country: 'France' },
+    'toulon': { region: 'Provence-Alpes-Côte d\'Azur', country: 'France' },
+    'grenoble': { region: 'Auvergne-Rhône-Alpes', country: 'France' },
+    'dijon': { region: 'Bourgogne-Franche-Comté', country: 'France' },
+    'angers': { region: 'Pays de la Loire', country: 'France' },
+    'nimes': { region: 'Occitanie', country: 'France' },
+    'villeurbanne': { region: 'Auvergne-Rhône-Alpes', country: 'France' },
+    'saint-etienne': { region: 'Auvergne-Rhône-Alpes', country: 'France' },
+    'le havre': { region: 'Normandie', country: 'France' },
+    'cannes': { region: 'Provence-Alpes-Côte d\'Azur', country: 'France' },
+    'monaco': { region: 'Monaco', country: 'Monaco' },
+
+    // ========== SPAIN ==========
+
+    'madrid': { region: 'Community of Madrid', country: 'Spain' },
+    'barcelona': { region: 'Catalonia', country: 'Spain' },
+    'seville': { region: 'Andalusia', country: 'Spain' },
+    'sevilla': { region: 'Andalusia', country: 'Spain' },
+    'valencia': { region: 'Valencian Community', country: 'Spain' },
+    'malaga': { region: 'Andalusia', country: 'Spain' },
+    'murcia': { region: 'Region of Murcia', country: 'Spain' },
+    'palma': { region: 'Balearic Islands', country: 'Spain' },
+    'bilbao': { region: 'Basque Country', country: 'Spain' },
+    'alicante': { region: 'Valencian Community', country: 'Spain' },
+    'cordoba': { region: 'Andalusia', country: 'Spain' },
+    'valladolid': { region: 'Castile and León', country: 'Spain' },
+    'vigo': { region: 'Galicia', country: 'Spain' },
+    'gijon': { region: 'Asturias', country: 'Spain' },
+    'granada': { region: 'Andalusia', country: 'Spain' },
+    'toledo': { region: 'Castilla-La Mancha', country: 'Spain' },
+    'san sebastian': { region: 'Basque Country', country: 'Spain' },
+    'ibiza': { region: 'Balearic Islands', country: 'Spain' },
+
+    // ========== GERMANY ==========
+
+    'berlin': { region: 'Berlin', country: 'Germany' },
+    'munich': { region: 'Bavaria', country: 'Germany' },
+    'munchen': { region: 'Bavaria', country: 'Germany' },
+    'hamburg': { region: 'Hamburg', country: 'Germany' },
+    'cologne': { region: 'North Rhine-Westphalia', country: 'Germany' },
+    'koln': { region: 'North Rhine-Westphalia', country: 'Germany' },
+    'frankfurt': { region: 'Hesse', country: 'Germany' },
+    'stuttgart': { region: 'Baden-Württemberg', country: 'Germany' },
+    'dusseldorf': { region: 'North Rhine-Westphalia', country: 'Germany' },
+    'dortmund': { region: 'North Rhine-Westphalia', country: 'Germany' },
+    'essen': { region: 'North Rhine-Westphalia', country: 'Germany' },
+    'leipzig': { region: 'Saxony', country: 'Germany' },
+    'bremen': { region: 'Bremen', country: 'Germany' },
+    'dresden': { region: 'Saxony', country: 'Germany' },
+    'hanover': { region: 'Lower Saxony', country: 'Germany' },
+    'nuremberg': { region: 'Bavaria', country: 'Germany' },
+    'nurnberg': { region: 'Bavaria', country: 'Germany' },
+
+    // ========== UK ==========
+
+    'london': { region: 'England', country: 'United Kingdom' },
+    'edinburgh': { region: 'Scotland', country: 'United Kingdom' },
+    'manchester': { region: 'England', country: 'United Kingdom' },
+    'birmingham': { region: 'England', country: 'United Kingdom' },
+    'liverpool': { region: 'England', country: 'United Kingdom' },
+    'glasgow': { region: 'Scotland', country: 'United Kingdom' },
+    'bristol': { region: 'England', country: 'United Kingdom' },
+    'cardiff': { region: 'Wales', country: 'United Kingdom' },
+    'belfast': { region: 'Northern Ireland', country: 'United Kingdom' },
+    'leeds': { region: 'England', country: 'United Kingdom' },
+    'oxford': { region: 'England', country: 'United Kingdom' },
+    'cambridge': { region: 'England', country: 'United Kingdom' },
+    'bath': { region: 'England', country: 'United Kingdom' },
+
+    // ========== PORTUGAL ==========
+
+    'lisbon': { region: 'Lisbon', country: 'Portugal' },
+    'lisboa': { region: 'Lisbon', country: 'Portugal' },
+    'porto': { region: 'Norte', country: 'Portugal' },
+    'faro': { region: 'Algarve', country: 'Portugal' },
+    'braga': { region: 'Norte', country: 'Portugal' },
+    'coimbra': { region: 'Centro', country: 'Portugal' },
+
+    // ========== GREECE ==========
+
+    'athens': { region: 'Attica', country: 'Greece' },
+    'atene': { region: 'Attica', country: 'Greece' },
+    'thessaloniki': { region: 'Central Macedonia', country: 'Greece' },
+    'patras': { region: 'Western Greece', country: 'Greece' },
+    'santorini': { region: 'South Aegean', country: 'Greece' },
+    'mykonos': { region: 'South Aegean', country: 'Greece' },
+    'rhodes': { region: 'South Aegean', country: 'Greece' },
+    'crete': { region: 'Crete', country: 'Greece' },
+
+    // ========== SWITZERLAND ==========
+
+    'zurich': { region: 'Zurich', country: 'Switzerland' },
+    'geneva': { region: 'Geneva', country: 'Switzerland' },
+    'ginevra': { region: 'Geneva', country: 'Switzerland' },
+    'basel': { region: 'Basel-Stadt', country: 'Switzerland' },
+    'bern': { region: 'Bern', country: 'Switzerland' },
+    'lausanne': { region: 'Vaud', country: 'Switzerland' },
+    'lucerne': { region: 'Lucerne', country: 'Switzerland' },
+
+    // ========== AUSTRIA ==========
+
+    'vienna': { region: 'Vienna', country: 'Austria' },
+    'wien': { region: 'Vienna', country: 'Austria' },
+    'salzburg': { region: 'Salzburg', country: 'Austria' },
+    'innsbruck': { region: 'Tyrol', country: 'Austria' },
+    'graz': { region: 'Styria', country: 'Austria' },
+    'linz': { region: 'Upper Austria', country: 'Austria' },
+
+    // ========== NETHERLANDS ==========
+
+    'amsterdam': { region: 'North Holland', country: 'Netherlands' },
+    'rotterdam': { region: 'South Holland', country: 'Netherlands' },
+    'the hague': { region: 'South Holland', country: 'Netherlands' },
+    'utrecht': { region: 'Utrecht', country: 'Netherlands' },
+    'eindhoven': { region: 'North Brabant', country: 'Netherlands' },
+    'groningen': { region: 'Groningen', country: 'Netherlands' },
+
+    // ========== BELGIUM ==========
+
+    'brussels': { region: 'Brussels', country: 'Belgium' },
+    'bruxelles': { region: 'Brussels', country: 'Belgium' },
+    'antwerp': { region: 'Flemish Region', country: 'Belgium' },
+    'ghent': { region: 'Flemish Region', country: 'Belgium' },
+    'bruges': { region: 'Flemish Region', country: 'Belgium' },
+    'liege': { region: 'Walloon Region', country: 'Belgium' },
+
+    // ========== USA ==========
+
+    'new york': { region: 'New York', country: 'USA' },
+    'los angeles': { region: 'California', country: 'USA' },
+    'chicago': { region: 'Illinois', country: 'USA' },
+    'houston': { region: 'Texas', country: 'USA' },
+    'phoenix': { region: 'Arizona', country: 'USA' },
+    'philadelphia': { region: 'Pennsylvania', country: 'USA' },
+    'san antonio': { region: 'Texas', country: 'USA' },
+    'san diego': { region: 'California', country: 'USA' },
+    'dallas': { region: 'Texas', country: 'USA' },
+    'san jose': { region: 'California', country: 'USA' },
+    'austin': { region: 'Texas', country: 'USA' },
+    'san francisco': { region: 'California', country: 'USA' },
+    'seattle': { region: 'Washington', country: 'USA' },
+    'denver': { region: 'Colorado', country: 'USA' },
+    'washington': { region: 'District of Columbia', country: 'USA' },
+    'boston': { region: 'Massachusetts', country: 'USA' },
+    'las vegas': { region: 'Nevada', country: 'USA' },
+    'miami': { region: 'Florida', country: 'USA' },
+    'orlando': { region: 'Florida', country: 'USA' },
+
+    // ========== OTHER MAJOR TOURIST DESTINATIONS ==========
+
+    // Turkey
+    'istanbul': { region: 'Istanbul', country: 'Turkey' },
+    'ankara': { region: 'Ankara', country: 'Turkey' },
+    'antalya': { region: 'Antalya', country: 'Turkey' },
+
+    // Egypt
+    'cairo': { region: 'Cairo', country: 'Egypt' },
+    'alexandria': { region: 'Alexandria', country: 'Egypt' },
+
+    // Dubai
+    'dubai': { region: 'Dubai', country: 'UAE' },
+    'abu dhabi': { region: 'Abu Dhabi', country: 'UAE' },
+
+    // Morocco
+    'marrakech': { region: 'Marrakech-Safi', country: 'Morocco' },
+    'casablanca': { region: 'Casablanca-Settat', country: 'Morocco' },
+
+    // Croatia
+    'zagreb': { region: 'Zagreb County', country: 'Croatia' },
+    'split': { region: 'Split-Dalmatia County', country: 'Croatia' },
+    'dubrovnik': { region: 'Dubrovnik-Neretva County', country: 'Croatia' },
+
+    // Czech Republic
+    'prague': { region: 'Prague', country: 'Czech Republic' },
+    'praga': { region: 'Prague', country: 'Czech Republic' },
+
+    // Poland
+    'warsaw': { region: 'Masovian Voivodeship', country: 'Poland' },
+    'krakow': { region: 'Lesser Poland Voivodeship', country: 'Poland' },
+    'cracovia': { region: 'Lesser Poland Voivodeship', country: 'Poland' },
+
+    // Hungary
+    'budapest': { region: 'Budapest', country: 'Hungary' },
+
+    // Romania
+    'bucharest': { region: 'Bucharest', country: 'Romania' },
+
+    // Ireland
+    'dublin': { region: 'Leinster', country: 'Ireland' },
+    'dublino': { region: 'Leinster', country: 'Ireland' },
+    'cork': { region: 'Munster', country: 'Ireland' },
+
+    // Denmark
+    'copenhagen': { region: 'Capital Region', country: 'Denmark' },
+    'copenaghen': { region: 'Capital Region', country: 'Denmark' },
+
+    // Sweden
+    'stockholm': { region: 'Stockholm County', country: 'Sweden' },
+    'stoccolma': { region: 'Stockholm County', country: 'Sweden' },
+    'gothenburg': { region: 'Västra Götaland County', country: 'Sweden' },
+
+    // Norway
+    'oslo': { region: 'Oslo', country: 'Norway' },
+    'bergen': { region: 'Vestland', country: 'Norway' },
+
+    // Finland
+    'helsinki': { region: 'Uusimaa', country: 'Finland' },
+
+    // Iceland
+    'reykjavik': { region: 'Capital Region', country: 'Iceland' }
+};
+
+function setupCityAutofill(cityInputId, regionInputId, countryInputId) {
+    const cityInput = document.getElementById(cityInputId);
+    const regionInput = document.getElementById(regionInputId);
+    const countryInput = document.getElementById(countryInputId);
+
+    if (!cityInput) return;
+
+    cityInput.addEventListener('input', (e) => {
+        const city = e.target.value.toLowerCase().trim();
+        const cityData = CITY_DATABASE[city];
+
+        if (cityData && regionInput && countryInput) {
+            regionInput.value = cityData.region;
+            countryInput.value = cityData.country;
+
+            // Visual feedback
+            cityInput.classList.add('auto-filled');
+            regionInput.classList.add('auto-filled');
+            countryInput.classList.add('auto-filled');
+        } else {
+            if (regionInput) {
+                regionInput.value = '';
+                regionInput.classList.remove('auto-filled');
+            }
+            if (countryInput) {
+                countryInput.value = '';
+                countryInput.classList.remove('auto-filled');
+            }
+            cityInput.classList.remove('auto-filled');
+        }
+    });
+}
+
+// =====================================================
+// PART 3: GESTURE SUPPORT (Swipe back)
+// =====================================================
+
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+}, {passive: true});
+
+document.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndY = e.changedTouches[0].screenY;
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+
+    // Swipe right (back gesture) - only if swiping from left edge
+    if (diffX > 100 && Math.abs(diffY) < 50 && touchStartX < 50) {
+        if (history.length > 1) {
+            history.back();
+        }
+    }
+}, {passive: true});
+
     </script>
 </body>
 </html>

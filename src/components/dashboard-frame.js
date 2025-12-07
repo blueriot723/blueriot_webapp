@@ -71,7 +71,7 @@ export class DashboardFrame extends HTMLElement {
                         <button data-v="routes">R0UT35</button>
                         <button data-v="stay">SΤΔΥ</button>
                         <button data-v="node">NODΞ</button>
-                        <div class="nav-section">Strumenti</div>
+                        <div class="nav-section">T00L5</div>
                         <button data-v="etickets">🎫 eTICKΞTS</button>
                         <button data-v="pdfocr">📄 PDF 0CR</button>
                     </nav>

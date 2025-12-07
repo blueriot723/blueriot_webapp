@@ -1970,7 +1970,7 @@
                 const { data, error } = await db.from('blueriot_routes').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessuna tratta trovata</div>'; return; }
-                list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.from_location||'?'} → ${i.to_location||'?'}</div><div class="data-card-meta">🚌 ${i.type||'N/A'} | ⏱️ ${i.duration||'N/A'}</div></div>`).join('');
+                list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.start_point||'?'} → ${i.end_point||'?'}</div><div class="data-card-meta">🚌 ${i.transport_type||'N/A'} | ⏱️ ${i.duration||'N/A'}</div></div>`).join('');
             } catch(e) { list.innerHTML = '<div class="empty-state">Errore caricamento</div>'; }
         }
 
@@ -1982,7 +1982,7 @@
                 const { data, error } = await db.from('blueriot_stay').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessuna struttura trovata</div>'; return; }
-                list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.name||'N/A'}</div><div class="data-card-meta">📍 ${i.city||'N/A'} | 🏨 ${i.type||'N/A'}</div></div>`).join('');
+                list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.name||'N/A'}</div><div class="data-card-meta">📍 ${i.location||'N/A'} | 🏨 ${i.type||'N/A'}</div></div>`).join('');
             } catch(e) { list.innerHTML = '<div class="empty-state">Errore caricamento</div>'; }
         }
 
@@ -2000,8 +2000,8 @@
         $('closeRouteModal').addEventListener('click', () => $('routeModal').classList.remove('active'));
         $('cancelRoute').addEventListener('click', () => $('routeModal').classList.remove('active'));
         $('saveRoute').addEventListener('click', async () => {
-            const d = { from_location: $('routeFrom').value, to_location: $('routeTo').value, type: $('routeType').value, company: $('routeCompany').value, duration: $('routeDuration').value, price: $('routePrice').value, notes: $('routeNotes').value };
-            if (!d.from_location || !d.to_location) return alert('Partenza e Arrivo obbligatori');
+            const d = { start_point: $('routeFrom').value, end_point: $('routeTo').value, transport_type: $('routeType').value, operator_name: $('routeCompany').value, duration: $('routeDuration').value, price: $('routePrice').value, notes: $('routeNotes').value };
+            if (!d.start_point || !d.end_point) return alert('Partenza e Arrivo obbligatori');
             try { await db.from('blueriot_routes').insert([d]); $('routeModal').classList.remove('active'); loadRoutes(); } catch(e) { alert(e.message); }
         });
 
@@ -2009,8 +2009,8 @@
         $('closeStayModal').addEventListener('click', () => $('stayModal').classList.remove('active'));
         $('cancelStay').addEventListener('click', () => $('stayModal').classList.remove('active'));
         $('saveStay').addEventListener('click', async () => {
-            const d = { name: $('stayName').value, city: $('stayCity').value, type: $('stayType').value, address: $('stayAddress').value, price: $('stayPrice').value, contact: $('stayContact').value, notes: $('stayNotes').value };
-            if (!d.name || !d.city) return alert('Nome e Città obbligatori');
+            const d = { name: $('stayName').value, location: $('stayCity').value, type: $('stayType').value, address: $('stayAddress').value, price_range: $('stayPrice').value, contact: $('stayContact').value, notes: $('stayNotes').value };
+            if (!d.name || !d.location) return alert('Nome e Località obbligatori');
             try { await db.from('blueriot_stay').insert([d]); $('stayModal').classList.remove('active'); loadStay(); } catch(e) { alert(e.message); }
         });
 
@@ -2040,7 +2040,14 @@
                 const { data: { user } } = await db.auth.getUser();
                 if (!user) return;
 
-                const { data, error } = await db.from('tours').select('*').eq('user_id', user.id).order('start_date', { ascending: false });
+                // Get TL profile first
+                const { data: tlProfile } = await db.from('tl_users').select('id').eq('user_id', user.id).single();
+                if (!tlProfile) {
+                    list.innerHTML = '<div class="empty-state">Profilo TL non trovato</div>';
+                    return;
+                }
+
+                const { data, error } = await db.from('tours').select('*').eq('tl_id', tlProfile.id).order('start_date', { ascending: false });
                 if (error) throw error;
 
                 tours = data || [];
@@ -2052,6 +2059,7 @@
 
                 list.innerHTML = tours.map(t => {
                     const status = getTourStatus(t);
+                    const duration = calcDuration(t.start_date, t.end_date);
                     return `
                         <div class="tour-card ${status}" data-tour-id="${t.id}" onclick="openTourDetail('${t.id}')">
                             <div class="tour-card-header">
@@ -2060,9 +2068,9 @@
                             </div>
                             <div class="tour-card-name">${t.name || 'Tour senza nome'}</div>
                             <div class="tour-card-info">
-                                <span>👥 ${t.pax || 0} pax</span>
+                                <span>👥 ${t.passenger_count || 0} pax</span>
                                 <span>📅 ${formatDate(t.start_date)}</span>
-                                <span>⏱️ ${t.duration || 0}gg</span>
+                                <span>⏱️ ${duration}gg</span>
                             </div>
                         </div>
                     `;
@@ -2073,13 +2081,19 @@
             }
         }
 
+        function calcDuration(startDate, endDate) {
+            if (!startDate || !endDate) return 1;
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
         // Get tour status based on dates
         function getTourStatus(tour) {
             const today = new Date();
             today.setHours(0,0,0,0);
             const start = new Date(tour.start_date);
-            const end = new Date(tour.end_date || tour.start_date);
-            end.setDate(end.getDate() + (tour.duration || 1) - 1);
+            const end = tour.end_date ? new Date(tour.end_date) : new Date(start);
 
             if (today < start) return 'upcoming';
             if (today > end) return 'completed';
@@ -2109,15 +2123,15 @@
             // Update info
             $('tourDetailTitle').textContent = currentTour.name || 'Tour';
             $('tourCode').textContent = currentTour.code || '-';
-            $('tourPax').textContent = currentTour.pax || '-';
-            $('tourTL').textContent = currentTour.tl_count || '1';
+            $('tourPax').textContent = currentTour.passenger_count || '-';
+            $('tourTL').textContent = '1'; // TL count not stored in tours table
 
-            const startDate = currentTour.start_date ? formatDate(currentTour.start_date) : '-';
-            const duration = currentTour.duration || 0;
-            $('tourDates').textContent = `${startDate} (${duration}gg)`;
+            const startDateFmt = currentTour.start_date ? formatDate(currentTour.start_date) : '-';
+            const duration = calcDuration(currentTour.start_date, currentTour.end_date);
+            $('tourDates').textContent = `${startDateFmt} (${duration}gg)`;
 
-            // Load tour items
-            await loadTourItems();
+            // Load tour days and items
+            await loadTourDays();
 
             // Render calendar
             renderTourCalendar();
@@ -2140,7 +2154,7 @@
             if (!currentTour || !currentTour.start_date) return;
 
             const container = $('calendarDays');
-            const duration = currentTour.duration || 7;
+            const duration = calcDuration(currentTour.start_date, currentTour.end_date);
             const startDate = new Date(currentTour.start_date);
 
             $('calTitle').textContent = `${currentTour.name} - ${duration} giorni`;
@@ -2151,7 +2165,8 @@
                 date.setDate(date.getDate() + i);
                 const dayNum = i + 1;
                 const dateStr = date.toISOString().split('T')[0];
-                const dayItems = (currentTour.items || []).filter(item => item.day === dayNum);
+                const tourDay = (currentTour.days || []).find(d => d.day_number === dayNum);
+                const dayItems = tourDay ? (tourDay.items || []) : [];
                 const hasItems = dayItems.length > 0;
 
                 html += `
@@ -2184,23 +2199,44 @@
             renderDayItems(dayNum);
         }
 
-        // Load tour items from database
-        async function loadTourItems() {
+        // Load tour days and their items from database
+        async function loadTourDays() {
             if (!db || !currentTour) return;
             try {
-                const { data, error } = await db.from('tour_items').select('*').eq('tour_id', currentTour.id).order('day', { ascending: true }).order('time', { ascending: true });
-                if (error) throw error;
-                currentTour.items = data || [];
+                // Load tour_days
+                const { data: daysData, error: daysError } = await db.from('tour_days')
+                    .select('*')
+                    .eq('tour_id', currentTour.id)
+                    .order('day_number', { ascending: true });
+                if (daysError) throw daysError;
+
+                currentTour.days = daysData || [];
+
+                // Load day_items for each day
+                if (currentTour.days.length > 0) {
+                    const dayIds = currentTour.days.map(d => d.id);
+                    const { data: itemsData, error: itemsError } = await db.from('day_items')
+                        .select('*')
+                        .in('day_id', dayIds)
+                        .order('position', { ascending: true });
+                    if (itemsError) throw itemsError;
+
+                    // Attach items to their respective days
+                    currentTour.days.forEach(day => {
+                        day.items = (itemsData || []).filter(item => item.day_id === day.id);
+                    });
+                }
             } catch(e) {
-                console.error('Error loading tour items:', e);
-                currentTour.items = [];
+                console.error('Error loading tour days:', e);
+                currentTour.days = [];
             }
         }
 
         // Render day items
         function renderDayItems(dayNum) {
             const list = $('dayItemsList');
-            const items = (currentTour.items || []).filter(item => item.day === dayNum);
+            const tourDay = (currentTour.days || []).find(d => d.day_number === dayNum);
+            const items = tourDay ? (tourDay.items || []) : [];
 
             if (!items.length) {
                 list.innerHTML = '<div class="empty-state" style="padding: 20px;">Nessun elemento per questo giorno</div>';
@@ -2208,8 +2244,9 @@
             }
 
             list.innerHTML = items.map(item => {
-                const typeClass = item.type || 'activity';
+                const typeClass = item.item_type || 'activity';
                 const icons = { activity: '🎯', restaurant: '🍽️', transport: '🚌', hotel: '🏨', info: 'ℹ️', link: '🔗', map: '🗺️' };
+                const timeStr = item.start_time ? item.start_time.substring(0, 5) : '';
                 return `
                     <div class="day-item ${typeClass}" data-item-id="${item.id}">
                         <span class="day-item-icon">${icons[typeClass] || '📌'}</span>
@@ -2217,7 +2254,7 @@
                             <div class="day-item-title">${item.title || 'N/A'}</div>
                             <div class="day-item-meta">${item.description || ''}</div>
                         </div>
-                        <span class="day-item-time">${item.time || ''}</span>
+                        <span class="day-item-time">${timeStr}</span>
                     </div>
                 `;
             }).join('');
@@ -2268,14 +2305,12 @@
         $('saveTour').addEventListener('click', async () => {
             const code = $('tourCodeInput').value.trim();
             const name = $('tourNameInput').value.trim();
-            const pax = parseInt($('tourPaxInput').value) || 0;
-            const tlCount = parseInt($('tourTLInput').value) || 1;
+            const passengerCount = parseInt($('tourPaxInput').value) || 0;
             const startDate = $('tourStartDate').value;
-            const duration = parseInt($('tourDuration').value) || 0;
+            const endDate = $('tourEndDate').value;
             const operator = $('tourOperator').value;
-            const notes = $('tourNotesInput').value.trim();
 
-            if (!code || !name || !startDate || !pax) {
+            if (!code || !name || !startDate || !passengerCount) {
                 alert('Compila i campi obbligatori: Codice, Nome, Data Inizio, Passeggeri');
                 return;
             }
@@ -2286,16 +2321,19 @@
                 const { data: { user } } = await db.auth.getUser();
                 if (!user) return alert('Utente non autenticato');
 
+                // Get TL profile
+                const { data: tlProfile } = await db.from('tl_users').select('id').eq('user_id', user.id).single();
+                if (!tlProfile) return alert('Profilo TL non trovato. Registrati come Tour Leader.');
+
                 const tourData = {
-                    user_id: user.id,
+                    tl_id: tlProfile.id,
                     code,
                     name,
-                    pax,
-                    tl_count: tlCount,
+                    passenger_count: passengerCount,
                     start_date: startDate,
-                    duration: duration || 7,
+                    end_date: endDate || startDate,
                     operator,
-                    notes,
+                    status: 'upcoming',
                     created_at: new Date().toISOString()
                 };
 
@@ -2334,33 +2372,57 @@
         $('saveDayItem').addEventListener('click', async () => {
             if (!currentTour || !selectedDay) return;
 
-            const type = $('dayItemType').value;
+            const itemType = $('dayItemType').value;
             const title = $('dayItemTitle').value.trim();
-            const time = $('dayItemTime').value;
+            const startTime = $('dayItemTime').value || null;
             const description = $('dayItemDesc').value.trim();
-            const link = $('dayItemLink').value.trim();
 
             if (!title) return alert('Inserisci un titolo');
             if (!db) return alert('Database non disponibile');
 
             try {
+                // First, get or create the tour_day for this day
+                let tourDay = (currentTour.days || []).find(d => d.day_number === selectedDay);
+
+                if (!tourDay) {
+                    // Calculate the date for this day
+                    const startDate = new Date(currentTour.start_date);
+                    startDate.setDate(startDate.getDate() + selectedDay - 1);
+                    const dayDate = startDate.toISOString().split('T')[0];
+
+                    // Create the tour_day
+                    const { data: newDay, error: dayError } = await db.from('tour_days').insert([{
+                        tour_id: currentTour.id,
+                        day_number: selectedDay,
+                        date: dayDate
+                    }]).select().single();
+                    if (dayError) throw dayError;
+                    tourDay = newDay;
+                    if (!currentTour.days) currentTour.days = [];
+                    currentTour.days.push(tourDay);
+                }
+
+                // Get current max position
+                const existingItems = tourDay.items || [];
+                const maxPosition = existingItems.length > 0 ? Math.max(...existingItems.map(i => i.position || 0)) : 0;
+
                 const itemData = {
                     tour_id: currentTour.id,
-                    day: selectedDay,
-                    type,
+                    day_id: tourDay.id,
+                    item_type: itemType,
                     title,
-                    time,
+                    start_time: startTime,
                     description,
-                    link
+                    position: maxPosition + 1
                 };
 
-                const { error } = await db.from('tour_items').insert([itemData]);
+                const { error } = await db.from('day_items').insert([itemData]);
                 if (error) throw error;
 
                 $('dayItemModal').classList.remove('active');
 
                 // Reload items
-                await loadTourItems();
+                await loadTourDays();
                 renderTourCalendar();
                 renderDayItems(selectedDay);
             } catch(e) {
@@ -2375,8 +2437,10 @@
             if (!confirm(`Eliminare il tour "${currentTour.name}"? Questa azione è irreversibile.`)) return;
 
             try {
-                // Delete tour items first
-                await db.from('tour_items').delete().eq('tour_id', currentTour.id);
+                // Delete day_items first (has FK to tour_days)
+                await db.from('day_items').delete().eq('tour_id', currentTour.id);
+                // Delete tour_days
+                await db.from('tour_days').delete().eq('tour_id', currentTour.id);
                 // Delete tour
                 const { error } = await db.from('tours').delete().eq('id', currentTour.id);
                 if (error) throw error;

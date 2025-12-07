@@ -251,7 +251,16 @@ git pull origin main
 
 ## Changelog Recente
 
-### 7 Dicembre 2024
+### 7 Dicembre 2024 (Sessione 2)
+- Implementato sistema eTicketing completo:
+  - Upload template biglietto (immagine)
+  - Selezione posizione nome con click
+  - Gestione lista passeggeri
+  - Generazione biglietti con Canvas API
+  - Download biglietti PNG
+- Aggiunto CSS per eTicket section
+
+### 7 Dicembre 2024 (Sessione 1)
 - Reimplementato tutto in single-file HTML (no modules, no Shadow DOM)
 - Aggiunto NODΞ tour management completo
 - Corretto nomi tabelle Supabase
@@ -262,3 +271,14 @@ git pull origin main
 - Pagina nera → Single file HTML
 - Auth non funziona → Chiave JWT asimmetrica
 - TASTES non carica → Nome tabella `blueriot_tastes`
+
+---
+
+## Come Usare eTicketing
+
+1. **Vai su NODΞ** → Seleziona un tour → Clicca **🎫 eTickets**
+2. **Carica Template**: Immagine del biglietto vuoto (JPG/PNG)
+3. **Posiziona Nome**: Clicca 📍 poi clicca sull'immagine dove vuoi il nome
+4. **Aggiungi Passeggeri**: Manualmente o con inserimento multiplo
+5. **Genera Biglietti**: Crea automaticamente un biglietto per ogni passeggero
+6. **Scarica**: Ogni biglietto puo' essere scaricato come PNG

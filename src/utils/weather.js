@@ -225,7 +225,7 @@ export async function getWeatherForecast(cityName) {
         const url = `${OPEN_METEO_API}/forecast?` + new URLSearchParams({
             latitude: coords.lat,
             longitude: coords.lon,
-            daily: 'temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode',
+            daily: 'temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,weathercode',
             timezone: 'auto',
             forecast_days: '7'
         });
@@ -249,6 +249,7 @@ export async function getWeatherForecast(cityName) {
                 temp_min: Math.round(data.daily.temperature_2m_min[i]),
                 temp_max: Math.round(data.daily.temperature_2m_max[i]),
                 precipitation_probability: data.daily.precipitation_probability_max[i] || 0,
+                precipitation_mm: data.daily.precipitation_sum?.[i] || 0,
                 weather_code: data.daily.weathercode[i],
                 ...weatherInfo
             };

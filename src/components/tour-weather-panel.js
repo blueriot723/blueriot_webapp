@@ -167,6 +167,44 @@ export class TourWeatherPanel extends HTMLElement {
                     color: #00bfff;
                 }
 
+                .location-input {
+                    background: rgba(0, 0, 0, 0.3);
+                    border: 1px solid rgba(0, 240, 255, 0.3);
+                    border-radius: 4px;
+                    color: #fff;
+                    padding: 4px 8px;
+                    font-size: 12px;
+                    width: 120px;
+                    font-family: inherit;
+                }
+                .location-input:focus {
+                    outline: none;
+                    border-color: #00f0ff;
+                    box-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+                }
+                .location-input::placeholder {
+                    color: rgba(255, 255, 255, 0.4);
+                }
+                .location-btn {
+                    background: rgba(0, 240, 255, 0.2);
+                    border: 1px solid rgba(0, 240, 255, 0.3);
+                    color: #00f0ff;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    margin-left: 4px;
+                }
+                .location-btn:hover {
+                    background: rgba(0, 240, 255, 0.3);
+                }
+                .day-location {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    margin-top: 4px;
+                }
+
                 .loading {
                     text-align: center;
                     padding: 40px;
@@ -355,6 +393,80 @@ export class TourWeatherPanel extends HTMLElement {
                 ${daysToShow.length > 0 ? this.renderDaysTimeline(daysToShow) : this.renderForecastGrid()}
             </div>
         `;
+
+        // Setup location input listeners
+        this.setupLocationListeners();
+    }
+
+    setupLocationListeners() {
+        // Refresh weather button
+        this.shadowRoot.querySelectorAll('.location-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const dayId = e.target.dataset.dayId;
+                const dayNum = parseInt(e.target.dataset.dayNum);
+                const input = this.shadowRoot.querySelector(`.location-input[data-day-num="${dayNum}"]`);
+                const newCity = input?.value?.trim();
+
+                if (!newCity) return;
+
+                // Save and refresh weather
+                await this.updateDayLocation(dayId, dayNum, newCity);
+            });
+        });
+
+        // Save on Enter key
+        this.shadowRoot.querySelectorAll('.location-input').forEach(input => {
+            input.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    const dayId = e.target.dataset.dayId;
+                    const dayNum = parseInt(e.target.dataset.dayNum);
+                    const newCity = e.target.value?.trim();
+
+                    if (newCity) {
+                        await this.updateDayLocation(dayId, dayNum, newCity);
+                    }
+                }
+            });
+        });
+    }
+
+    async updateDayLocation(dayId, dayNum, city) {
+        try {
+            // Update in database if we have an ID
+            if (dayId) {
+                const { error } = await window.supabaseClient
+                    .from('tour_days')
+                    .update({ city: city })
+                    .eq('id', dayId);
+
+                if (error) throw error;
+            }
+
+            // Update local data
+            const dayIndex = this.tourDays.findIndex(d => d.day_number === dayNum);
+            if (dayIndex >= 0) {
+                this.tourDays[dayIndex].city = city;
+            }
+
+            // Fetch weather for the new city
+            const forecast = await getWeatherForecast(city);
+            if (forecast) {
+                // Find the weather for this day's date
+                const day = this.tourDays.find(d => d.day_number === dayNum);
+                if (day && day.calendar_date) {
+                    const dayWeather = forecast.find(w => w.date === day.calendar_date);
+                    if (dayWeather) {
+                        this.weatherData.set(day.calendar_date, dayWeather);
+                    }
+                }
+            }
+
+            // Re-render
+            this.renderTourDetail();
+
+        } catch (error) {
+            console.error('Update location error:', error);
+        }
     }
 
     generateDaysFromDates(startDate, endDate) {
@@ -394,7 +506,16 @@ export class TourWeatherPanel extends HTMLElement {
                             </div>
                             <div class="day-info">
                                 <h4>${day.title || day.city || 'In viaggio'}</h4>
-                                <p>${day.city ? '📍 ' + day.city : ''} ${day.description || ''}</p>
+                                <div class="day-location">
+                                    <span>📍</span>
+                                    <input type="text" class="location-input"
+                                           data-day-id="${day.id || ''}"
+                                           data-day-num="${day.day_number}"
+                                           value="${day.city || ''}"
+                                           placeholder="Luogo...">
+                                    <button class="location-btn" data-day-id="${day.id || ''}" data-day-num="${day.day_number}">↻</button>
+                                </div>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${day.description || ''}</p>
                             </div>
                             <div class="day-weather">
                                 ${weather ? `
@@ -402,7 +523,7 @@ export class TourWeatherPanel extends HTMLElement {
                                     <div>
                                         <div class="weather-temp">${formatTemp(weather.temp_min, weather.temp_max)}</div>
                                         <div class="weather-condition">${weather.condition}</div>
-                                        ${weather.precipitation_probability > 20 ? `<div class="weather-rain">💧 ${weather.precipitation_probability}%</div>` : ''}
+                                        ${weather.precipitation_mm > 0 ? `<div class="weather-rain">💧 ${weather.precipitation_mm.toFixed(1)} mm</div>` : ''}
                                     </div>
                                 ` : `
                                     <div class="weather-icon">❓</div>

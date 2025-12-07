@@ -36,7 +36,13 @@ export class PdfOcrPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                :host { display: block; }
+                :host {
+                    display: block;
+                    --neon-cyan: #00f0ff;
+                    --neon-fuchsia: #ff00ff;
+                    --text-secondary: #8899aa;
+                    --bg-dark: #0a0e27;
+                }
 
                 .mode-tabs {
                     display: flex;
@@ -47,21 +53,22 @@ export class PdfOcrPanel extends HTMLElement {
                     flex: 1;
                     padding: 16px;
                     background: rgba(10, 20, 30, 0.6);
-                    border: 1px solid rgba(0, 212, 255, 0.2);
+                    border: 1px solid rgba(0, 240, 255, 0.2);
                     border-radius: 8px;
-                    color: #8899aa;
+                    color: var(--text-secondary);
                     font-size: 14px;
                     cursor: pointer;
                     transition: all 0.3s ease;
                     text-align: center;
+                    font-family: 'Orbitron', sans-serif;
                 }
                 .mode-tab:hover {
-                    border-color: rgba(0, 212, 255, 0.4);
+                    border-color: rgba(0, 240, 255, 0.4);
                 }
                 .mode-tab.active {
-                    background: rgba(0, 212, 255, 0.1);
-                    border-color: #00d4ff;
-                    color: #00d4ff;
+                    background: rgba(0, 240, 255, 0.1);
+                    border-color: var(--neon-cyan);
+                    color: var(--neon-cyan);
                 }
                 .mode-icon {
                     font-size: 24px;
@@ -69,7 +76,7 @@ export class PdfOcrPanel extends HTMLElement {
                 }
 
                 .upload-area {
-                    border: 2px dashed rgba(0, 212, 255, 0.3);
+                    border: 2px dashed rgba(0, 240, 255, 0.3);
                     border-radius: 12px;
                     padding: 48px 24px;
                     text-align: center;
@@ -79,12 +86,12 @@ export class PdfOcrPanel extends HTMLElement {
                     transition: all 0.3s ease;
                 }
                 .upload-area:hover {
-                    border-color: #00d4ff;
-                    background: rgba(0, 212, 255, 0.05);
+                    border-color: var(--neon-cyan);
+                    background: rgba(0, 240, 255, 0.05);
                 }
                 .upload-area.dragover {
-                    border-color: #ff4fd8;
-                    background: rgba(255, 79, 216, 0.05);
+                    border-color: var(--neon-fuchsia);
+                    background: rgba(255, 0, 255, 0.05);
                 }
                 .upload-icon {
                     font-size: 56px;
@@ -101,8 +108,8 @@ export class PdfOcrPanel extends HTMLElement {
                 .spinner {
                     width: 48px;
                     height: 48px;
-                    border: 3px solid rgba(0, 212, 255, 0.2);
-                    border-top-color: #00d4ff;
+                    border: 3px solid rgba(0, 240, 255, 0.2);
+                    border-top-color: var(--neon-cyan);
                     border-radius: 50%;
                     animation: spin 1s linear infinite;
                     margin: 0 auto 16px;
@@ -117,13 +124,13 @@ export class PdfOcrPanel extends HTMLElement {
                 }
                 .result-card {
                     background: rgba(10, 20, 30, 0.6);
-                    border: 1px solid rgba(0, 212, 255, 0.2);
+                    border: 1px solid rgba(0, 240, 255, 0.2);
                     border-radius: 12px;
                     padding: 20px;
                     transition: all 0.3s ease;
                 }
                 .result-card:hover {
-                    border-color: rgba(0, 212, 255, 0.4);
+                    border-color: rgba(0, 240, 255, 0.4);
                 }
                 .result-header {
                     display: flex;
@@ -180,11 +187,11 @@ export class PdfOcrPanel extends HTMLElement {
                     transition: all 0.2s ease;
                 }
                 .btn-primary {
-                    background: linear-gradient(135deg, #00d4ff, #0099cc);
+                    background: linear-gradient(135deg, #00f0ff, #0080ff);
                     color: white;
                 }
                 .btn-primary:hover {
-                    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+                    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
                 }
                 .btn-success {
                     background: linear-gradient(135deg, #00ff88, #00cc66);
@@ -196,7 +203,7 @@ export class PdfOcrPanel extends HTMLElement {
 
                 .passengers-list {
                     background: rgba(10, 20, 30, 0.6);
-                    border: 1px solid rgba(0, 212, 255, 0.2);
+                    border: 1px solid rgba(0, 240, 255, 0.2);
                     border-radius: 12px;
                     overflow: hidden;
                 }
@@ -205,18 +212,18 @@ export class PdfOcrPanel extends HTMLElement {
                     justify-content: space-between;
                     align-items: center;
                     padding: 16px 20px;
-                    background: rgba(0, 212, 255, 0.1);
-                    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+                    background: rgba(0, 240, 255, 0.1);
+                    border-bottom: 1px solid rgba(0, 240, 255, 0.2);
                 }
                 .passengers-count {
-                    color: #00d4ff;
+                    color: var(--neon-cyan);
                     font-weight: 600;
                 }
                 .passenger-row {
                     display: flex;
                     align-items: center;
                     padding: 12px 20px;
-                    border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+                    border-bottom: 1px solid rgba(0, 240, 255, 0.1);
                 }
                 .passenger-row:last-child {
                     border-bottom: none;
@@ -225,7 +232,7 @@ export class PdfOcrPanel extends HTMLElement {
                     margin-right: 12px;
                     width: 18px;
                     height: 18px;
-                    accent-color: #00d4ff;
+                    accent-color: var(--neon-cyan);
                 }
                 .passenger-name {
                     color: white;
@@ -236,7 +243,7 @@ export class PdfOcrPanel extends HTMLElement {
                     width: 100%;
                     padding: 12px 16px;
                     background: rgba(10, 20, 30, 0.8);
-                    border: 1px solid rgba(0, 212, 255, 0.3);
+                    border: 1px solid rgba(0, 240, 255, 0.3);
                     border-radius: 8px;
                     color: white;
                     font-size: 14px;
@@ -250,9 +257,9 @@ export class PdfOcrPanel extends HTMLElement {
                     font-size: 14px;
                 }
                 .alert-info {
-                    background: rgba(0, 212, 255, 0.1);
-                    border: 1px solid rgba(0, 212, 255, 0.3);
-                    color: #00d4ff;
+                    background: rgba(0, 240, 255, 0.1);
+                    border: 1px solid rgba(0, 240, 255, 0.3);
+                    color: var(--neon-cyan);
                 }
                 .alert-success {
                     background: rgba(0, 255, 136, 0.1);
@@ -267,7 +274,7 @@ export class PdfOcrPanel extends HTMLElement {
             </style>
 
             <div>
-                <h2 style="color: #00d4ff; margin-bottom: 8px;">📄 PDF OCR Engine</h2>
+                <h2 style="color: var(--neon-cyan); margin-bottom: 8px; font-family: 'Orbitron', sans-serif; font-size: 24px;">PDF 0CR</h2>
                 <p style="color: #8899aa; margin-bottom: 24px;">
                     Estrai automaticamente informazioni da documenti PDF
                 </p>
@@ -299,7 +306,7 @@ export class PdfOcrPanel extends HTMLElement {
                 <!-- Processing -->
                 <div id="processing" style="display: none;" class="processing">
                     <div class="spinner"></div>
-                    <div style="color: #00d4ff; font-size: 16px;" id="processingStatus">Elaborazione PDF...</div>
+                    <div style="color: var(--neon-cyan); font-size: 16px;" id="processingStatus">Elaborazione PDF...</div>
                 </div>
 
                 <!-- Entity Results -->

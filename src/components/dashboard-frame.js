@@ -5,6 +5,7 @@ import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
+import './tastes-panel.js';
 
 export class DashboardFrame extends HTMLElement {
     constructor() {
@@ -85,7 +86,7 @@ export class DashboardFrame extends HTMLElement {
                             <h1 style="margin-top:30px;">SYNDICATE MATRIX</h1>
                             <p style="color:var(--text-secondary);">Seleziona una sezione dal menu</p>
                         </div>
-                        <div id="tastes" class="page"><h1>ΤΔSΤΞ5</h1><div id="tastes-c">Caricamento...</div></div>
+                        <div id="tastes" class="page"><h1>ΤΔSΤΞ5</h1><tastes-panel></tastes-panel></div>
                         <div id="routes" class="page"><h1>R0UT35</h1><div id="routes-c">Caricamento...</div></div>
                         <div id="stay" class="page"><h1>SΤΔΥ</h1><div id="stay-c">Caricamento...</div></div>
                         <div id="node" class="page">
@@ -124,23 +125,7 @@ export class DashboardFrame extends HTMLElement {
         if(!c) return; // etickets and pdfocr don't have -c containers, they use web components
 
         try {
-            if(v==='tastes') {
-                // Try blueriot_tastes first, fall back to shared_restaurants
-                let data, error;
-                const result1 = await window.supabaseClient.from('blueriot_tastes').select('*').order('rating_avg',{ascending:false}).limit(30);
-                if (result1.error) {
-                    const result2 = await window.supabaseClient.from('shared_restaurants').select('*').order('rating_avg',{ascending:false}).limit(30);
-                    data = result2.data;
-                    error = result2.error;
-                } else {
-                    data = result1.data;
-                    error = result1.error;
-                }
-                if(error) throw error;
-                c.innerHTML = !data?.length ? '<p style="color:#8899aa;">Nessun ristorante nel database</p>' :
-                    '<div class="grid">' + data.map(r=>`<div class="card"><h3>${r.name||r.restaurant_name||'N/A'}</h3><p>📍 ${r.city||r.location||'N/A'}</p><p>🍽️ ${r.cuisine||r.type||'N/A'}</p>${r.rating_avg ? `<p>⭐ ${parseFloat(r.rating_avg).toFixed(1)}</p>` : ''}</div>`).join('') + '</div>';
-
-            } else if(v==='routes') {
+            if(v==='routes') {
                 const {data,error} = await window.supabaseClient.from('blueriot_routes').select('*').order('created_at',{ascending:false}).limit(30);
                 if(error) throw error;
                 c.innerHTML = !data?.length ? '<p style="color:#8899aa;">Nessuna tratta nel database</p>' :

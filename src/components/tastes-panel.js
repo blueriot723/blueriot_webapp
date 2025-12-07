@@ -21,12 +21,20 @@ export class TastesPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('../styles/base.css');
-                @import url('../styles/layout.css');
-                @import url('../styles/components.css');
-
                 :host {
                     display: block;
+                    --neon-cyan: #00f0ff;
+                    --neon-fuchsia: #ff00ff;
+                    --text-secondary: #8899aa;
+                    --bg-card: rgba(10, 14, 39, 0.6);
+                    --spacing-xs: 4px;
+                    --spacing-sm: 8px;
+                    --spacing-md: 12px;
+                    --spacing-lg: 16px;
+                    --spacing-xl: 24px;
+                    --spacing-2xl: 32px;
+                    --radius-sm: 4px;
+                    --radius-lg: 12px;
                 }
 
                 .header-actions {
@@ -34,6 +42,8 @@ export class TastesPanel extends HTMLElement {
                     justify-content: space-between;
                     align-items: center;
                     margin-bottom: var(--spacing-xl);
+                    flex-wrap: wrap;
+                    gap: 12px;
                 }
 
                 .restaurants-grid {
@@ -44,15 +54,15 @@ export class TastesPanel extends HTMLElement {
 
                 .restaurant-card {
                     background: var(--bg-card);
-                    border: 1px solid rgba(0, 200, 255, 0.2);
+                    border: 1px solid rgba(0, 240, 255, 0.2);
                     border-radius: var(--radius-lg);
                     padding: var(--spacing-lg);
-                    transition: all var(--transition-normal);
+                    transition: all 0.3s ease;
                 }
 
                 .restaurant-card:hover {
-                    border-color: rgba(0, 200, 255, 0.4);
-                    box-shadow: 0 0 12px rgba(0, 200, 255, 0.3);
+                    border-color: rgba(0, 240, 255, 0.4);
+                    box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
                 }
 
                 .restaurant-header {
@@ -65,7 +75,7 @@ export class TastesPanel extends HTMLElement {
                 .restaurant-title {
                     font-size: 18px;
                     font-weight: 600;
-                    color: var(--text-primary);
+                    color: #fff;
                     margin-bottom: var(--spacing-xs);
                 }
 
@@ -83,27 +93,61 @@ export class TastesPanel extends HTMLElement {
                     gap: var(--spacing-sm);
                 }
 
+                .btn {
+                    padding: 10px 16px;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                .btn-primary {
+                    background: linear-gradient(135deg, #00f0ff, #0080ff);
+                    color: white;
+                }
+                .btn-primary:hover {
+                    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+                }
+
+                .btn-secondary {
+                    background: rgba(0, 240, 255, 0.1);
+                    border: 1px solid rgba(0, 240, 255, 0.3);
+                    color: var(--neon-cyan);
+                }
+
+                .btn-danger {
+                    background: rgba(255, 71, 87, 0.1);
+                    border: 1px solid rgba(255, 71, 87, 0.3);
+                    color: #ff4757;
+                }
+
                 .btn-icon {
-                    width: 32px;
-                    height: 32px;
+                    width: 36px;
+                    height: 36px;
                     padding: 0;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 14px;
+                    font-size: 16px;
                 }
 
-                .badges {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: var(--spacing-sm);
-                    margin-top: var(--spacing-md);
+                .badge {
+                    display: inline-block;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    background: rgba(0, 240, 255, 0.15);
+                    color: var(--neon-cyan);
+                    border: 1px solid rgba(0, 240, 255, 0.3);
                 }
 
                 .empty-state {
                     text-align: center;
                     padding: var(--spacing-2xl);
-                    color: var(--text-muted);
+                    color: var(--text-secondary);
                 }
 
                 .modal-backdrop {
@@ -126,14 +170,14 @@ export class TastesPanel extends HTMLElement {
                 }
 
                 .modal-content {
-                    background: var(--bg-card);
-                    border: 1px solid rgba(0, 200, 255, 0.3);
+                    background: #0a0e27;
+                    border: 1px solid rgba(0, 240, 255, 0.3);
                     border-radius: var(--radius-lg);
                     max-width: 600px;
                     width: 100%;
                     max-height: 90vh;
                     overflow-y: auto;
-                    box-shadow: 0 0 24px rgba(0, 200, 255, 0.5), 0 0 48px rgba(0, 200, 255, 0.3);
+                    box-shadow: 0 0 24px rgba(0, 240, 255, 0.5), 0 0 48px rgba(0, 240, 255, 0.3);
                 }
 
                 .modal-header {
@@ -141,7 +185,7 @@ export class TastesPanel extends HTMLElement {
                     align-items: center;
                     justify-content: space-between;
                     padding: var(--spacing-lg);
-                    border-bottom: 1px solid rgba(0, 200, 255, 0.2);
+                    border-bottom: 1px solid rgba(0, 240, 255, 0.2);
                 }
 
                 .modal-title {
@@ -155,7 +199,7 @@ export class TastesPanel extends HTMLElement {
                     width: 32px;
                     height: 32px;
                     background: transparent;
-                    border: 1px solid rgba(255, 79, 216, 0.3);
+                    border: 1px solid rgba(255, 0, 255, 0.3);
                     border-radius: var(--radius-sm);
                     color: var(--neon-fuchsia);
                     font-size: 20px;
@@ -168,10 +212,52 @@ export class TastesPanel extends HTMLElement {
 
                 .modal-footer {
                     padding: var(--spacing-lg);
-                    border-top: 1px solid rgba(0, 200, 255, 0.2);
+                    border-top: 1px solid rgba(0, 240, 255, 0.2);
                     display: flex;
                     gap: var(--spacing-md);
                     justify-content: flex-end;
+                }
+
+                .form-group {
+                    margin-bottom: 16px;
+                }
+
+                .form-label {
+                    display: block;
+                    color: var(--text-secondary);
+                    font-size: 13px;
+                    margin-bottom: 6px;
+                }
+
+                .form-input, .form-select, .form-textarea {
+                    width: 100%;
+                    padding: 12px;
+                    background: rgba(0, 0, 0, 0.3);
+                    border: 1px solid rgba(0, 240, 255, 0.2);
+                    border-radius: 6px;
+                    color: #fff;
+                    font-size: 14px;
+                    box-sizing: border-box;
+                }
+
+                .form-input:focus, .form-select:focus, .form-textarea:focus {
+                    outline: none;
+                    border-color: var(--neon-cyan);
+                    box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+                }
+
+                .form-textarea {
+                    min-height: 80px;
+                    resize: vertical;
+                }
+
+                .alert-error {
+                    background: rgba(255, 71, 87, 0.1);
+                    border: 1px solid rgba(255, 71, 87, 0.3);
+                    color: #ff4757;
+                    padding: 12px;
+                    border-radius: 6px;
+                    font-size: 13px;
                 }
             </style>
 
@@ -188,7 +274,7 @@ export class TastesPanel extends HTMLElement {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3 class="modal-title" id="modalTitle">Aggiungi Locale</h3>
-                        <button class="modal-close" id="closeBtn">�</button>
+                        <button class="modal-close" id="closeBtn">X</button>
                     </div>
                     <div class="modal-body">
                         <form id="restaurantForm">
@@ -197,7 +283,7 @@ export class TastesPanel extends HTMLElement {
                                 <input type="text" class="form-input" id="name" required placeholder="es. Trattoria da Mario">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Citt� *</label>
+                                <label class="form-label">Citta *</label>
                                 <input type="text" class="form-input" id="city" required placeholder="es. Roma">
                             </div>
                             <div class="form-group">
@@ -211,18 +297,19 @@ export class TastesPanel extends HTMLElement {
                             <div class="form-group">
                                 <label class="form-label">Tipo</label>
                                 <select class="form-select" id="type">
-                                    <option value="restaurant"><} Ristorante</option>
-                                    <option value="bar"> Bar/Caff�</option>
-                                    <option value="gelateria"><f Gelateria</option>
-                                    <option value="pub"><z Pub</option>
-                                    <option value="other">=� Altro</option>
+                                    <option value="restaurant">Ristorante</option>
+                                    <option value="bar">Bar/Caffe</option>
+                                    <option value="gelateria">Gelateria</option>
+                                    <option value="pizzeria">Pizzeria</option>
+                                    <option value="pub">Pub</option>
+                                    <option value="other">Altro</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Note</label>
                                 <textarea class="form-textarea" id="notes" placeholder="Note aggiuntive..."></textarea>
                             </div>
-                            <div class="alert alert-error" id="error" style="display: none;"></div>
+                            <div class="alert-error" id="error" style="display: none;"></div>
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -260,10 +347,18 @@ export class TastesPanel extends HTMLElement {
             const supabase = window.supabaseClient;
             if (!supabase) throw new Error('Supabase not initialized');
 
-            const response = await supabase
-                .from('tastes_database')
+            // Try blueriot_tastes first, fall back to shared_restaurants
+            let response = await supabase
+                .from('blueriot_tastes')
                 .select('*')
                 .order('city', { ascending: true });
+
+            if (response.error) {
+                response = await supabase
+                    .from('shared_restaurants')
+                    .select('*')
+                    .order('city', { ascending: true });
+            }
 
             if (response.error) throw response.error;
 
@@ -271,7 +366,7 @@ export class TastesPanel extends HTMLElement {
             this.displayRestaurants();
         } catch (error) {
             console.error('Load error:', error);
-            container.innerHTML = '<div class="empty-state" style="color: var(--error);">Errore caricamento</div>';
+            container.innerHTML = '<div class="empty-state" style="color: #ff4757;">Errore caricamento: ' + error.message + '</div>';
         }
     }
 
@@ -283,33 +378,31 @@ export class TastesPanel extends HTMLElement {
             return;
         }
 
-        const html = [];
-        for (const r of this.restaurants) {
-            const typeLabel = this.getTypeLabel(r.type || 'restaurant');
-            const cityText = r.city || 'N/A';
-            const addressHtml = r.address ? '<div class="restaurant-meta"><� ' + r.address + '</div>' : '';
-            const phoneHtml = r.phone ? '<div class="restaurant-meta">=� ' + r.phone + '</div>' : '';
-            const notesHtml = r.notes ? '<div class="restaurant-meta" style="margin-top: var(--spacing-md);">=� ' + r.notes + '</div>' : '';
+        container.innerHTML = this.restaurants.map(r => {
+            const typeLabel = this.getTypeLabel(r.type || r.cuisine || 'restaurant');
+            const cityText = r.city || r.location || 'N/A';
+            const ratingHtml = r.rating_avg ? `<div class="restaurant-meta">* ${parseFloat(r.rating_avg).toFixed(1)}</div>` : '';
 
-            html.push('<div class="restaurant-card">');
-            html.push('<div class="restaurant-header">');
-            html.push('<div>');
-            html.push('<div class="restaurant-title">' + (r.name || 'N/A') + '</div>');
-            html.push('<span class="badge badge-cyan">' + typeLabel + '</span>');
-            html.push('</div>');
-            html.push('<div class="restaurant-actions">');
-            html.push('<button class="btn btn-secondary btn-icon" data-id="' + r.id + '" data-action="edit"></button>');
-            html.push('<button class="btn btn-danger btn-icon" data-id="' + r.id + '" data-action="delete">=�</button>');
-            html.push('</div>');
-            html.push('</div>');
-            html.push('<div class="restaurant-meta">=� ' + cityText + '</div>');
-            html.push(addressHtml);
-            html.push(phoneHtml);
-            html.push(notesHtml);
-            html.push('</div>');
-        }
-
-        container.innerHTML = html.join('');
+            return `
+                <div class="restaurant-card">
+                    <div class="restaurant-header">
+                        <div>
+                            <div class="restaurant-title">${r.name || r.restaurant_name || 'N/A'}</div>
+                            <span class="badge">${typeLabel}</span>
+                        </div>
+                        <div class="restaurant-actions">
+                            <button class="btn btn-secondary btn-icon" data-id="${r.id}" data-action="edit">E</button>
+                            <button class="btn btn-danger btn-icon" data-id="${r.id}" data-action="delete">X</button>
+                        </div>
+                    </div>
+                    <div class="restaurant-meta">@ ${cityText}</div>
+                    ${r.address ? `<div class="restaurant-meta"># ${r.address}</div>` : ''}
+                    ${r.phone ? `<div class="restaurant-meta">T ${r.phone}</div>` : ''}
+                    ${ratingHtml}
+                    ${r.notes ? `<div class="restaurant-meta" style="margin-top: 8px;">N ${r.notes}</div>` : ''}
+                </div>
+            `;
+        }).join('');
 
         container.querySelectorAll('[data-action]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -326,13 +419,15 @@ export class TastesPanel extends HTMLElement {
 
     getTypeLabel(type) {
         const labels = {
-            restaurant: '<} Ristorante',
-            bar: ' Bar/Caff�',
-            gelateria: '<f Gelateria',
-            pub: '<z Pub',
-            other: '=� Altro'
+            restaurant: 'Ristorante',
+            ristorante: 'Ristorante',
+            bar: 'Bar/Caffe',
+            gelateria: 'Gelateria',
+            pizzeria: 'Pizzeria',
+            pub: 'Pub',
+            other: 'Altro'
         };
-        return labels[type] || type;
+        return labels[type?.toLowerCase()] || type || 'Locale';
     }
 
     openAddModal() {
@@ -352,7 +447,7 @@ export class TastesPanel extends HTMLElement {
         this.currentEdit = restaurant;
 
         this.shadowRoot.getElementById('name').value = restaurant.name || '';
-        this.shadowRoot.getElementById('city').value = restaurant.city || '';
+        this.shadowRoot.getElementById('city').value = restaurant.city || restaurant.location || '';
         this.shadowRoot.getElementById('address').value = restaurant.address || '';
         this.shadowRoot.getElementById('phone').value = restaurant.phone || '';
         this.shadowRoot.getElementById('type').value = restaurant.type || 'restaurant';
@@ -378,7 +473,7 @@ export class TastesPanel extends HTMLElement {
         const saveBtn = this.shadowRoot.getElementById('saveBtn');
 
         if (!name || !city) {
-            error.textContent = 'Nome e Citt� sono obbligatori';
+            error.textContent = 'Nome e Citta sono obbligatori';
             error.style.display = 'block';
             return;
         }
@@ -393,13 +488,13 @@ export class TastesPanel extends HTMLElement {
 
             if (this.currentEdit) {
                 const response = await supabase
-                    .from('tastes_database')
+                    .from('blueriot_tastes')
                     .update(data)
                     .eq('id', this.currentEdit.id);
                 if (response.error) throw response.error;
             } else {
                 const response = await supabase
-                    .from('tastes_database')
+                    .from('blueriot_tastes')
                     .insert([data]);
                 if (response.error) throw response.error;
             }
@@ -425,7 +520,7 @@ export class TastesPanel extends HTMLElement {
         try {
             const supabase = window.supabaseClient;
             const response = await supabase
-                .from('tastes_database')
+                .from('blueriot_tastes')
                 .delete()
                 .eq('id', id);
 
@@ -434,7 +529,7 @@ export class TastesPanel extends HTMLElement {
             await this.loadRestaurants();
         } catch (err) {
             console.error('Delete error:', err);
-            alert('Errore durante l eliminazione: ' + err.message);
+            alert('Errore durante eliminazione: ' + err.message);
         }
     }
 }

@@ -41,19 +41,19 @@ export class Router {
             return;
         }
 
-        // Hide all screens
+        // Hide all screens using classList (works with CSS)
         document.querySelectorAll('[data-screen]').forEach(screen => {
-            screen.style.display = 'none';
+            screen.classList.remove('active');
         });
 
         // Execute route handler
         this.currentRoute = path;
         await handler(params);
 
-        // Show the screen
+        // Show the screen using classList
         const screen = document.querySelector(`[data-screen="${path}"]`);
         if (screen) {
-            screen.style.display = 'block';
+            screen.classList.add('active');
         }
     }
 

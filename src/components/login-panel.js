@@ -19,9 +19,8 @@ export class LoginPanel extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap">
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-
                 /* CSS Variables - must be defined here for Shadow DOM */
                 :host {
                     --neon-cyan: #00eaff;
@@ -417,7 +416,7 @@ export class LoginPanel extends HTMLElement {
                         <div class="logo-container">
                             <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
                         </div>
-                        <img src="matrix.svg" alt="Matrix" class="matrix-logo">
+                        <img src="matrix.png" alt="Matrix" class="matrix-logo">
                     </div>
 
                     <div class="language-buttons">

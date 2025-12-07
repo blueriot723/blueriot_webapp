@@ -15,26 +15,35 @@ class AuthManager {
      * Initialize Supabase client
      */
     init() {
-        const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
+        try {
+            const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
 
-        this.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Expose globally for components
-        window.supabaseClient = this.supabase;
-
-        // Setup auth state listener
-        this.supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log('🔐 Auth state changed:', event);
-
-            if (event === 'SIGNED_IN' && session) {
-                await this.handleSignIn(session);
-            } else if (event === 'SIGNED_OUT') {
-                this.handleSignOut();
+            if (!window.supabase) {
+                console.error('❌ Supabase library not loaded');
+                return;
             }
-        });
 
-        console.log('✅ Auth manager initialized');
+            this.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Expose globally for components
+            window.supabaseClient = this.supabase;
+
+            // Setup auth state listener
+            this.supabase.auth.onAuthStateChange(async (event, session) => {
+                console.log('🔐 Auth state changed:', event);
+
+                if (event === 'SIGNED_IN' && session) {
+                    await this.handleSignIn(session);
+                } else if (event === 'SIGNED_OUT') {
+                    this.handleSignOut();
+                }
+            });
+
+            console.log('✅ Auth manager initialized');
+        } catch (error) {
+            console.error('❌ Auth manager init failed:', error);
+        }
     }
 
     /**
@@ -89,6 +98,10 @@ class AuthManager {
      * Sign in with email and password
      */
     async signInWithEmail(email, password) {
+        if (!this.supabase) {
+            throw new Error('Supabase not initialized');
+        }
+
         const { data, error } = await this.supabase.auth.signInWithPassword({
             email,
             password
@@ -102,6 +115,10 @@ class AuthManager {
      * Sign in with Google OAuth
      */
     async signInWithGoogle() {
+        if (!this.supabase) {
+            throw new Error('Supabase not initialized');
+        }
+
         const { data, error } = await this.supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
@@ -117,6 +134,7 @@ class AuthManager {
      * Sign out
      */
     async signOut() {
+        if (!this.supabase) return;
         await this.supabase.auth.signOut();
     }
 
@@ -124,14 +142,24 @@ class AuthManager {
      * Check if user is authenticated
      */
     async checkAuth() {
-        const { data: { session } } = await this.supabase.auth.getSession();
-
-        if (session) {
-            await this.handleSignIn(session);
-            return true;
+        if (!this.supabase) {
+            console.warn('⚠️ Supabase not initialized, skipping auth check');
+            return false;
         }
 
-        return false;
+        try {
+            const { data: { session } } = await this.supabase.auth.getSession();
+
+            if (session) {
+                await this.handleSignIn(session);
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error('❌ Auth check failed:', error);
+            return false;
+        }
     }
 
     /**

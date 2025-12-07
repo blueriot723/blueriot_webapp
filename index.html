@@ -6,21 +6,20 @@
     <title>BlueRiot Syndicate</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --neon-cyan: #00eaff;
-            --neon-blue: #00C8FF;
+            --neon-cyan: #00d4ff;
+            --neon-cyan-dim: rgba(0, 212, 255, 0.6);
             --neon-fuchsia: #ff4fd8;
-            --bg-pure-dark: #050505;
-            --bg-sidebar: #0a0d10;
-            --bg-card: #0D1117;
+            --bg-dark: #0a0a0a;
+            --bg-sidebar: #0d0d0d;
+            --bg-card: rgba(20, 25, 30, 0.5);
+            --border-subtle: rgba(80, 90, 100, 0.3);
             --text-primary: #FFFFFF;
-            --text-secondary: #8B9DC3;
-            --text-muted: #525866;
-            --error: #FF4757;
-            --success: #00FF88;
+            --text-secondary: #8899aa;
+            --text-muted: #556677;
         }
 
         * {
@@ -29,124 +28,114 @@
             box-sizing: border-box;
         }
 
-        html {
-            font-size: 16px;
-            overflow-x: hidden;
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
             font-family: 'Share Tech Mono', monospace;
-            background: var(--bg-pure-dark);
+            background: var(--bg-dark);
             color: var(--text-primary);
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow-x: hidden;
         }
 
         /* ===== SCREENS ===== */
         .screen {
             display: none;
-            min-height: 100vh;
-            min-height: 100dvh;
+            width: 100%;
+            height: 100%;
         }
         .screen.active {
             display: flex;
         }
 
-        /* ===== MAIN LAYOUT ===== */
-        .app-container {
+        /* ===== LAYOUT ===== */
+        .app-layout {
             display: flex;
             width: 100%;
-            min-height: 100vh;
-            min-height: 100dvh;
+            height: 100%;
         }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 280px;
-            min-width: 280px;
+            width: 240px;
+            min-width: 240px;
             background: var(--bg-sidebar);
             display: flex;
             flex-direction: column;
-            padding: 32px 20px;
-            border-right: 1px solid rgba(0, 234, 255, 0.1);
-            position: relative;
-            z-index: 100;
+            padding: 24px 20px;
+            border-right: 1px solid var(--border-subtle);
         }
 
-        .sidebar-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 40px;
+        .brand {
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
         }
 
-        .logo-container {
-            background: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.1);
+        .brand-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #a0b0c0;
         }
 
-        .blueriot-logo {
-            width: 160px;
-            height: auto;
+        .brand-name span {
             display: block;
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
-        .matrix-logo {
-            width: 120px;
+        .sidebar-logo {
+            width: 100%;
+            max-width: 160px;
             height: auto;
-            filter: drop-shadow(0 0 15px rgba(0, 234, 255, 0.6));
+            margin: 0 auto 32px;
+            display: block;
+            filter: brightness(0.8);
         }
 
-        /* ===== NAV BUTTONS - RIGHT NEON 45° ===== */
-        .nav-buttons {
+        /* ===== NAV MENU ===== */
+        .nav-menu {
             display: flex;
             flex-direction: column;
             gap: 8px;
             flex: 1;
         }
 
-        .nav-btn {
-            position: relative;
-            width: 100%;
-            height: 52px;
-            background: rgba(10, 14, 20, 0.95);
+        .nav-item {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            background: none;
             border: none;
-            color: var(--text-primary);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            cursor: pointer;
             text-align: left;
-            padding-left: 20px;
-            transition: all 0.3s ease;
-            clip-path: polygon(0 0, 100% 0, 100% 65%, 94% 100%, 0 100%);
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: color 0.2s ease;
         }
 
-        .nav-btn::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 4px;
-            height: 50%;
-            background: linear-gradient(180deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
-            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-            transition: all 0.3s ease;
+        .nav-item:hover {
+            color: var(--text-primary);
         }
 
-        .nav-btn:hover::after,
-        .nav-btn.active::after {
-            background: linear-gradient(180deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
-            box-shadow: 0 0 10px var(--neon-fuchsia), 0 0 20px var(--neon-fuchsia);
+        .nav-item.active {
+            color: var(--neon-cyan);
         }
 
-        .nav-btn.active {
-            background: rgba(255, 79, 216, 0.1);
+        .sidebar-bottom-logo {
+            width: 100%;
+            max-width: 140px;
+            height: auto;
+            margin: auto auto 0;
+            display: block;
+            filter: brightness(0.7);
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -154,75 +143,149 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            padding: 24px 32px;
+            overflow: hidden;
             position: relative;
+        }
+
+        /* Top decoration */
+        .top-decoration {
+            position: relative;
+            height: 80px;
+            margin-bottom: 16px;
+        }
+
+        .top-logo {
+            width: 200px;
+            height: auto;
+            filter: brightness(0.6) blur(1px);
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Neon top line with 45° angle */
+        .neon-line-top {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 40px;
+            height: 2px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan-dim);
+        }
+
+        .neon-line-top::after {
+            content: '';
+            position: absolute;
+            right: -40px;
+            top: 0;
+            width: 56px;
+            height: 2px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan-dim);
+            transform: rotate(45deg);
+            transform-origin: left center;
+        }
+
+        /* ===== WORK AREA FRAME ===== */
+        .work-frame {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
-        /* Top neon line */
-        .main-content::before {
+        /* Left neon border with 45° corners */
+        .work-frame::before {
             content: '';
             position: absolute;
-            top: 0;
             left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-cyan) 70%, transparent 100%);
-            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-            z-index: 10;
+            top: 30px;
+            bottom: 30px;
+            width: 2px;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                var(--neon-cyan) 10%,
+                var(--neon-cyan) 90%,
+                transparent 100%
+            );
+            box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan-dim);
         }
 
-        .content-area {
+        /* Top-left corner */
+        .work-frame::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 30px;
+            height: 2px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+            transform: rotate(45deg);
+            transform-origin: left center;
+        }
+
+        .corner-bottom-left {
+            position: absolute;
+            left: 0;
+            bottom: 8px;
+            width: 30px;
+            height: 2px;
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+            transform: rotate(-45deg);
+            transform-origin: left center;
+        }
+
+        .work-content {
             flex: 1;
+            margin-left: 24px;
             display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        /* Inner content box */
+        .content-box {
+            flex: 1;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--bg-card);
+        }
+
+        /* ===== LOGIN SCREEN SPECIFICS ===== */
+        .login-content {
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
-            position: relative;
+            height: 100%;
         }
 
-        /* ===== LOGIN OPTIONS - LEFT NEON 45° ===== */
-        .login-options {
+        .login-box {
             width: 100%;
-            max-width: 420px;
+            max-width: 380px;
         }
 
         .login-option {
-            position: relative;
-            background: rgba(10, 14, 20, 0.8);
-            padding: 0;
             margin-bottom: 16px;
-            clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%, 0 35%);
-            transition: all 0.3s ease;
         }
 
-        .login-option::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 4px;
-            height: 50%;
-            background: linear-gradient(0deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
-            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-            transition: all 0.3s ease;
-            z-index: 2;
-        }
-
-        .login-option:hover::before,
-        .login-option.active::before {
-            background: linear-gradient(0deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
-            box-shadow: 0 0 10px var(--neon-fuchsia), 0 0 20px var(--neon-fuchsia);
-        }
-
-        .login-option.active {
-            background: rgba(255, 79, 216, 0.1);
-        }
-
-        .login-option-inner {
-            padding: 20px 24px;
-        }
-
-        /* Google Button */
         .google-btn {
             width: 100%;
             height: 50px;
@@ -246,49 +309,32 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .google-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        /* Email Toggle */
         .email-toggle {
             width: 100%;
             height: 50px;
             background: transparent;
-            border: 1px solid rgba(0, 234, 255, 0.3);
+            border: 1px solid var(--border-subtle);
             color: var(--text-primary);
             border-radius: 4px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 1px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .email-toggle:hover {
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2);
         }
 
-        .email-toggle.expanded {
-            border-color: var(--neon-fuchsia);
+        .email-toggle.active {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
         }
 
-        .toggle-arrow {
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-arrow.rotated {
-            transform: rotate(180deg);
-        }
-
-        /* Email Form */
         .email-form {
             max-height: 0;
             overflow: hidden;
@@ -303,25 +349,19 @@
         .form-input {
             width: 100%;
             height: 46px;
-            background: rgba(5, 5, 5, 0.9);
-            border: 1px solid rgba(0, 234, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-subtle);
             border-radius: 4px;
             padding: 0 16px;
             color: var(--text-primary);
             font-family: 'Share Tech Mono', monospace;
             font-size: 14px;
             margin-bottom: 12px;
-            transition: all 0.2s ease;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
-        }
-
-        .form-input::placeholder {
-            color: var(--text-muted);
         }
 
         .submit-btn {
@@ -332,318 +372,120 @@
             border-radius: 4px;
             color: #000;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
-            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .submit-btn:hover {
-            box-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
+            box-shadow: 0 0 20px var(--neon-cyan-dim);
         }
 
-        .submit-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        /* Error Message */
         .error-msg {
             display: none;
-            padding: 12px;
-            background: rgba(255, 71, 87, 0.1);
-            border: 1px solid rgba(255, 71, 87, 0.3);
-            border-radius: 4px;
-            color: var(--error);
-            font-size: 13px;
             margin-top: 16px;
+            padding: 12px;
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid rgba(255, 50, 50, 0.3);
+            border-radius: 4px;
+            color: #ff5555;
+            font-size: 13px;
         }
 
         .error-msg.show {
             display: block;
         }
 
-        /* ===== MATRIX DASHBOARD ===== */
+        /* ===== MATRIX HOME ===== */
         .matrix-home {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            max-width: 600px;
+            height: 100%;
+            text-align: center;
         }
 
         .matrix-logo-large {
-            width: 200px;
-            height: auto;
-            filter: drop-shadow(0 0 20px rgba(0, 234, 255, 0.5));
-            margin-bottom: 40px;
-        }
-
-        .matrix-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
-            margin-bottom: 10px;
-            letter-spacing: 4px;
+            width: 180px;
+            margin-bottom: 24px;
+            filter: drop-shadow(0 0 20px var(--neon-cyan-dim));
         }
 
         .matrix-subtitle {
             color: var(--text-secondary);
             font-size: 14px;
-            margin-bottom: 40px;
         }
 
-        /* ===== SECTION CARDS ===== */
-        .section-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            width: 100%;
-        }
-
-        .section-card {
-            position: relative;
-            background: rgba(10, 14, 20, 0.9);
-            padding: 24px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            clip-path: polygon(0 0, 94% 0, 100% 35%, 100% 100%, 0 100%);
-        }
-
-        .section-card::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 4px;
-            height: 50%;
-            background: linear-gradient(180deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
-            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-            transition: all 0.3s ease;
-        }
-
-        .section-card:hover::after {
-            background: linear-gradient(180deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
-            box-shadow: 0 0 10px var(--neon-fuchsia), 0 0 20px var(--neon-fuchsia);
-        }
-
-        .section-card:hover {
-            background: rgba(255, 79, 216, 0.1);
-        }
-
-        .section-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-        }
-
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .section-desc {
-            font-size: 12px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        /* ===== USER INFO ===== */
-        .user-info {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 234, 255, 0.1);
-        }
-
-        .user-email {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            word-break: break-all;
-        }
-
-        .logout-btn {
-            width: 100%;
-            height: 40px;
-            background: transparent;
-            border: 1px solid rgba(255, 71, 87, 0.3);
-            color: var(--error);
-            border-radius: 4px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 71, 87, 0.1);
-            border-color: var(--error);
-        }
-
-        /* ===== HAMBURGER MENU (Mobile) ===== */
-        .hamburger {
-            display: none;
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            z-index: 1000;
-            width: 44px;
-            height: 44px;
-            background: var(--bg-sidebar);
-            border: 1px solid rgba(0, 234, 255, 0.3);
-            border-radius: 8px;
-            cursor: pointer;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .hamburger span {
-            width: 22px;
-            height: 2px;
-            background: var(--neon-cyan);
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 90;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        /* ===== DATABASE SCREENS ===== */
-        .db-header {
+        /* ===== DATA SECTIONS ===== */
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 30px;
-            background: var(--bg-sidebar);
-            border-bottom: 1px solid rgba(0, 234, 255, 0.1);
-        }
-
-        .db-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .add-btn {
-            height: 42px;
+            height: 40px;
             padding: 0 20px;
             background: var(--neon-cyan);
             border: none;
             border-radius: 4px;
             color: #000;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .add-btn:hover {
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+            box-shadow: 0 0 15px var(--neon-cyan-dim);
         }
 
-        .db-content {
-            flex: 1;
-            padding: 24px 30px;
-            overflow-y: auto;
-        }
-
-        /* Filters */
         .filters {
-            background: var(--bg-card);
-            border: 1px solid rgba(0, 234, 255, 0.1);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            display: flex;
             gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .filter-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
-        }
-
-        .filter-group input,
-        .filter-group select {
-            width: 100%;
-            height: 40px;
-            background: var(--bg-pure-dark);
-            border: 1px solid rgba(0, 234, 255, 0.2);
-            border-radius: 4px;
+        .filter-input {
+            height: 38px;
             padding: 0 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
             color: var(--text-primary);
             font-family: 'Share Tech Mono', monospace;
             font-size: 13px;
+            min-width: 150px;
         }
 
-        .filter-group input:focus,
-        .filter-group select:focus {
+        .filter-input:focus {
             outline: none;
             border-color: var(--neon-cyan);
         }
 
-        /* Data Cards */
         .data-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 16px;
         }
 
         .data-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(0, 234, 255, 0.1);
-            border-radius: 8px;
-            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .data-card:hover {
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 234, 255, 0.2);
         }
 
         .data-card-title {
-            font-size: 16px;
             font-weight: 700;
             margin-bottom: 8px;
         }
@@ -651,30 +493,13 @@
         .data-card-meta {
             font-size: 13px;
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        .data-card-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(0, 234, 255, 0.1);
-            border-radius: 4px;
-            font-size: 11px;
-            color: var(--neon-cyan);
-            margin-right: 6px;
-            margin-top: 8px;
-        }
-
-        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+            padding: 40px;
+            color: var(--text-muted);
         }
 
         /* ===== MODAL ===== */
@@ -685,24 +510,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(5, 5, 5, 0.95);
-            z-index: 2000;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
         }
 
         .modal.active {
             display: flex;
         }
 
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid rgba(0, 234, 255, 0.2);
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
+        .modal-box {
+            background: #111;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 80vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -711,107 +536,162 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 24px;
-            border-bottom: 1px solid rgba(0, 234, 255, 0.1);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
         .modal-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .modal-close {
-            width: 36px;
-            height: 36px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 32px;
+            height: 32px;
+            background: none;
+            border: 1px solid var(--border-subtle);
             border-radius: 4px;
             color: var(--text-secondary);
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .modal-close:hover {
-            background: rgba(255, 71, 87, 0.1);
-            border-color: var(--error);
-            color: var(--error);
+            border-color: #ff5555;
+            color: #ff5555;
         }
 
         .modal-body {
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
-            flex: 1;
         }
 
-        .modal-form-group {
-            margin-bottom: 16px;
+        .modal-field {
+            margin-bottom: 14px;
         }
 
-        .modal-form-group label {
+        .modal-field label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             margin-bottom: 6px;
         }
 
-        .modal-form-group input,
-        .modal-form-group select,
-        .modal-form-group textarea {
+        .modal-field input,
+        .modal-field select,
+        .modal-field textarea {
             width: 100%;
-            background: var(--bg-pure-dark);
-            border: 1px solid rgba(0, 234, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-subtle);
             border-radius: 4px;
-            padding: 12px;
+            padding: 10px 12px;
             color: var(--text-primary);
             font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .modal-form-group textarea {
-            min-height: 80px;
+        .modal-field textarea {
+            min-height: 70px;
             resize: vertical;
         }
 
         .modal-actions {
             display: flex;
             gap: 12px;
-            padding: 20px 24px;
-            border-top: 1px solid rgba(0, 234, 255, 0.1);
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-subtle);
         }
 
         .modal-actions button {
             flex: 1;
-            height: 44px;
+            height: 40px;
             border-radius: 4px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .btn-cancel {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: none;
+            border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
-        }
-
-        .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.05);
         }
 
         .btn-save {
             background: var(--neon-cyan);
             border: none;
             color: #000;
+            font-weight: 700;
         }
 
-        .btn-save:hover {
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+        /* ===== USER INFO ===== */
+        .user-info {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
         }
 
-        /* ===== MOBILE RESPONSIVE ===== */
+        .user-email {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .logout-btn {
+            width: 100%;
+            height: 36px;
+            background: none;
+            border: 1px solid rgba(255, 80, 80, 0.3);
+            color: #ff5555;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 80, 80, 0.1);
+        }
+
+        /* ===== HAMBURGER (Mobile) ===== */
+        .hamburger {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 500;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            width: 20px;
+            height: 2px;
+            background: var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 90;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== MOBILE ===== */
         @media (max-width: 768px) {
             .hamburger {
                 display: flex;
@@ -819,9 +699,10 @@
 
             .sidebar {
                 position: fixed;
-                left: -300px;
+                left: -260px;
                 top: 0;
                 height: 100%;
+                z-index: 100;
                 transition: left 0.3s ease;
             }
 
@@ -830,34 +711,27 @@
             }
 
             .main-content {
-                width: 100%;
+                padding: 60px 16px 16px;
             }
 
-            .content-area {
-                padding: 80px 20px 20px;
+            .top-decoration {
+                height: 60px;
             }
 
-            .section-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .db-header {
-                padding: 70px 20px 20px;
-                flex-direction: column;
-                gap: 16px;
-                align-items: flex-start;
-            }
-
-            .db-content {
-                padding: 20px;
+            .section-title {
+                font-size: 18px;
             }
 
             .data-grid {
                 grid-template-columns: 1fr;
             }
 
-            .filters-grid {
-                grid-template-columns: 1fr;
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-input {
+                width: 100%;
             }
         }
 
@@ -866,18 +740,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
-            color: var(--text-secondary);
+            padding: 30px;
+            color: var(--text-muted);
         }
 
         .spinner {
-            width: 24px;
-            height: 24px;
-            border: 2px solid rgba(0, 234, 255, 0.2);
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-subtle);
             border-top-color: var(--neon-cyan);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-right: 12px;
+            margin-right: 10px;
         }
 
         @keyframes spin {
@@ -886,67 +760,68 @@
     </style>
 </head>
 <body>
-    <!-- Hamburger Menu -->
     <button class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
     </button>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-overlay" id="overlay"></div>
 
-    <!-- ==================== LOGIN SCREEN ==================== -->
+    <!-- ==================== LOGIN ==================== -->
     <div id="loginScreen" class="screen active">
-        <div class="app-container">
+        <div class="app-layout">
             <aside class="sidebar" id="loginSidebar">
-                <div class="sidebar-header">
-                    <div class="logo-container">
-                        <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="blueriot-logo">
-                    </div>
-                    <img src="matrix.png" alt="Matrix" class="matrix-logo">
+                <div class="brand">
+                    <div class="brand-name">BLUERIOT<span>SYNDICATE</span></div>
                 </div>
+                <img src="matrix.png" alt="" class="sidebar-logo">
 
-                <nav class="nav-buttons">
-                    <button class="nav-btn active" data-lang="it">IT</button>
-                    <button class="nav-btn" data-lang="en">EN</button>
-                    <button class="nav-btn" data-lang="es">ES</button>
-                    <button class="nav-btn" data-lang="de">DE</button>
-                    <button class="nav-btn" data-lang="fr">FR</button>
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-lang="it">IT</button>
+                    <button class="nav-item" data-lang="en">EN</button>
+                    <button class="nav-item" data-lang="es">ES</button>
+                    <button class="nav-item" data-lang="de">DE</button>
+                    <button class="nav-item" data-lang="fr">FR</button>
                 </nav>
+
+                <img src="matrix.png" alt="" class="sidebar-bottom-logo">
             </aside>
 
             <main class="main-content">
-                <div class="content-area">
-                    <div class="login-options">
-                        <!-- Google Login -->
-                        <div class="login-option" id="googleOption">
-                            <div class="login-option-inner">
-                                <button class="google-btn" id="googleBtn">
-                                    <svg width="18" height="18" viewBox="0 0 18 18">
-                                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
-                                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                                        <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.335z"/>
-                                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                                    </svg>
-                                    Sign in with Google
-                                </button>
-                            </div>
-                        </div>
+                <div class="top-decoration">
+                    <img src="matrix.png" alt="" class="top-logo">
+                    <div class="neon-line-top"></div>
+                </div>
 
-                        <!-- Email Login -->
-                        <div class="login-option" id="emailOption">
-                            <div class="login-option-inner">
-                                <button class="email-toggle" id="emailToggle">
-                                    <span class="toggle-arrow" id="toggleArrow">▼</span>
-                                    EMAIL LOGIN
-                                </button>
-
-                                <div class="email-form" id="emailForm">
-                                    <input type="email" id="emailInput" class="form-input" placeholder="email@example.com">
-                                    <input type="password" id="passwordInput" class="form-input" placeholder="Password">
-                                    <button class="submit-btn" id="emailSubmit">ACCEDI</button>
+                <div class="work-frame">
+                    <div class="corner-bottom-left"></div>
+                    <div class="work-content">
+                        <div class="section-title">LOGIN</div>
+                        <div class="content-box">
+                            <div class="login-content">
+                                <div class="login-box">
+                                    <div class="login-option">
+                                        <button class="google-btn" id="googleBtn">
+                                            <svg width="18" height="18" viewBox="0 0 18 18">
+                                                <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                                                <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                                                <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.335z"/>
+                                                <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                                            </svg>
+                                            Sign in with Google
+                                        </button>
+                                    </div>
+                                    <div class="login-option">
+                                        <button class="email-toggle" id="emailToggle">
+                                            <span id="toggleArrow">▼</span> EMAIL LOGIN
+                                        </button>
+                                        <div class="email-form" id="emailForm">
+                                            <input type="email" id="emailInput" class="form-input" placeholder="email@example.com">
+                                            <input type="password" id="passwordInput" class="form-input" placeholder="Password">
+                                            <button class="submit-btn" id="emailSubmit">ACCEDI</button>
+                                        </div>
+                                    </div>
+                                    <div class="error-msg" id="errorMsg"></div>
                                 </div>
                             </div>
-                            <div class="error-msg" id="errorMsg"></div>
                         </div>
                     </div>
                 </div>
@@ -954,189 +829,115 @@
         </div>
     </div>
 
-    <!-- ==================== MATRIX DASHBOARD ==================== -->
-    <div id="matrixScreen" class="screen">
-        <div class="app-container">
-            <aside class="sidebar" id="matrixSidebar">
-                <div class="sidebar-header">
-                    <div class="logo-container">
-                        <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="blueriot-logo">
-                    </div>
-                    <img src="matrix.png" alt="Matrix" class="matrix-logo">
+    <!-- ==================== DASHBOARD ==================== -->
+    <div id="dashboardScreen" class="screen">
+        <div class="app-layout">
+            <aside class="sidebar" id="dashSidebar">
+                <div class="brand">
+                    <div class="brand-name">BLUERIOT<span>SYNDICATE</span></div>
                 </div>
+                <img src="matrix.png" alt="" class="sidebar-logo">
 
-                <nav class="nav-buttons" id="mainNav">
-                    <button class="nav-btn active" data-section="home">mαtrιχ</button>
-                    <button class="nav-btn" data-section="tastes">ΤΔSΤΞ5</button>
-                    <button class="nav-btn" data-section="routes">R0UT35</button>
-                    <button class="nav-btn" data-section="stay">SΤΔΥ</button>
-                    <button class="nav-btn" data-section="node">NODΞ</button>
+                <nav class="nav-menu" id="mainNav">
+                    <button class="nav-item active" data-section="home">HOME</button>
+                    <button class="nav-item" data-section="tastes">TASTES</button>
+                    <button class="nav-item" data-section="routes">ROUTES</button>
+                    <button class="nav-item" data-section="stay">STAY</button>
+                    <button class="nav-item" data-section="syndicate">SYNDICATE</button>
                 </nav>
 
                 <div class="user-info">
                     <div class="user-email" id="userEmail"></div>
                     <button class="logout-btn" id="logoutBtn">LOGOUT</button>
                 </div>
+
+                <img src="matrix.png" alt="" class="sidebar-bottom-logo">
             </aside>
 
             <main class="main-content">
-                <!-- HOME -->
-                <div class="content-area" id="homeContent">
-                    <div class="matrix-home">
-                        <img src="matrix.png" alt="Matrix" class="matrix-logo-large">
-                        <h1 class="matrix-title">mαtrιχ</h1>
-                        <p class="matrix-subtitle">Seleziona un servizio per iniziare</p>
-
-                        <div class="section-grid">
-                            <div class="section-card" data-goto="tastes">
-                                <div class="section-icon">🍽️</div>
-                                <div class="section-title">ΤΔSΤΞ5</div>
-                                <div class="section-desc">Database ristoranti, bar, gelaterie e locali testati</div>
-                            </div>
-                            <div class="section-card" data-goto="routes">
-                                <div class="section-icon">🚌</div>
-                                <div class="section-title">R0UT35</div>
-                                <div class="section-desc">Database trasporti: bus, treni, ferry, taxi, NCC</div>
-                            </div>
-                            <div class="section-card" data-goto="stay">
-                                <div class="section-icon">🏨</div>
-                                <div class="section-title">SΤΔΥ</div>
-                                <div class="section-desc">Database hotel alternativi, B&B e strutture</div>
-                            </div>
-                            <div class="section-card" data-goto="node">
-                                <div class="section-icon">⚡</div>
-                                <div class="section-title">NODΞ</div>
-                                <div class="section-desc">eTickets, PDF OCR, gestione tour completa</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="top-decoration">
+                    <img src="matrix.png" alt="" class="top-logo">
+                    <div class="neon-line-top"></div>
                 </div>
 
-                <!-- TASTES -->
-                <div id="tastesContent" style="display:none; flex-direction:column; flex:1;">
-                    <div class="db-header">
-                        <h1 class="db-title">🍽️ ΤΔSΤΞ5 - Database Locali</h1>
-                        <button class="add-btn" id="addTasteBtn">+ Aggiungi Locale</button>
-                    </div>
-                    <div class="db-content">
-                        <div class="filters">
-                            <div class="filters-grid">
-                                <div class="filter-group">
-                                    <label>Città</label>
-                                    <input type="text" id="filterTasteCity" placeholder="es. Roma">
-                                </div>
-                                <div class="filter-group">
-                                    <label>Tipo Cucina</label>
-                                    <input type="text" id="filterTasteCuisine" placeholder="es. Italiana">
-                                </div>
-                                <div class="filter-group">
-                                    <label>Vantaggi TL</label>
-                                    <select id="filterTasteAdvantage">
-                                        <option value="">Tutti</option>
-                                        <option value="sconto">Sconto</option>
-                                        <option value="omaggio">Omaggio</option>
-                                        <option value="priorita">Priorità</option>
-                                    </select>
+                <div class="work-frame">
+                    <div class="corner-bottom-left"></div>
+                    <div class="work-content">
+                        <!-- HOME -->
+                        <div id="homeSection">
+                            <div class="section-title">MATRIX</div>
+                            <div class="content-box">
+                                <div class="matrix-home">
+                                    <img src="matrix.png" alt="Matrix" class="matrix-logo-large">
+                                    <p class="matrix-subtitle">Seleziona un servizio dal menu</p>
                                 </div>
                             </div>
                         </div>
-                        <div id="tastesList" class="data-grid">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🍽️</div>
-                                <p>Nessun locale trovato. Aggiungi il primo!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- ROUTES -->
-                <div id="routesContent" style="display:none; flex-direction:column; flex:1;">
-                    <div class="db-header">
-                        <h1 class="db-title">🚌 R0UT35 - Database Trasporti</h1>
-                        <button class="add-btn" id="addRouteBtn">+ Aggiungi Tratta</button>
-                    </div>
-                    <div class="db-content">
-                        <div class="filters">
-                            <div class="filters-grid">
-                                <div class="filter-group">
-                                    <label>Partenza</label>
-                                    <input type="text" id="filterRouteFrom" placeholder="es. Roma">
+                        <!-- TASTES -->
+                        <div id="tastesSection" style="display:none;">
+                            <div class="section-header">
+                                <div class="section-title">TASTES</div>
+                                <button class="add-btn" id="addTasteBtn">+ AGGIUNGI</button>
+                            </div>
+                            <div class="content-box">
+                                <div class="filters">
+                                    <input type="text" class="filter-input" id="filterTasteCity" placeholder="Città...">
+                                    <input type="text" class="filter-input" id="filterTasteCuisine" placeholder="Cucina...">
                                 </div>
-                                <div class="filter-group">
-                                    <label>Arrivo</label>
-                                    <input type="text" id="filterRouteTo" placeholder="es. Firenze">
-                                </div>
-                                <div class="filter-group">
-                                    <label>Tipo</label>
-                                    <select id="filterRouteType">
-                                        <option value="">Tutti</option>
-                                        <option value="bus">Bus</option>
-                                        <option value="treno">Treno</option>
-                                        <option value="ferry">Ferry</option>
-                                        <option value="taxi">Taxi/NCC</option>
-                                    </select>
+                                <div id="tastesList" class="data-grid">
+                                    <div class="empty-state">Nessun locale. Aggiungi il primo!</div>
                                 </div>
                             </div>
                         </div>
-                        <div id="routesList" class="data-grid">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🚌</div>
-                                <p>Nessuna tratta trovata. Aggiungi la prima!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- STAY -->
-                <div id="stayContent" style="display:none; flex-direction:column; flex:1;">
-                    <div class="db-header">
-                        <h1 class="db-title">🏨 SΤΔΥ - Database Hotel</h1>
-                        <button class="add-btn" id="addStayBtn">+ Aggiungi Struttura</button>
-                    </div>
-                    <div class="db-content">
-                        <div class="filters">
-                            <div class="filters-grid">
-                                <div class="filter-group">
-                                    <label>Città</label>
-                                    <input type="text" id="filterStayCity" placeholder="es. Firenze">
+                        <!-- ROUTES -->
+                        <div id="routesSection" style="display:none;">
+                            <div class="section-header">
+                                <div class="section-title">ROUTES</div>
+                                <button class="add-btn" id="addRouteBtn">+ AGGIUNGI</button>
+                            </div>
+                            <div class="content-box">
+                                <div class="filters">
+                                    <input type="text" class="filter-input" id="filterRouteFrom" placeholder="Da...">
+                                    <input type="text" class="filter-input" id="filterRouteTo" placeholder="A...">
                                 </div>
-                                <div class="filter-group">
-                                    <label>Tipo</label>
-                                    <select id="filterStayType">
-                                        <option value="">Tutti</option>
-                                        <option value="hotel">Hotel</option>
-                                        <option value="bb">B&B</option>
-                                        <option value="appartamento">Appartamento</option>
-                                        <option value="ostello">Ostello</option>
-                                    </select>
+                                <div id="routesList" class="data-grid">
+                                    <div class="empty-state">Nessuna tratta. Aggiungi la prima!</div>
                                 </div>
                             </div>
                         </div>
-                        <div id="stayList" class="data-grid">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">🏨</div>
-                                <p>Nessuna struttura trovata. Aggiungi la prima!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- NODE -->
-                <div id="nodeContent" style="display:none; flex-direction:column; flex:1;">
-                    <div class="db-header">
-                        <h1 class="db-title">⚡ NODΞ - Gestione Tour</h1>
-                    </div>
-                    <div class="db-content">
-                        <div class="section-grid" style="max-width: 600px;">
-                            <div class="section-card" id="eticketCard">
-                                <div class="section-icon">🎫</div>
-                                <div class="section-title">eTickets</div>
-                                <div class="section-desc">Importa e gestisci biglietti elettronici</div>
+                        <!-- STAY -->
+                        <div id="staySection" style="display:none;">
+                            <div class="section-header">
+                                <div class="section-title">STAY</div>
+                                <button class="add-btn" id="addStayBtn">+ AGGIUNGI</button>
                             </div>
-                            <div class="section-card" id="pdfOcrCard">
-                                <div class="section-icon">📄</div>
-                                <div class="section-title">PDF OCR</div>
-                                <div class="section-desc">Estrai dati da documenti PDF</div>
+                            <div class="content-box">
+                                <div class="filters">
+                                    <input type="text" class="filter-input" id="filterStayCity" placeholder="Città...">
+                                </div>
+                                <div id="stayList" class="data-grid">
+                                    <div class="empty-state">Nessuna struttura. Aggiungi la prima!</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SYNDICATE (NODE) -->
+                        <div id="syndicateSection" style="display:none;">
+                            <div class="section-title">SYNDICATE</div>
+                            <div class="content-box">
+                                <div class="data-grid">
+                                    <div class="data-card" id="eticketCard">
+                                        <div class="data-card-title">🎫 eTickets</div>
+                                        <div class="data-card-meta">Importa biglietti elettronici</div>
+                                    </div>
+                                    <div class="data-card" id="pdfCard">
+                                        <div class="data-card-title">📄 PDF OCR</div>
+                                        <div class="data-card-meta">Estrai dati da PDF</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1145,39 +946,20 @@
         </div>
     </div>
 
-    <!-- ==================== MODALS ==================== -->
-    <!-- Taste Modal -->
+    <!-- ===== MODALS ===== -->
     <div class="modal" id="tasteModal">
-        <div class="modal-content">
+        <div class="modal-box">
             <div class="modal-header">
-                <h2 class="modal-title">Aggiungi Locale</h2>
+                <div class="modal-title">Aggiungi Locale</div>
                 <button class="modal-close" id="closeTasteModal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="modal-form-group">
-                    <label>Nome Locale *</label>
-                    <input type="text" id="tasteName" placeholder="es. Ristorante Da Mario">
-                </div>
-                <div class="modal-form-group">
-                    <label>Città *</label>
-                    <input type="text" id="tasteCity" placeholder="es. Roma">
-                </div>
-                <div class="modal-form-group">
-                    <label>Tipo Cucina</label>
-                    <input type="text" id="tasteCuisine" placeholder="es. Italiana, Pizza, Pesce">
-                </div>
-                <div class="modal-form-group">
-                    <label>Indirizzo</label>
-                    <input type="text" id="tasteAddress" placeholder="es. Via Roma 123">
-                </div>
-                <div class="modal-form-group">
-                    <label>Telefono</label>
-                    <input type="text" id="tastePhone" placeholder="es. +39 06 1234567">
-                </div>
-                <div class="modal-form-group">
-                    <label>Note</label>
-                    <textarea id="tasteNotes" placeholder="Vantaggi TL, orari, info utili..."></textarea>
-                </div>
+                <div class="modal-field"><label>Nome *</label><input type="text" id="tasteName"></div>
+                <div class="modal-field"><label>Città *</label><input type="text" id="tasteCity"></div>
+                <div class="modal-field"><label>Cucina</label><input type="text" id="tasteCuisine"></div>
+                <div class="modal-field"><label>Indirizzo</label><input type="text" id="tasteAddress"></div>
+                <div class="modal-field"><label>Telefono</label><input type="text" id="tastePhone"></div>
+                <div class="modal-field"><label>Note</label><textarea id="tasteNotes"></textarea></div>
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" id="cancelTaste">Annulla</button>
@@ -1186,47 +968,20 @@
         </div>
     </div>
 
-    <!-- Route Modal -->
     <div class="modal" id="routeModal">
-        <div class="modal-content">
+        <div class="modal-box">
             <div class="modal-header">
-                <h2 class="modal-title">Aggiungi Tratta</h2>
+                <div class="modal-title">Aggiungi Tratta</div>
                 <button class="modal-close" id="closeRouteModal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="modal-form-group">
-                    <label>Partenza *</label>
-                    <input type="text" id="routeFrom" placeholder="es. Roma Termini">
-                </div>
-                <div class="modal-form-group">
-                    <label>Arrivo *</label>
-                    <input type="text" id="routeTo" placeholder="es. Firenze SMN">
-                </div>
-                <div class="modal-form-group">
-                    <label>Tipo Trasporto *</label>
-                    <select id="routeType">
-                        <option value="bus">Bus</option>
-                        <option value="treno">Treno</option>
-                        <option value="ferry">Ferry</option>
-                        <option value="taxi">Taxi/NCC</option>
-                    </select>
-                </div>
-                <div class="modal-form-group">
-                    <label>Compagnia</label>
-                    <input type="text" id="routeCompany" placeholder="es. Trenitalia, Flixbus">
-                </div>
-                <div class="modal-form-group">
-                    <label>Durata</label>
-                    <input type="text" id="routeDuration" placeholder="es. 1h 30min">
-                </div>
-                <div class="modal-form-group">
-                    <label>Prezzo Indicativo</label>
-                    <input type="text" id="routePrice" placeholder="es. €15-25">
-                </div>
-                <div class="modal-form-group">
-                    <label>Note</label>
-                    <textarea id="routeNotes" placeholder="Frequenza, affidabilità, tips..."></textarea>
-                </div>
+                <div class="modal-field"><label>Partenza *</label><input type="text" id="routeFrom"></div>
+                <div class="modal-field"><label>Arrivo *</label><input type="text" id="routeTo"></div>
+                <div class="modal-field"><label>Tipo</label><select id="routeType"><option>Bus</option><option>Treno</option><option>Ferry</option><option>Taxi</option></select></div>
+                <div class="modal-field"><label>Compagnia</label><input type="text" id="routeCompany"></div>
+                <div class="modal-field"><label>Durata</label><input type="text" id="routeDuration"></div>
+                <div class="modal-field"><label>Prezzo</label><input type="text" id="routePrice"></div>
+                <div class="modal-field"><label>Note</label><textarea id="routeNotes"></textarea></div>
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" id="cancelRoute">Annulla</button>
@@ -1235,47 +990,20 @@
         </div>
     </div>
 
-    <!-- Stay Modal -->
     <div class="modal" id="stayModal">
-        <div class="modal-content">
+        <div class="modal-box">
             <div class="modal-header">
-                <h2 class="modal-title">Aggiungi Struttura</h2>
+                <div class="modal-title">Aggiungi Struttura</div>
                 <button class="modal-close" id="closeStayModal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="modal-form-group">
-                    <label>Nome Struttura *</label>
-                    <input type="text" id="stayName" placeholder="es. Hotel Bella Vista">
-                </div>
-                <div class="modal-form-group">
-                    <label>Città *</label>
-                    <input type="text" id="stayCity" placeholder="es. Firenze">
-                </div>
-                <div class="modal-form-group">
-                    <label>Tipo *</label>
-                    <select id="stayType">
-                        <option value="hotel">Hotel</option>
-                        <option value="bb">B&B</option>
-                        <option value="appartamento">Appartamento</option>
-                        <option value="ostello">Ostello</option>
-                    </select>
-                </div>
-                <div class="modal-form-group">
-                    <label>Indirizzo</label>
-                    <input type="text" id="stayAddress" placeholder="es. Via Firenze 45">
-                </div>
-                <div class="modal-form-group">
-                    <label>Prezzo/Notte</label>
-                    <input type="text" id="stayPrice" placeholder="es. €60-90">
-                </div>
-                <div class="modal-form-group">
-                    <label>Contatto</label>
-                    <input type="text" id="stayContact" placeholder="es. +39 055 1234567">
-                </div>
-                <div class="modal-form-group">
-                    <label>Note</label>
-                    <textarea id="stayNotes" placeholder="Commissioni, convenzioni, tips..."></textarea>
-                </div>
+                <div class="modal-field"><label>Nome *</label><input type="text" id="stayName"></div>
+                <div class="modal-field"><label>Città *</label><input type="text" id="stayCity"></div>
+                <div class="modal-field"><label>Tipo</label><select id="stayType"><option>Hotel</option><option>B&B</option><option>Appartamento</option><option>Ostello</option></select></div>
+                <div class="modal-field"><label>Indirizzo</label><input type="text" id="stayAddress"></div>
+                <div class="modal-field"><label>Prezzo</label><input type="text" id="stayPrice"></div>
+                <div class="modal-field"><label>Contatto</label><input type="text" id="stayContact"></div>
+                <div class="modal-field"><label>Note</label><textarea id="stayNotes"></textarea></div>
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" id="cancelStay">Annulla</button>
@@ -1284,409 +1012,215 @@
         </div>
     </div>
 
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
-        // ===== CONFIG =====
         const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
 
         let db = null;
-        let currentUser = null;
+        try { db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error(e); }
 
-        // Init Supabase
-        try {
-            db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('✅ Supabase ready');
-        } catch (e) {
-            console.error('❌ Supabase error:', e);
-        }
-
-        // ===== DOM =====
         const $ = id => document.getElementById(id);
         const $$ = sel => document.querySelectorAll(sel);
 
         // Screens
         const loginScreen = $('loginScreen');
-        const matrixScreen = $('matrixScreen');
+        const dashboardScreen = $('dashboardScreen');
 
-        // Login elements
-        const googleBtn = $('googleBtn');
-        const googleOption = $('googleOption');
-        const emailToggle = $('emailToggle');
-        const emailForm = $('emailForm');
-        const toggleArrow = $('toggleArrow');
-        const emailOption = $('emailOption');
-        const emailInput = $('emailInput');
-        const passwordInput = $('passwordInput');
-        const emailSubmit = $('emailSubmit');
-        const errorMsg = $('errorMsg');
-
-        // Dashboard elements
-        const userEmailEl = $('userEmail');
-        const logoutBtn = $('logoutBtn');
-        const mainNav = $('mainNav');
-
-        // Content areas
-        const homeContent = $('homeContent');
-        const tastesContent = $('tastesContent');
-        const routesContent = $('routesContent');
-        const stayContent = $('stayContent');
-        const nodeContent = $('nodeContent');
-
-        // Mobile
-        const hamburger = $('hamburger');
-        const sidebarOverlay = $('sidebarOverlay');
-        const loginSidebar = $('loginSidebar');
-        const matrixSidebar = $('matrixSidebar');
-
-        // ===== HELPERS =====
+        // Show screen
         function showScreen(screen) {
             $$('.screen').forEach(s => s.classList.remove('active'));
             screen.classList.add('active');
         }
 
-        function showError(msg) {
-            errorMsg.textContent = msg;
-            errorMsg.classList.add('show');
-            setTimeout(() => errorMsg.classList.remove('show'), 5000);
-        }
-
+        // Show section
         function showSection(section) {
-            // Hide all content
-            homeContent.style.display = 'none';
-            tastesContent.style.display = 'none';
-            routesContent.style.display = 'none';
-            stayContent.style.display = 'none';
-            nodeContent.style.display = 'none';
-
-            // Update nav
-            $$('#mainNav .nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`#mainNav .nav-btn[data-section="${section}"]`)?.classList.add('active');
-
-            // Show selected
-            switch(section) {
-                case 'home':
-                    homeContent.style.display = 'flex';
-                    break;
-                case 'tastes':
-                    tastesContent.style.display = 'flex';
-                    loadTastes();
-                    break;
-                case 'routes':
-                    routesContent.style.display = 'flex';
-                    loadRoutes();
-                    break;
-                case 'stay':
-                    stayContent.style.display = 'flex';
-                    loadStay();
-                    break;
-                case 'node':
-                    nodeContent.style.display = 'flex';
-                    break;
-            }
-
-            // Close mobile sidebar
+            ['home', 'tastes', 'routes', 'stay', 'syndicate'].forEach(s => {
+                const el = $(s + 'Section');
+                if (el) el.style.display = s === section ? 'block' : 'none';
+            });
+            $$('#mainNav .nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.section === section);
+            });
+            if (section === 'tastes') loadTastes();
+            if (section === 'routes') loadRoutes();
+            if (section === 'stay') loadStay();
             closeSidebar();
         }
 
-        function closeSidebar() {
-            hamburger.classList.remove('active');
-            loginSidebar.classList.remove('open');
-            matrixSidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('active');
+        // Error
+        function showError(msg) {
+            const el = $('errorMsg');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 4000);
         }
 
-        // ===== AUTH =====
+        // Mobile
+        const hamburger = $('hamburger');
+        const overlay = $('overlay');
+        function closeSidebar() {
+            $('loginSidebar').classList.remove('open');
+            $('dashSidebar').classList.remove('open');
+            overlay.classList.remove('active');
+        }
+        hamburger.addEventListener('click', () => {
+            const isLogin = loginScreen.classList.contains('active');
+            const sidebar = isLogin ? $('loginSidebar') : $('dashSidebar');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        });
+        overlay.addEventListener('click', closeSidebar);
+
+        // Language
+        $$('#loginSidebar .nav-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('#loginSidebar .nav-item').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Nav
+        $('mainNav').addEventListener('click', e => {
+            const btn = e.target.closest('.nav-item');
+            if (btn) showSection(btn.dataset.section);
+        });
+
         // Google login
-        googleBtn.addEventListener('click', async () => {
-            if (!db) return showError('Database non disponibile');
-
-            googleOption.classList.add('active');
-            googleBtn.disabled = true;
-            googleBtn.textContent = 'Reindirizzamento...';
-
+        $('googleBtn').addEventListener('click', async () => {
+            if (!db) return showError('DB non disponibile');
+            $('googleBtn').disabled = true;
+            $('googleBtn').textContent = 'Attendere...';
             try {
                 const { error } = await db.auth.signInWithOAuth({
                     provider: 'google',
-                    options: { redirectTo: window.location.origin + window.location.pathname }
+                    options: { redirectTo: location.origin + location.pathname }
                 });
                 if (error) throw error;
-            } catch (e) {
-                showError(e.message || 'Errore login Google');
-                googleBtn.disabled = false;
-                googleBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.335z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg> Sign in with Google`;
-                googleOption.classList.remove('active');
+            } catch(e) {
+                showError(e.message);
+                $('googleBtn').disabled = false;
+                $('googleBtn').innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.335z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg> Sign in with Google';
             }
         });
 
         // Email toggle
-        let emailExpanded = false;
-        emailToggle.addEventListener('click', () => {
-            emailExpanded = !emailExpanded;
-            emailForm.classList.toggle('expanded', emailExpanded);
-            toggleArrow.classList.toggle('rotated', emailExpanded);
-            emailOption.classList.toggle('active', emailExpanded);
+        let emailOpen = false;
+        $('emailToggle').addEventListener('click', () => {
+            emailOpen = !emailOpen;
+            $('emailForm').classList.toggle('expanded', emailOpen);
+            $('emailToggle').classList.toggle('active', emailOpen);
+            $('toggleArrow').textContent = emailOpen ? '▲' : '▼';
         });
 
-        // Email login
-        emailSubmit.addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
-            if (!email || !password) return showError('Inserisci email e password');
-            if (!db) return showError('Database non disponibile');
-
-            emailSubmit.disabled = true;
-            emailSubmit.textContent = 'ACCESSO...';
-
+        // Email submit
+        $('emailSubmit').addEventListener('click', async () => {
+            const email = $('emailInput').value.trim();
+            const pass = $('passwordInput').value;
+            if (!email || !pass) return showError('Compila tutti i campi');
+            if (!db) return showError('DB non disponibile');
+            $('emailSubmit').disabled = true;
             try {
-                const { error } = await db.auth.signInWithPassword({ email, password });
+                const { error } = await db.auth.signInWithPassword({ email, password: pass });
                 if (error) throw error;
-            } catch (e) {
-                showError(e.message || 'Errore login');
-                emailSubmit.disabled = false;
-                emailSubmit.textContent = 'ACCEDI';
+            } catch(e) {
+                showError(e.message);
+                $('emailSubmit').disabled = false;
             }
         });
 
         // Logout
-        logoutBtn.addEventListener('click', async () => {
+        $('logoutBtn').addEventListener('click', async () => {
             if (db) await db.auth.signOut();
-            currentUser = null;
             showScreen(loginScreen);
         });
 
         // Auth state
         if (db) {
             db.auth.onAuthStateChange((event, session) => {
-                console.log('Auth:', event);
                 if (event === 'SIGNED_IN' && session) {
-                    currentUser = session.user;
-                    userEmailEl.textContent = session.user.email;
-                    showScreen(matrixScreen);
+                    $('userEmail').textContent = session.user.email;
+                    showScreen(dashboardScreen);
                     showSection('home');
                 } else if (event === 'SIGNED_OUT') {
-                    currentUser = null;
                     showScreen(loginScreen);
                 }
             });
-
-            // Check session
             db.auth.getSession().then(({ data: { session } }) => {
                 if (session) {
-                    currentUser = session.user;
-                    userEmailEl.textContent = session.user.email;
-                    showScreen(matrixScreen);
+                    $('userEmail').textContent = session.user.email;
+                    showScreen(dashboardScreen);
                     showSection('home');
                 }
             });
         }
 
-        // ===== NAVIGATION =====
-        // Language buttons
-        $$('#loginScreen .nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                $$('#loginScreen .nav-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-
-        // Main nav
-        mainNav.addEventListener('click', e => {
-            const btn = e.target.closest('.nav-btn');
-            if (btn) showSection(btn.dataset.section);
-        });
-
-        // Section cards
-        $$('.section-card[data-goto]').forEach(card => {
-            card.addEventListener('click', () => showSection(card.dataset.goto));
-        });
-
-        // ===== MOBILE =====
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            const isLogin = loginScreen.classList.contains('active');
-            const sidebar = isLogin ? loginSidebar : matrixSidebar;
-            sidebar.classList.toggle('open');
-            sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', closeSidebar);
-
-        // ===== DATA LOADING =====
+        // Data loading
         async function loadTastes() {
             if (!db) return;
             const list = $('tastesList');
             list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
-
             try {
                 const { data, error } = await db.from('tastes').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍽️</div><p>Nessun locale trovato. Aggiungi il primo!</p></div>';
-                    return;
-                }
-
-                list.innerHTML = data.map(item => `
-                    <div class="data-card">
-                        <div class="data-card-title">${item.name || 'Senza nome'}</div>
-                        <div class="data-card-meta">
-                            📍 ${item.city || 'N/A'}<br>
-                            🍽️ ${item.cuisine || 'N/A'}
-                        </div>
-                        ${item.advantages ? `<span class="data-card-tag">${item.advantages}</span>` : ''}
-                    </div>
-                `).join('');
-            } catch (e) {
-                console.error('Load tastes error:', e);
-                list.innerHTML = '<div class="empty-state"><p>Errore caricamento dati</p></div>';
-            }
+                if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessun locale trovato</div>'; return; }
+                list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.name||'N/A'}</div><div class="data-card-meta">📍 ${i.city||'N/A'} | 🍽️ ${i.cuisine||'N/A'}</div></div>`).join('');
+            } catch(e) { list.innerHTML = '<div class="empty-state">Errore caricamento</div>'; }
         }
 
         async function loadRoutes() {
             if (!db) return;
             const list = $('routesList');
             list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
-
             try {
                 const { data, error } = await db.from('routes').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚌</div><p>Nessuna tratta trovata. Aggiungi la prima!</p></div>';
-                    return;
-                }
-
-                list.innerHTML = data.map(item => `
-                    <div class="data-card">
-                        <div class="data-card-title">${item.from_location || '?'} → ${item.to_location || '?'}</div>
-                        <div class="data-card-meta">
-                            🚌 ${item.type || 'N/A'}<br>
-                            ⏱️ ${item.duration || 'N/A'} | 💰 ${item.price || 'N/A'}
-                        </div>
-                        ${item.company ? `<span class="data-card-tag">${item.company}</span>` : ''}
-                    </div>
-                `).join('');
-            } catch (e) {
-                console.error('Load routes error:', e);
-                list.innerHTML = '<div class="empty-state"><p>Errore caricamento dati</p></div>';
-            }
+                if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessuna tratta trovata</div>'; return; }
+                list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.from_location||'?'} → ${i.to_location||'?'}</div><div class="data-card-meta">🚌 ${i.type||'N/A'} | ⏱️ ${i.duration||'N/A'}</div></div>`).join('');
+            } catch(e) { list.innerHTML = '<div class="empty-state">Errore caricamento</div>'; }
         }
 
         async function loadStay() {
             if (!db) return;
             const list = $('stayList');
             list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
-
             try {
                 const { data, error } = await db.from('stay').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏨</div><p>Nessuna struttura trovata. Aggiungi la prima!</p></div>';
-                    return;
-                }
-
-                list.innerHTML = data.map(item => `
-                    <div class="data-card">
-                        <div class="data-card-title">${item.name || 'Senza nome'}</div>
-                        <div class="data-card-meta">
-                            📍 ${item.city || 'N/A'}<br>
-                            🏨 ${item.type || 'N/A'} | 💰 ${item.price || 'N/A'}
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) {
-                console.error('Load stay error:', e);
-                list.innerHTML = '<div class="empty-state"><p>Errore caricamento dati</p></div>';
-            }
+                if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessuna struttura trovata</div>'; return; }
+                list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.name||'N/A'}</div><div class="data-card-meta">📍 ${i.city||'N/A'} | 🏨 ${i.type||'N/A'}</div></div>`).join('');
+            } catch(e) { list.innerHTML = '<div class="empty-state">Errore caricamento</div>'; }
         }
 
-        // ===== MODALS =====
-        // Taste Modal
+        // Modals
         $('addTasteBtn').addEventListener('click', () => $('tasteModal').classList.add('active'));
         $('closeTasteModal').addEventListener('click', () => $('tasteModal').classList.remove('active'));
         $('cancelTaste').addEventListener('click', () => $('tasteModal').classList.remove('active'));
         $('saveTaste').addEventListener('click', async () => {
-            if (!db) return;
-            const data = {
-                name: $('tasteName').value,
-                city: $('tasteCity').value,
-                cuisine: $('tasteCuisine').value,
-                address: $('tasteAddress').value,
-                phone: $('tastePhone').value,
-                notes: $('tasteNotes').value
-            };
-            if (!data.name || !data.city) return alert('Nome e Città obbligatori');
-
-            try {
-                const { error } = await db.from('tastes').insert([data]);
-                if (error) throw error;
-                $('tasteModal').classList.remove('active');
-                loadTastes();
-            } catch (e) {
-                alert('Errore salvataggio: ' + e.message);
-            }
+            const d = { name: $('tasteName').value, city: $('tasteCity').value, cuisine: $('tasteCuisine').value, address: $('tasteAddress').value, phone: $('tastePhone').value, notes: $('tasteNotes').value };
+            if (!d.name || !d.city) return alert('Nome e Città obbligatori');
+            try { await db.from('tastes').insert([d]); $('tasteModal').classList.remove('active'); loadTastes(); } catch(e) { alert(e.message); }
         });
 
-        // Route Modal
         $('addRouteBtn').addEventListener('click', () => $('routeModal').classList.add('active'));
         $('closeRouteModal').addEventListener('click', () => $('routeModal').classList.remove('active'));
         $('cancelRoute').addEventListener('click', () => $('routeModal').classList.remove('active'));
         $('saveRoute').addEventListener('click', async () => {
-            if (!db) return;
-            const data = {
-                from_location: $('routeFrom').value,
-                to_location: $('routeTo').value,
-                type: $('routeType').value,
-                company: $('routeCompany').value,
-                duration: $('routeDuration').value,
-                price: $('routePrice').value,
-                notes: $('routeNotes').value
-            };
-            if (!data.from_location || !data.to_location) return alert('Partenza e Arrivo obbligatori');
-
-            try {
-                const { error } = await db.from('routes').insert([data]);
-                if (error) throw error;
-                $('routeModal').classList.remove('active');
-                loadRoutes();
-            } catch (e) {
-                alert('Errore salvataggio: ' + e.message);
-            }
+            const d = { from_location: $('routeFrom').value, to_location: $('routeTo').value, type: $('routeType').value, company: $('routeCompany').value, duration: $('routeDuration').value, price: $('routePrice').value, notes: $('routeNotes').value };
+            if (!d.from_location || !d.to_location) return alert('Partenza e Arrivo obbligatori');
+            try { await db.from('routes').insert([d]); $('routeModal').classList.remove('active'); loadRoutes(); } catch(e) { alert(e.message); }
         });
 
-        // Stay Modal
         $('addStayBtn').addEventListener('click', () => $('stayModal').classList.add('active'));
         $('closeStayModal').addEventListener('click', () => $('stayModal').classList.remove('active'));
         $('cancelStay').addEventListener('click', () => $('stayModal').classList.remove('active'));
         $('saveStay').addEventListener('click', async () => {
-            if (!db) return;
-            const data = {
-                name: $('stayName').value,
-                city: $('stayCity').value,
-                type: $('stayType').value,
-                address: $('stayAddress').value,
-                price: $('stayPrice').value,
-                contact: $('stayContact').value,
-                notes: $('stayNotes').value
-            };
-            if (!data.name || !data.city) return alert('Nome e Città obbligatori');
-
-            try {
-                const { error } = await db.from('stay').insert([data]);
-                if (error) throw error;
-                $('stayModal').classList.remove('active');
-                loadStay();
-            } catch (e) {
-                alert('Errore salvataggio: ' + e.message);
-            }
+            const d = { name: $('stayName').value, city: $('stayCity').value, type: $('stayType').value, address: $('stayAddress').value, price: $('stayPrice').value, contact: $('stayContact').value, notes: $('stayNotes').value };
+            if (!d.name || !d.city) return alert('Nome e Città obbligatori');
+            try { await db.from('stay').insert([d]); $('stayModal').classList.remove('active'); loadStay(); } catch(e) { alert(e.message); }
         });
 
-        console.log('🚀 BlueRiot Matrix Ready');
+        console.log('🚀 BlueRiot Ready');
     </script>
 </body>
 </html>

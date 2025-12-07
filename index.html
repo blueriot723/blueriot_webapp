@@ -1716,7 +1716,7 @@
             const list = $('tastesList');
             list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
             try {
-                const { data, error } = await db.from('tastes').select('*').order('created_at', { ascending: false });
+                const { data, error } = await db.from('blueriot_tastes').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessun locale trovato</div>'; return; }
                 list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.name||'N/A'}</div><div class="data-card-meta">📍 ${i.city||'N/A'} | 🍽️ ${i.cuisine||'N/A'}</div></div>`).join('');
@@ -1728,7 +1728,7 @@
             const list = $('routesList');
             list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
             try {
-                const { data, error } = await db.from('routes').select('*').order('created_at', { ascending: false });
+                const { data, error } = await db.from('blueriot_routes').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessuna tratta trovata</div>'; return; }
                 list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.from_location||'?'} → ${i.to_location||'?'}</div><div class="data-card-meta">🚌 ${i.type||'N/A'} | ⏱️ ${i.duration||'N/A'}</div></div>`).join('');
@@ -1740,7 +1740,7 @@
             const list = $('stayList');
             list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
             try {
-                const { data, error } = await db.from('stay').select('*').order('created_at', { ascending: false });
+                const { data, error } = await db.from('blueriot_stay').select('*').order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!data?.length) { list.innerHTML = '<div class="empty-state">Nessuna struttura trovata</div>'; return; }
                 list.innerHTML = data.map(i => `<div class="data-card"><div class="data-card-title">${i.name||'N/A'}</div><div class="data-card-meta">📍 ${i.city||'N/A'} | 🏨 ${i.type||'N/A'}</div></div>`).join('');
@@ -1754,7 +1754,7 @@
         $('saveTaste').addEventListener('click', async () => {
             const d = { name: $('tasteName').value, city: $('tasteCity').value, cuisine: $('tasteCuisine').value, address: $('tasteAddress').value, phone: $('tastePhone').value, notes: $('tasteNotes').value };
             if (!d.name || !d.city) return alert('Nome e Città obbligatori');
-            try { await db.from('tastes').insert([d]); $('tasteModal').classList.remove('active'); loadTastes(); } catch(e) { alert(e.message); }
+            try { await db.from('blueriot_tastes').insert([d]); $('tasteModal').classList.remove('active'); loadTastes(); } catch(e) { alert(e.message); }
         });
 
         $('addRouteBtn').addEventListener('click', () => $('routeModal').classList.add('active'));
@@ -1763,7 +1763,7 @@
         $('saveRoute').addEventListener('click', async () => {
             const d = { from_location: $('routeFrom').value, to_location: $('routeTo').value, type: $('routeType').value, company: $('routeCompany').value, duration: $('routeDuration').value, price: $('routePrice').value, notes: $('routeNotes').value };
             if (!d.from_location || !d.to_location) return alert('Partenza e Arrivo obbligatori');
-            try { await db.from('routes').insert([d]); $('routeModal').classList.remove('active'); loadRoutes(); } catch(e) { alert(e.message); }
+            try { await db.from('blueriot_routes').insert([d]); $('routeModal').classList.remove('active'); loadRoutes(); } catch(e) { alert(e.message); }
         });
 
         $('addStayBtn').addEventListener('click', () => $('stayModal').classList.add('active'));
@@ -1772,7 +1772,7 @@
         $('saveStay').addEventListener('click', async () => {
             const d = { name: $('stayName').value, city: $('stayCity').value, type: $('stayType').value, address: $('stayAddress').value, price: $('stayPrice').value, contact: $('stayContact').value, notes: $('stayNotes').value };
             if (!d.name || !d.city) return alert('Nome e Città obbligatori');
-            try { await db.from('stay').insert([d]); $('stayModal').classList.remove('active'); loadStay(); } catch(e) { alert(e.message); }
+            try { await db.from('blueriot_stay').insert([d]); $('stayModal').classList.remove('active'); loadStay(); } catch(e) { alert(e.message); }
         });
 
         // ==================== NODΞ TOUR MANAGEMENT ====================

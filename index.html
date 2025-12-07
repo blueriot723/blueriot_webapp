@@ -1128,6 +1128,194 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* ===== ETICKET STYLES ===== */
+        .eticket-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--neon-fuchsia);
+        }
+
+        .eticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .eticket-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-fuchsia);
+            text-shadow: 0 0 10px var(--neon-fuchsia);
+        }
+
+        .eticket-step {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .eticket-step h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            color: var(--neon-cyan);
+            margin-bottom: 12px;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .template-preview {
+            margin-top: 16px;
+        }
+
+        .template-img-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .template-img-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 8px;
+        }
+
+        .name-marker {
+            position: absolute;
+            font-size: 24px;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 5px #ff0000);
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .passenger-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .passengers-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .passenger-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .passenger-row input {
+            flex: 1;
+            min-width: 0;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 8px 10px;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+        }
+
+        .passenger-row input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        .passenger-row .remove-btn {
+            width: 32px;
+            height: 32px;
+            background: none;
+            border: 1px solid rgba(255, 80, 80, 0.3);
+            border-radius: 4px;
+            color: #ff5555;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .passenger-row .remove-btn:hover {
+            background: rgba(255, 80, 80, 0.1);
+        }
+
+        .empty-msg {
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 16px;
+        }
+
+        .generate-btn {
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-fuchsia));
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            box-shadow: 0 0 30px var(--neon-fuchsia);
+            transform: scale(1.02);
+        }
+
+        .generated-tickets {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .ticket-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .ticket-card img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .ticket-card h5 {
+            font-size: 12px;
+            margin-bottom: 8px;
+            color: var(--neon-cyan);
+        }
+
+        .ticket-card a {
+            display: inline-block;
+            padding: 6px 12px;
+            background: var(--neon-cyan);
+            color: #000;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -1383,6 +1571,57 @@
                                         <div class="tool-card small" id="tourFeedback">
                                             <span class="tool-icon">⭐</span>
                                             <span class="tool-name">Feedback</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- eTickets Section (hidden by default) -->
+                                    <div id="eticketSection" class="eticket-section" style="display:none;">
+                                        <div class="eticket-header">
+                                            <h3>🎫 Sistema eTickets</h3>
+                                            <button class="back-btn" id="closeEticketSection">← Chiudi</button>
+                                        </div>
+
+                                        <!-- Step 1: Template -->
+                                        <div class="eticket-step">
+                                            <h4>1. Template Biglietto</h4>
+                                            <p class="step-desc">Carica un biglietto vuoto. Il nome verrà aggiunto automaticamente.</p>
+                                            <input type="file" id="ticketTemplateInput" accept=".jpg,.jpeg,.png" style="display:none;">
+                                            <button class="add-btn" onclick="document.getElementById('ticketTemplateInput').click()">📤 Carica Template</button>
+                                            <div id="templatePreview" class="template-preview" style="display:none;">
+                                                <div class="template-img-container">
+                                                    <img id="templateImage" alt="Template">
+                                                    <div id="nameMarker" class="name-marker" style="display:none;">📍</div>
+                                                </div>
+                                                <div class="template-actions">
+                                                    <button class="action-btn" id="setNamePosBtn" title="Posizione nome">📍</button>
+                                                    <button class="action-btn danger" id="removeTemplateBtn" title="Rimuovi">🗑️</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2: Passengers -->
+                                        <div class="eticket-step">
+                                            <h4>2. Passeggeri</h4>
+                                            <div class="passenger-actions">
+                                                <button class="add-btn small" id="addPassengerBtn">+ Aggiungi</button>
+                                                <button class="action-btn" id="bulkAddBtn" title="Inserimento multiplo">📋</button>
+                                            </div>
+                                            <div id="passengersList" class="passengers-list">
+                                                <p class="empty-msg">Nessun passeggero</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 3: Generate -->
+                                        <div class="eticket-step">
+                                            <button class="generate-btn" id="generateTicketsBtn">⚡ Genera Biglietti</button>
+                                        </div>
+
+                                        <!-- Step 4: Results -->
+                                        <div class="eticket-step">
+                                            <h4>3. Biglietti Generati</h4>
+                                            <div id="generatedTickets" class="generated-tickets">
+                                                <p class="empty-msg">I biglietti appariranno qui</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2171,13 +2410,308 @@
             }
         });
 
-        // Tool buttons (placeholders)
+        // Tool buttons
         $('toolPdfOcr').addEventListener('click', () => alert('PDF OCR Engine\n\nFunzionalità in sviluppo.\nPermetterà di estrarre info da rooming list PDF.'));
-        $('toolEticket').addEventListener('click', () => alert('eTicket System\n\nFunzionalità in sviluppo.\nGestione biglietti elettronici.'));
-        $('tourEtickets')?.addEventListener('click', () => alert('eTickets per questo tour\n\nFunzionalità in sviluppo.'));
+        $('toolEticket').addEventListener('click', () => alert('Vai su NODΞ → seleziona un tour → clicca eTickets'));
         $('tourPdfOcr')?.addEventListener('click', () => alert('PDF OCR per questo tour\n\nFunzionalità in sviluppo.'));
         $('tourRooming')?.addEventListener('click', () => alert('Rooming List\n\nFunzionalità in sviluppo.'));
         $('tourFeedback')?.addEventListener('click', () => alert('Feedback passeggeri\n\nFunzionalità in sviluppo.'));
+
+        // ==================== ETICKET SYSTEM ====================
+        let ticketTemplate = null;
+        let namePosition = { x: null, y: null };
+
+        // Open eTicket section
+        $('tourEtickets')?.addEventListener('click', () => {
+            if (!currentTour) return;
+            $('eticketSection').style.display = 'block';
+            loadTicketTemplate();
+            loadPassengers();
+            loadGeneratedTickets();
+        });
+
+        // Close eTicket section
+        $('closeEticketSection')?.addEventListener('click', () => {
+            $('eticketSection').style.display = 'none';
+        });
+
+        // Template upload
+        $('ticketTemplateInput')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const base64 = await fileToBase64(file);
+                ticketTemplate = { url: base64, name: file.name };
+
+                $('templateImage').src = base64;
+                $('templatePreview').style.display = 'block';
+
+                await saveTicketTemplate();
+                alert('✅ Template caricato!');
+            } catch(err) {
+                alert('❌ Errore: ' + err.message);
+            }
+        });
+
+        // Remove template
+        $('removeTemplateBtn')?.addEventListener('click', () => {
+            ticketTemplate = null;
+            namePosition = { x: null, y: null };
+            $('templatePreview').style.display = 'none';
+            $('templateImage').src = '';
+            $('nameMarker').style.display = 'none';
+        });
+
+        // Set name position
+        $('setNamePosBtn')?.addEventListener('click', () => {
+            const img = $('templateImage');
+            alert('👆 Clicca sull\'immagine dove vuoi il nome');
+            img.style.cursor = 'crosshair';
+
+            img.onclick = async (e) => {
+                const rect = img.getBoundingClientRect();
+                const x = Math.round((e.clientX - rect.left) / rect.width * img.naturalWidth);
+                const y = Math.round((e.clientY - rect.top) / rect.height * img.naturalHeight);
+
+                namePosition = { x, y };
+
+                // Show marker
+                const marker = $('nameMarker');
+                marker.style.left = ((e.clientX - rect.left) / rect.width * 100) + '%';
+                marker.style.top = ((e.clientY - rect.top) / rect.height * 100) + '%';
+                marker.style.display = 'block';
+
+                img.style.cursor = 'default';
+                img.onclick = null;
+
+                await saveTicketTemplate();
+                alert(`✅ Posizione salvata! (${x}, ${y})`);
+            };
+        });
+
+        // Save ticket template to DB
+        async function saveTicketTemplate() {
+            if (!db || !currentTour || !ticketTemplate) return;
+
+            try {
+                const data = {
+                    tour_id: currentTour.id,
+                    template_name: ticketTemplate.name || 'template',
+                    template_file_url: ticketTemplate.url,
+                    name_position_x: namePosition.x,
+                    name_position_y: namePosition.y
+                };
+
+                await db.from('ticket_templates').upsert(data, { onConflict: 'tour_id' });
+            } catch(e) {
+                console.error('Save template error:', e);
+            }
+        }
+
+        // Load ticket template from DB
+        async function loadTicketTemplate() {
+            if (!db || !currentTour) return;
+
+            try {
+                const { data } = await db.from('ticket_templates').select('*').eq('tour_id', currentTour.id).single();
+
+                if (data) {
+                    ticketTemplate = { url: data.template_file_url, name: data.template_name };
+                    namePosition = { x: data.name_position_x, y: data.name_position_y };
+
+                    $('templateImage').src = data.template_file_url;
+                    $('templatePreview').style.display = 'block';
+
+                    if (namePosition.x && namePosition.y) {
+                        const marker = $('nameMarker');
+                        marker.style.display = 'block';
+                    }
+                }
+            } catch(e) {
+                console.log('No template found');
+            }
+        }
+
+        // Add passenger
+        $('addPassengerBtn')?.addEventListener('click', () => {
+            addPassengerRow();
+        });
+
+        function addPassengerRow(name = '', email = '') {
+            const list = $('passengersList');
+            if (list.querySelector('.empty-msg')) list.innerHTML = '';
+
+            const row = document.createElement('div');
+            row.className = 'passenger-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Nome completo *" value="${name}" class="pax-name">
+                <input type="email" placeholder="Email" value="${email}" class="pax-email">
+                <button class="remove-btn" onclick="this.parentElement.remove()">✕</button>
+            `;
+            list.appendChild(row);
+        }
+
+        // Bulk add passengers
+        $('bulkAddBtn')?.addEventListener('click', () => {
+            const names = prompt('Inserisci i nomi (uno per riga):');
+            if (!names) return;
+
+            names.split('\n').forEach(name => {
+                if (name.trim()) addPassengerRow(name.trim());
+            });
+        });
+
+        // Save passengers to DB
+        async function savePassengers() {
+            if (!db || !currentTour) return;
+
+            const rows = $$('.passenger-row');
+            const passengers = [];
+
+            for (const row of rows) {
+                const name = row.querySelector('.pax-name').value.trim();
+                if (name) {
+                    passengers.push({
+                        tour_id: currentTour.id,
+                        full_name: name,
+                        email: row.querySelector('.pax-email').value.trim() || null
+                    });
+                }
+            }
+
+            // Delete existing
+            await db.from('tour_passengers').delete().eq('tour_id', currentTour.id);
+
+            // Insert new
+            if (passengers.length > 0) {
+                await db.from('tour_passengers').insert(passengers);
+            }
+        }
+
+        // Load passengers from DB
+        async function loadPassengers() {
+            if (!db || !currentTour) return;
+
+            try {
+                const { data } = await db.from('tour_passengers').select('*').eq('tour_id', currentTour.id).order('full_name');
+
+                const list = $('passengersList');
+                list.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    list.innerHTML = '<p class="empty-msg">Nessun passeggero</p>';
+                    return;
+                }
+
+                data.forEach(p => addPassengerRow(p.full_name, p.email || ''));
+            } catch(e) {
+                console.error('Load passengers error:', e);
+            }
+        }
+
+        // Generate tickets
+        $('generateTicketsBtn')?.addEventListener('click', async () => {
+            if (!ticketTemplate) return alert('❌ Carica prima un template!');
+            if (!namePosition.x || !namePosition.y) return alert('❌ Scegli prima la posizione del nome!');
+            if (!currentTour) return alert('❌ Tour non selezionato');
+
+            // Save passengers first
+            await savePassengers();
+
+            // Get passengers
+            const { data: passengers } = await db.from('tour_passengers').select('*').eq('tour_id', currentTour.id);
+
+            if (!passengers || passengers.length === 0) return alert('❌ Aggiungi almeno un passeggero');
+
+            if (!confirm(`Generare ${passengers.length} biglietti?`)) return;
+
+            alert(`⏳ Generazione di ${passengers.length} biglietti...`);
+
+            let success = 0;
+            for (const p of passengers) {
+                try {
+                    const ticketUrl = await generateSingleTicket(p.full_name);
+
+                    await db.from('tour_passengers').update({
+                        ticket_generated: true,
+                        ticket_url: ticketUrl
+                    }).eq('id', p.id);
+
+                    success++;
+                } catch(e) {
+                    console.error(`Error for ${p.full_name}:`, e);
+                }
+            }
+
+            alert(`✅ ${success} biglietti generati!`);
+            loadGeneratedTickets();
+        });
+
+        // Generate single ticket using Canvas
+        async function generateSingleTicket(passengerName) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+
+                    // Draw name
+                    ctx.font = 'bold 28px Arial';
+                    ctx.fillStyle = '#000000';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(passengerName, namePosition.x, namePosition.y);
+
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => reject(new Error('Image load failed'));
+                img.src = ticketTemplate.url;
+            });
+        }
+
+        // Load generated tickets
+        async function loadGeneratedTickets() {
+            if (!db || !currentTour) return;
+
+            try {
+                const { data } = await db.from('tour_passengers')
+                    .select('*')
+                    .eq('tour_id', currentTour.id)
+                    .eq('ticket_generated', true)
+                    .order('full_name');
+
+                const container = $('generatedTickets');
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p class="empty-msg">I biglietti appariranno qui</p>';
+                    return;
+                }
+
+                container.innerHTML = data.map(p => `
+                    <div class="ticket-card">
+                        <img src="${p.ticket_url}" alt="${p.full_name}">
+                        <h5>${p.full_name}</h5>
+                        <a href="${p.ticket_url}" download="${p.full_name.replace(/\s+/g, '_')}_ticket.png">⬇️ Scarica</a>
+                    </div>
+                `).join('');
+            } catch(e) {
+                console.error('Load tickets error:', e);
+            }
+        }
+
+        // Helper: File to Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
 
         console.log('🚀 BlueRiot Ready');
     </script>

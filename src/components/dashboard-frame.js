@@ -24,30 +24,48 @@ export class DashboardFrame extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('../styles/base.css');
-                * { box-sizing: border-box; }
-                .container { display: flex; min-height: 100vh; }
-                .sidebar { width: 260px; background: var(--bg-sidebar); position: fixed; height: 100vh; overflow-y: auto; }
-                .logos { padding: 20px; text-align: center; border-bottom: 1px solid rgba(0,240,255,0.1); }
-                .logos img { width: 120px; }
-                .logos img:first-child { background: white; padding: 8px; border-radius: 6px; margin-bottom: 10px; }
-                .syndicate { color: white; font-size: 12px; letter-spacing: 2px; margin: 8px 0; }
-                .nav { padding: 20px 0; }
-                .nav-section { padding: 8px 16px; color: #556677; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 16px; }
-                .nav-section:first-child { margin-top: 0; }
-                .nav button { width: calc(100% - 32px); margin: 0 16px 12px; height: 56px; background: rgba(10,14,39,0.8); border: none; color: white; font-size: 17px; font-weight: 700; cursor: pointer; position: relative; text-align: left; padding-left: 24px; transition: all 0.2s ease; border-radius: 0 4px 4px 0; }
-                .nav button:hover { background: rgba(0,240,255,0.15); }
-                .nav button::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #00f0ff; box-shadow: 0 0 8px #00f0ff, 0 0 16px #00f0ff; transition: all 0.2s ease; }
-                .nav button:hover::before { width: 4px; box-shadow: 0 0 12px #00f0ff, 0 0 24px #00f0ff; }
-                .nav button.active::before { background: #ff00ff; box-shadow: 0 0 12px #ff00ff, 0 0 24px #ff00ff; width: 4px; }
-                .nav button.active { background: rgba(255,0,255,0.15); color: #ff00ff; text-shadow: 0 0 8px #ff00ff; }
-                .main { margin-left: 260px; flex: 1; padding: 30px; background: var(--bg-pure-dark); min-height: 100vh; }
-                .work { background: rgba(10,14,39,0.4); border-radius: 12px; padding: 30px; min-height: 80vh; position: relative; }
-                .work::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,transparent 0%,#00f0ff 25%,#00f0ff 75%,transparent 100%); border-radius: 12px 12px 0 0; }
+                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+                * { box-sizing: border-box; margin: 0; padding: 0; }
+                :host { --neon-cyan: #00f0ff; --neon-fuchsia: #ff00ff; --text-gray: #6b7280; --bg-black: #000000; }
+                .container { display: flex; min-height: 100vh; background: var(--bg-black); font-family: 'Orbitron', sans-serif; }
+
+                /* === SIDEBAR === */
+                .sidebar { width: 240px; background: var(--bg-black); padding: 30px 20px; border-right: 1px solid rgba(255,255,255,0.1); position: fixed; height: 100vh; }
+                .logo-box { border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 50px; }
+                .logo-blue { font-size: 18px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; }
+                .logo-white { font-size: 16px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 5px; }
+
+                /* === NAV ITEMS === */
+                .nav { list-style: none; padding: 0; }
+                .nav-item { margin-bottom: 28px; position: relative; cursor: pointer; padding-bottom: 12px; }
+                .nav-item span { font-size: 16px; font-weight: 700; color: var(--text-gray); letter-spacing: 1px; transition: color 0.3s; display: block; }
+                .nav-item:hover span { color: white; }
+                .nav-item.active span { color: white; }
+                .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 50px; height: 2px; background: var(--neon-fuchsia); box-shadow: 0 0 10px var(--neon-fuchsia); }
+                .nav-item.active::before { content: '←'; position: absolute; right: 0; bottom: 0; color: var(--neon-fuchsia); font-size: 18px; text-shadow: 0 0 10px var(--neon-fuchsia); }
+                .nav-section { color: #445566; font-size: 10px; letter-spacing: 2px; margin: 30px 0 15px; text-transform: uppercase; }
+
+                /* === MAIN CONTENT === */
+                .main { margin-left: 240px; flex: 1; padding: 30px; background: var(--bg-black); min-height: 100vh; }
+
+                /* === WORK WINDOW with 45° corners === */
+                .work {
+                    position: relative; background: var(--bg-black); min-height: calc(100vh - 60px); padding: 40px;
+                    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+                }
+                .work::before {
+                    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+                    border: 2px solid var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 15px rgba(0,240,255,0.1);
+                    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+                }
+
                 .page { display: none; }
                 .page.active { display: block; }
-                h1 { font-size: 36px; color: #00f0ff; text-shadow: 0 0 12px #00f0ff; margin-bottom: 24px; }
-                .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 20px; }
+                h1 { font-size: 42px; font-weight: 900; color: white; letter-spacing: 4px; margin-bottom: 30px; }
+
+                /* === CONTENT BOX === */
+                .content-box { background: rgba(10,14,39,0.3); border: 1px solid rgba(0,240,255,0.2); border-radius: 8px; padding: 25px; min-height: 300px; }
+                .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 16px; }
                 .card { background: rgba(10,14,39,0.6); border: 1px solid rgba(0,240,255,0.2); border-radius: 8px; padding: 20px; transition: all 0.3s ease; position: relative; }
                 .card:hover { border-color: rgba(0,240,255,0.4); box-shadow: 0 0 20px rgba(0,240,255,0.1); }
                 .card h3 { color: #00f0ff; margin-bottom: 8px; }
@@ -93,41 +111,51 @@ export class DashboardFrame extends HTMLElement {
                 }
                 .hamburger { display: none; }
             </style>
-            <button class="hamburger" onclick="this.getRootNode().host.toggleSidebar()">☰</button>
+            <button class="hamburger" id="hamburger">☰</button>
             <div class="container">
                 <aside class="sidebar" id="sidebar">
-                    <div class="logos">
-                        <img src="blueriot-logo.png">
-                        <div class="syndicate">SYNDICATE</div>
-                        <img src="matrix.svg">
+                    <div class="logo-box">
+                        <div class="logo-blue">BLUERIOT</div>
+                        <div class="logo-white">SYNDICATE</div>
                     </div>
-                    <nav class="nav">
-                        <div class="nav-section">Database</div>
-                        <button data-v="tastes">ΤΔSΤΞ5</button>
-                        <button data-v="routes">R0UT35</button>
-                        <button data-v="stay">SΤΔΥ</button>
-                        <button data-v="node">NODΞ</button>
-                        <div class="nav-section">T00L5</div>
-                        <button data-v="etickets">🎫 eTICKΞTS</button>
-                        <button data-v="pdfocr">📄 PDF 0CR</button>
-                    </nav>
+                    <ul class="nav">
+                        <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
+                        <li class="nav-item" data-v="routes"><span>R0UT35</span></li>
+                        <li class="nav-item" data-v="stay"><span>SΤΔΥ</span></li>
+                        <li class="nav-item" data-v="node"><span>NODΞ</span></li>
+                        <li class="nav-section">T00L5</li>
+                        <li class="nav-item" data-v="etickets"><span>eTICKΞTS</span></li>
+                        <li class="nav-item" data-v="pdfocr"><span>PDF 0CR</span></li>
+                    </ul>
                 </aside>
                 <main class="main">
                     <div class="work">
-                        <div id="home" class="page active" style="text-align:center;padding:60px 20px;">
-                            <img src="matrix.svg" style="width:250px;opacity:0.8;">
-                            <h1 style="margin-top:30px;">SYNDICATE MATRIX</h1>
-                            <p style="color:var(--text-secondary);">Seleziona una sezione dal menu</p>
+                        <div id="home" class="page active" style="text-align:center;padding:80px 20px;">
+                            <div style="font-size:72px;margin-bottom:20px;opacity:0.6;">⬡</div>
+                            <h1>MATRIX</h1>
+                            <p style="color:#6b7280;font-size:14px;">Seleziona una sezione dal menu</p>
                         </div>
-                        <div id="tastes" class="page"><h1>ΤΔSΤΞ5</h1><div id="tastes-c">Caricamento...</div></div>
-                        <div id="routes" class="page"><h1>R0UT35</h1><div id="routes-c">Caricamento...</div></div>
-                        <div id="stay" class="page"><h1>SΤΔΥ</h1><div id="stay-c">Caricamento...</div></div>
+                        <div id="tastes" class="page">
+                            <h1>TASTES</h1>
+                            <div class="content-box" id="tastes-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                        </div>
+                        <div id="routes" class="page">
+                            <h1>ROUTES</h1>
+                            <div class="content-box" id="routes-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                        </div>
+                        <div id="stay" class="page">
+                            <h1>STAY</h1>
+                            <div class="content-box" id="stay-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                        </div>
                         <div id="node" class="page">
-                            <div id="node-list"><h1>NODΞ</h1><div id="node-c">Caricamento...</div></div>
+                            <div id="node-list">
+                                <h1>NODE</h1>
+                                <div class="content-box" id="node-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                            </div>
                             <div id="node-detail" style="display:none;"><tour-weather-panel></tour-weather-panel></div>
                         </div>
-                        <div id="etickets" class="page"><eticket-panel></eticket-panel></div>
-                        <div id="pdfocr" class="page"><pdf-ocr-panel></pdf-ocr-panel></div>
+                        <div id="etickets" class="page"><h1>eTICKETS</h1><eticket-panel></eticket-panel></div>
+                        <div id="pdfocr" class="page"><h1>PDF OCR</h1><pdf-ocr-panel></pdf-ocr-panel></div>
                     </div>
                 </main>
             </div>
@@ -150,11 +178,15 @@ export class DashboardFrame extends HTMLElement {
     }
     toggleSidebar() { this.shadowRoot.getElementById('sidebar').classList.toggle('open'); }
     setupListeners() {
-        this.shadowRoot.querySelectorAll('.nav button').forEach(b => {
-            b.onclick = () => {
-                const v = b.dataset.v;
-                this.shadowRoot.querySelectorAll('.nav button').forEach(x => x.classList.remove('active'));
-                b.classList.add('active');
+        // Hamburger
+        this.shadowRoot.getElementById('hamburger').onclick = () => this.toggleSidebar();
+
+        // Nav items
+        this.shadowRoot.querySelectorAll('.nav-item[data-v]').forEach(item => {
+            item.onclick = () => {
+                const v = item.dataset.v;
+                this.shadowRoot.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+                item.classList.add('active');
                 this.shadowRoot.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 this.shadowRoot.getElementById(v).classList.add('active');
                 this.load(v);

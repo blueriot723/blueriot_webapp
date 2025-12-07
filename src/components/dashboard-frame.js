@@ -31,7 +31,8 @@ export class DashboardFrame extends HTMLElement {
 
                 /* === SIDEBAR === */
                 .sidebar { width: 240px; background: var(--bg-black); padding: 30px 20px; border-right: 1px solid rgba(255,255,255,0.1); position: fixed; height: 100vh; }
-                .logo-box { border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 50px; }
+                .logo-box { border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 50px; position: relative; }
+                .logo-box::after { content: ''; position: absolute; bottom: -15px; left: 20%; right: 20%; height: 2px; background: white; box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white; border-radius: 2px; }
                 .logo-blue { font-size: 18px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; }
                 .logo-white { font-size: 16px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 5px; }
 

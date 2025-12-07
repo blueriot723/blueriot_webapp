@@ -3,65 +3,630 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueRiot Syndicate - TL Dashboard</title>
+    <title>BlueRiot Syndicate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-    <!-- CSS Modules -->
-    <link rel="stylesheet" href="src/styles/base.css">
-    <link rel="stylesheet" href="src/styles/layout.css">
-    <link rel="stylesheet" href="src/styles/components.css">
+    <style>
+        :root {
+            --neon-cyan: #00eaff;
+            --neon-blue: #00C8FF;
+            --neon-pink: #ff4fd8;
+            --neon-fuchsia: #ff4fd8;
+            --bg-pure-dark: #050505;
+            --bg-sidebar: #0c0f13;
+            --bg-card: #0D1117;
+            --bg-input: #0A0E13;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8B9DC3;
+            --text-muted: #525866;
+            --error: #FF4757;
+        }
 
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- App Initialization -->
-    <script type="module">
-        import { router } from './src/utils/router.js';
-        import { auth } from './src/utils/auth.js';
-        import { gestures } from './src/utils/gestures.js';
-        import './src/components/login-panel.js';
-        import './src/components/dashboard-frame.js';
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
 
-        // Initialize app when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🚀 BlueRiot Dashboard - Modular Architecture');
-            console.log('📦 Web Components loaded');
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: var(--bg-pure-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
 
-            // Initialize auth manager
-            auth.init();
+        /* ===== LOGIN CONTAINER ===== */
+        .login-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
 
-            // Initialize gesture navigation
-            gestures.init();
+        /* ===== SIDEBAR 20% ===== */
+        .login-sidebar {
+            width: 20%;
+            min-width: 260px;
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 48px 24px;
+            border-right: 1px solid rgba(0, 234, 255, 0.15);
+        }
 
-            // Register routes
-            router.register('login', async () => {
-                console.log('📄 Showing login screen');
-            });
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
 
-            router.register('dashboard', async () => {
-                console.log('📄 Showing dashboard screen');
-            });
+        .logo-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow:
+                0 0 20px rgba(255, 255, 255, 0.3),
+                0 0 40px rgba(255, 255, 255, 0.1);
+        }
 
-            // Check if user is already authenticated
-            const isAuthenticated = await auth.checkAuth();
+        .blueriot-logo {
+            width: 180px;
+            height: auto;
+            display: block;
+        }
 
-            if (!isAuthenticated) {
-                // Show login screen
-                await router.navigate('login');
+        .matrix-logo {
+            width: 140px;
+            height: auto;
+            margin-top: 16px;
+            filter: drop-shadow(0 0 12px rgba(0, 234, 255, 0.6));
+        }
+
+        /* ===== LANGUAGE BUTTONS ===== */
+        .language-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 140px;
+        }
+
+        .lang-btn {
+            position: relative;
+            width: 100%;
+            height: 48px;
+            background: rgba(10, 14, 39, 0.9);
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%);
+        }
+
+        .lang-btn::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 4px;
+            height: 50%;
+            background: linear-gradient(180deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
+            box-shadow: 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-cyan);
+        }
+
+        .lang-btn.active::before,
+        .lang-btn:hover::before {
+            background: linear-gradient(180deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
+            box-shadow: 0 0 12px var(--neon-fuchsia), 0 0 24px var(--neon-fuchsia);
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 79, 216, 0.1);
+        }
+
+        /* ===== MAIN LOGIN AREA 80% ===== */
+        .login-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            background: var(--bg-pure-dark);
+            position: relative;
+        }
+
+        .login-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 20%, var(--neon-cyan) 80%, transparent 100%);
+            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+        }
+
+        .login-content {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        /* ===== LOGIN OPTIONS ===== */
+        .login-option {
+            position: relative;
+            background: rgba(10, 14, 39, 0.7);
+            padding: 24px;
+            margin-bottom: 20px;
+            clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%, 0 30%);
+        }
+
+        .login-option::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 50%;
+            background: linear-gradient(180deg, transparent 0%, var(--neon-cyan) 20%, var(--neon-cyan) 100%);
+            box-shadow: 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-cyan);
+        }
+
+        .login-option:hover::before,
+        .login-option:focus-within::before,
+        .login-option.active::before {
+            background: linear-gradient(180deg, transparent 0%, var(--neon-fuchsia) 20%, var(--neon-fuchsia) 100%);
+            box-shadow: 0 0 12px var(--neon-fuchsia), 0 0 24px var(--neon-fuchsia);
+        }
+
+        /* ===== GOOGLE BUTTON ===== */
+        .google-signin-btn {
+            width: 100%;
+            height: 50px;
+            background: white;
+            color: #444;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .google-signin-btn:hover {
+            background: #f8f8f8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .google-signin-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* ===== EMAIL TOGGLE ===== */
+        .email-toggle-btn {
+            width: 100%;
+            height: 50px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid rgba(0, 234, 255, 0.3);
+            color: var(--text-primary);
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .email-toggle-btn:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.3);
+        }
+
+        .email-toggle-btn.expanded {
+            border-color: var(--neon-fuchsia);
+            box-shadow: 0 0 15px rgba(255, 79, 216, 0.3);
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        /* ===== EMAIL FORM ===== */
+        .email-form {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, margin-top 0.3s ease;
+        }
+
+        .email-form.expanded {
+            max-height: 200px;
+            margin-top: 20px;
+        }
+
+        .login-input {
+            width: 100%;
+            height: 48px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            border-radius: 4px;
+            padding: 0 16px;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 15px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .login-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+        }
+
+        .login-submit-btn {
+            width: 100%;
+            height: 48px;
+            background: var(--neon-cyan);
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .login-submit-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
+        }
+
+        .login-submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* ===== ERROR MESSAGE ===== */
+        .error-message {
+            display: none;
+            padding: 12px;
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            border-radius: 4px;
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* ===== DASHBOARD (hidden by default) ===== */
+        .dashboard-container {
+            display: none;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .dashboard-container.active {
+            display: block;
+        }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
             }
 
-            console.log('✅ App initialized');
-        });
-    </script>
+            .login-sidebar {
+                width: 100%;
+                min-width: 100%;
+                padding: 24px;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .logo-section {
+                flex-direction: row;
+                gap: 16px;
+            }
+
+            .logo-container {
+                padding: 12px;
+            }
+
+            .blueriot-logo {
+                width: 100px;
+            }
+
+            .matrix-logo {
+                width: 80px;
+                margin-top: 0;
+            }
+
+            .language-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+                max-width: none;
+                gap: 8px;
+            }
+
+            .lang-btn {
+                width: 60px;
+                height: 40px;
+                font-size: 14px;
+            }
+
+            .login-main {
+                padding: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div data-screen="login" class="active">
-        <login-panel></login-panel>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-container">
+        <!-- Sidebar -->
+        <div class="login-sidebar">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
+                </div>
+                <img src="matrix.png" alt="Matrix" class="matrix-logo">
+            </div>
+
+            <div class="language-buttons">
+                <button class="lang-btn active" data-lang="it">IT</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+                <button class="lang-btn" data-lang="es">ES</button>
+                <button class="lang-btn" data-lang="de">DE</button>
+                <button class="lang-btn" data-lang="fr">FR</button>
+            </div>
+        </div>
+
+        <!-- Main Login Area -->
+        <div class="login-main">
+            <div class="login-content">
+                <!-- Google Sign-In -->
+                <div class="login-option" id="googleOption">
+                    <button class="google-signin-btn" id="googleSigninBtn">
+                        <svg width="20" height="20" viewBox="0 0 18 18">
+                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                            <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
+                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                        </svg>
+                        Sign in with Google
+                    </button>
+                </div>
+
+                <!-- Email Login -->
+                <div class="login-option" id="emailOption">
+                    <button class="email-toggle-btn" id="emailToggleBtn">
+                        <span class="toggle-icon" id="emailToggleIcon">&#9660;</span>
+                        EMAIL LOGIN
+                    </button>
+
+                    <div class="email-form" id="emailForm">
+                        <input type="email" id="emailInput" placeholder="email@example.com" class="login-input">
+                        <input type="password" id="passwordInput" placeholder="Password" class="login-input">
+                        <button class="login-submit-btn" id="emailLoginBtn">ACCEDI</button>
+                    </div>
+
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Dashboard Screen -->
-    <div data-screen="dashboard">
-        <dashboard-frame></dashboard-frame>
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboardScreen" class="dashboard-container">
+        <h1 style="color: var(--neon-cyan);">Dashboard</h1>
+        <p>Benvenuto!</p>
+        <button id="logoutBtn" style="margin-top: 20px; padding: 10px 20px; background: var(--neon-fuchsia); border: none; color: white; cursor: pointer;">Logout</button>
     </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ===== CONFIG =====
+        const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
+
+        // ===== INIT SUPABASE =====
+        let supabaseClient = null;
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase initialized');
+        } catch (e) {
+            console.error('Supabase init error:', e);
+        }
+
+        // ===== DOM ELEMENTS =====
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboardScreen = document.getElementById('dashboardScreen');
+        const googleSigninBtn = document.getElementById('googleSigninBtn');
+        const googleOption = document.getElementById('googleOption');
+        const emailToggleBtn = document.getElementById('emailToggleBtn');
+        const emailForm = document.getElementById('emailForm');
+        const emailToggleIcon = document.getElementById('emailToggleIcon');
+        const emailOption = document.getElementById('emailOption');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const langBtns = document.querySelectorAll('.lang-btn');
+
+        // ===== NAVIGATION =====
+        function showLogin() {
+            loginScreen.style.display = 'flex';
+            dashboardScreen.classList.remove('active');
+        }
+
+        function showDashboard() {
+            loginScreen.style.display = 'none';
+            dashboardScreen.classList.add('active');
+        }
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.classList.add('show');
+            setTimeout(() => errorMessage.classList.remove('show'), 5000);
+        }
+
+        // ===== LANGUAGE BUTTONS =====
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                langBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // ===== EMAIL TOGGLE =====
+        let emailExpanded = false;
+        emailToggleBtn.addEventListener('click', () => {
+            emailExpanded = !emailExpanded;
+            emailForm.classList.toggle('expanded', emailExpanded);
+            emailToggleBtn.classList.toggle('expanded', emailExpanded);
+            emailToggleIcon.classList.toggle('rotated', emailExpanded);
+            emailOption.classList.toggle('active', emailExpanded);
+        });
+
+        // ===== GOOGLE SIGN IN =====
+        googleSigninBtn.addEventListener('click', async () => {
+            if (!supabaseClient) {
+                showError('Supabase non inizializzato');
+                return;
+            }
+
+            googleOption.classList.add('active');
+            googleSigninBtn.disabled = true;
+            googleSigninBtn.textContent = 'Reindirizzamento...';
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + window.location.pathname
+                    }
+                });
+
+                if (error) throw error;
+            } catch (e) {
+                console.error('Google login error:', e);
+                showError(e.message || 'Errore Google login');
+                googleSigninBtn.disabled = false;
+                googleSigninBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 18 18">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                    <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
+                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                </svg> Sign in with Google`;
+                googleOption.classList.remove('active');
+            }
+        });
+
+        // ===== EMAIL LOGIN =====
+        emailLoginBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!email || !password) {
+                showError('Inserisci email e password');
+                return;
+            }
+
+            if (!supabaseClient) {
+                showError('Supabase non inizializzato');
+                return;
+            }
+
+            emailLoginBtn.disabled = true;
+            emailLoginBtn.textContent = 'ACCESSO...';
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+                // Auth state change will handle navigation
+            } catch (e) {
+                console.error('Email login error:', e);
+                showError(e.message || 'Errore login');
+                emailLoginBtn.disabled = false;
+                emailLoginBtn.textContent = 'ACCEDI';
+            }
+        });
+
+        // ===== LOGOUT =====
+        logoutBtn.addEventListener('click', async () => {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            showLogin();
+        });
+
+        // ===== AUTH STATE LISTENER =====
+        if (supabaseClient) {
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                console.log('Auth state:', event);
+                if (event === 'SIGNED_IN' && session) {
+                    console.log('User signed in:', session.user.email);
+                    showDashboard();
+                } else if (event === 'SIGNED_OUT') {
+                    showLogin();
+                }
+            });
+
+            // Check initial session
+            supabaseClient.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    showDashboard();
+                }
+            });
+        }
+
+        console.log('BlueRiot Login Ready');
+    </script>
 </body>
 </html>

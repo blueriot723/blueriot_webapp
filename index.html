@@ -490,6 +490,389 @@
             color: var(--text-muted);
         }
 
+        /* ===== NODΞ STYLES ===== */
+        .node-tools {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tool-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            background: rgba(255, 79, 216, 0.1);
+            border-color: var(--neon-fuchsia);
+            box-shadow: 0 0 15px rgba(255, 79, 216, 0.3);
+        }
+
+        .tool-card.small {
+            padding: 10px 14px;
+            font-size: 12px;
+        }
+
+        .tool-icon {
+            font-size: 20px;
+        }
+
+        .tool-card.small .tool-icon {
+            font-size: 16px;
+        }
+
+        .tool-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tour-section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .tour-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            background: none;
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .action-btn.danger:hover {
+            border-color: #ff5555;
+            background: rgba(255, 85, 85, 0.1);
+        }
+
+        .tour-info-bar {
+            display: flex;
+            gap: 24px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tour-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        /* Calendar */
+        .calendar-container {
+            margin-bottom: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .cal-nav {
+            width: 32px;
+            height: 32px;
+            background: none;
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cal-nav:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .cal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 4px;
+        }
+
+        .cal-day:hover {
+            border-color: var(--neon-cyan);
+        }
+
+        .cal-day.active {
+            border-color: var(--neon-fuchsia);
+            background: rgba(255, 79, 216, 0.15);
+        }
+
+        .cal-day.has-items {
+            border-color: var(--neon-cyan);
+        }
+
+        .cal-day-num {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .cal-day-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .cal-day-dots {
+            display: flex;
+            gap: 2px;
+            margin-top: 4px;
+        }
+
+        .cal-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+        }
+
+        /* Day Detail */
+        .day-detail {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .day-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .day-detail-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            color: var(--neon-fuchsia);
+        }
+
+        .add-btn.small {
+            height: 32px;
+            padding: 0 12px;
+            font-size: 12px;
+        }
+
+        .day-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .day-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            border-left: 3px solid var(--neon-cyan);
+        }
+
+        .day-item.restaurant {
+            border-left-color: #ff9500;
+        }
+
+        .day-item.activity {
+            border-left-color: #00ff88;
+        }
+
+        .day-item.transport {
+            border-left-color: #9b59b6;
+        }
+
+        .day-item-icon {
+            font-size: 20px;
+        }
+
+        .day-item-content {
+            flex: 1;
+        }
+
+        .day-item-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .day-item-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .day-item-time {
+            font-size: 12px;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .tour-tools {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        /* Tour Card in List */
+        .tour-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tour-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--neon-cyan);
+        }
+
+        .tour-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .tour-card.active::before {
+            background: var(--neon-fuchsia);
+        }
+
+        .tour-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .tour-card-code {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            color: var(--neon-cyan);
+            background: rgba(0, 212, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .tour-card-status {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .tour-card-status.active {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+        }
+
+        .tour-card-status.upcoming {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--neon-cyan);
+        }
+
+        .tour-card-status.completed {
+            background: rgba(136, 153, 170, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .tour-card-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .tour-card-info {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
         /* ===== MODAL ===== */
         .modal {
             display: none;
@@ -906,18 +1289,101 @@
                             </div>
                         </div>
 
-                        <!-- NODE -->
+                        <!-- NODE - Tour Management -->
                         <div id="nodeSection" style="display:none;">
-                            <div class="section-title">NODΞ</div>
-                            <div class="content-box">
-                                <div class="data-grid">
-                                    <div class="data-card" id="eticketCard">
-                                        <div class="data-card-title">🎫 eTickets</div>
-                                        <div class="data-card-meta">Importa biglietti elettronici</div>
+                            <!-- Tour List View -->
+                            <div id="nodeListView">
+                                <div class="section-header">
+                                    <div class="section-title">NODΞ</div>
+                                    <button class="add-btn" id="addTourBtn">+ NUOVO TOUR</button>
+                                </div>
+                                <div class="content-box">
+                                    <div class="node-tools">
+                                        <div class="tool-card" id="toolPdfOcr">
+                                            <span class="tool-icon">📄</span>
+                                            <span class="tool-name">PDF OCR</span>
+                                        </div>
+                                        <div class="tool-card" id="toolEticket">
+                                            <span class="tool-icon">🎫</span>
+                                            <span class="tool-name">eTickets</span>
+                                        </div>
                                     </div>
-                                    <div class="data-card" id="pdfCard">
-                                        <div class="data-card-title">📄 PDF OCR</div>
-                                        <div class="data-card-meta">Estrai dati da PDF</div>
+                                    <div class="tour-section-title">I miei Tour</div>
+                                    <div id="tourList" class="data-grid">
+                                        <div class="empty-state">Nessun tour. Crea il primo!</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tour Detail View -->
+                            <div id="nodeDetailView" style="display:none;">
+                                <div class="section-header">
+                                    <button class="back-btn" id="backToTourList">← Indietro</button>
+                                    <div class="section-title" id="tourDetailTitle">Tour</div>
+                                    <div class="tour-actions">
+                                        <button class="action-btn" id="tourQrBtn" title="QR Code">📱</button>
+                                        <button class="action-btn" id="tourShareBtn" title="Condividi">🔗</button>
+                                        <button class="action-btn danger" id="tourDeleteBtn" title="Elimina">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <!-- Tour Info Bar -->
+                                    <div class="tour-info-bar">
+                                        <div class="tour-info-item">
+                                            <span class="info-label">Codice</span>
+                                            <span class="info-value" id="tourCode">-</span>
+                                        </div>
+                                        <div class="tour-info-item">
+                                            <span class="info-label">Pax</span>
+                                            <span class="info-value" id="tourPax">-</span>
+                                        </div>
+                                        <div class="tour-info-item">
+                                            <span class="info-label">TL</span>
+                                            <span class="info-value" id="tourTL">-</span>
+                                        </div>
+                                        <div class="tour-info-item">
+                                            <span class="info-label">Date</span>
+                                            <span class="info-value" id="tourDates">-</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Calendar View -->
+                                    <div class="calendar-container">
+                                        <div class="calendar-header">
+                                            <button class="cal-nav" id="calPrev">◀</button>
+                                            <span class="cal-title" id="calTitle">Calendario</span>
+                                            <button class="cal-nav" id="calNext">▶</button>
+                                        </div>
+                                        <div id="calendarDays" class="calendar-days"></div>
+                                    </div>
+
+                                    <!-- Day Detail -->
+                                    <div id="dayDetail" class="day-detail" style="display:none;">
+                                        <div class="day-detail-header">
+                                            <h3 id="dayDetailTitle">Giorno 1</h3>
+                                            <button class="add-btn small" id="addDayItemBtn">+ Aggiungi</button>
+                                        </div>
+                                        <div id="dayItemsList" class="day-items-list"></div>
+                                    </div>
+
+                                    <!-- Tour Tools -->
+                                    <div class="tour-tools">
+                                        <div class="tool-card small" id="tourEtickets">
+                                            <span class="tool-icon">🎫</span>
+                                            <span class="tool-name">eTickets</span>
+                                        </div>
+                                        <div class="tool-card small" id="tourPdfOcr">
+                                            <span class="tool-icon">📄</span>
+                                            <span class="tool-name">PDF OCR</span>
+                                        </div>
+                                        <div class="tool-card small" id="tourRooming">
+                                            <span class="tool-icon">🛏️</span>
+                                            <span class="tool-name">Rooming</span>
+                                        </div>
+                                        <div class="tool-card small" id="tourFeedback">
+                                            <span class="tool-icon">⭐</span>
+                                            <span class="tool-name">Feedback</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -990,6 +1456,113 @@
             <div class="modal-actions">
                 <button class="btn-cancel" id="cancelStay">Annulla</button>
                 <button class="btn-save" id="saveStay">Salva</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tour Modal -->
+    <div class="modal" id="tourModal">
+        <div class="modal-box" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">Nuovo Tour</div>
+                <button class="modal-close" id="closeTourModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label>Codice Tour *</label>
+                    <input type="text" id="tourCodeInput" placeholder="es. ITL240315">
+                </div>
+                <div class="modal-field">
+                    <label>Nome Tour *</label>
+                    <input type="text" id="tourNameInput" placeholder="es. Best of Italy">
+                </div>
+                <div class="modal-field">
+                    <label>Tour Operator</label>
+                    <select id="tourOperator">
+                        <option value="">Seleziona...</option>
+                        <option value="intrepid">Intrepid Travel</option>
+                        <option value="gadventures">G Adventures</option>
+                        <option value="trafalgar">Trafalgar</option>
+                        <option value="contiki">Contiki</option>
+                        <option value="other">Altro</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="modal-field">
+                        <label>N° Passeggeri *</label>
+                        <input type="number" id="tourPaxInput" min="1" placeholder="es. 15">
+                    </div>
+                    <div class="modal-field">
+                        <label>N° TL *</label>
+                        <input type="number" id="tourTLInput" min="1" value="1" placeholder="1">
+                    </div>
+                </div>
+                <div class="modal-field">
+                    <label>Data Inizio *</label>
+                    <input type="date" id="tourStartDate">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="modal-field">
+                        <label>Durata (giorni)</label>
+                        <input type="number" id="tourDuration" min="1" placeholder="es. 10">
+                    </div>
+                    <div class="modal-field">
+                        <label>oppure Data Fine</label>
+                        <input type="date" id="tourEndDate">
+                    </div>
+                </div>
+                <div class="modal-field">
+                    <label>Note</label>
+                    <textarea id="tourNotesInput" placeholder="Note aggiuntive..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelTour">Annulla</button>
+                <button class="btn-save" id="saveTour">Crea Tour</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Item Modal -->
+    <div class="modal" id="dayItemModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">Aggiungi Elemento</div>
+                <button class="modal-close" id="closeDayItemModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label>Tipo *</label>
+                    <select id="dayItemType">
+                        <option value="activity">🎯 Attività</option>
+                        <option value="restaurant">🍽️ Ristorante (da ΤΔSΤΞ5)</option>
+                        <option value="transport">🚌 Trasporto</option>
+                        <option value="hotel">🏨 Hotel (da SΤΔΥ)</option>
+                        <option value="info">ℹ️ Info/Suggerimento</option>
+                        <option value="link">🔗 Link</option>
+                        <option value="map">🗺️ Mappa</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>Titolo *</label>
+                    <input type="text" id="dayItemTitle" placeholder="es. Visita al Colosseo">
+                </div>
+                <div class="modal-field">
+                    <label>Orario</label>
+                    <input type="time" id="dayItemTime">
+                </div>
+                <div class="modal-field">
+                    <label>Descrizione</label>
+                    <textarea id="dayItemDesc" placeholder="Dettagli..."></textarea>
+                </div>
+                <div class="modal-field">
+                    <label>Link (opzionale)</label>
+                    <input type="url" id="dayItemLink" placeholder="https://...">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelDayItem">Annulla</button>
+                <button class="btn-save" id="saveDayItem">Aggiungi</button>
             </div>
         </div>
     </div>
@@ -1201,6 +1774,410 @@
             if (!d.name || !d.city) return alert('Nome e Città obbligatori');
             try { await db.from('stay').insert([d]); $('stayModal').classList.remove('active'); loadStay(); } catch(e) { alert(e.message); }
         });
+
+        // ==================== NODΞ TOUR MANAGEMENT ====================
+        let tours = [];
+        let currentTour = null;
+        let selectedDay = null;
+
+        // Load tours on section open
+        function updateShowSection() {
+            const originalShowSection = showSection;
+            showSection = function(section) {
+                originalShowSection(section);
+                if (section === 'node') {
+                    loadTours();
+                }
+            };
+        }
+        updateShowSection();
+
+        // Load tours from database
+        async function loadTours() {
+            if (!db) return;
+            const list = $('tourList');
+            list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento tour...</div>';
+            try {
+                const { data: { user } } = await db.auth.getUser();
+                if (!user) return;
+
+                const { data, error } = await db.from('tours').select('*').eq('user_id', user.id).order('start_date', { ascending: false });
+                if (error) throw error;
+
+                tours = data || [];
+
+                if (!tours.length) {
+                    list.innerHTML = '<div class="empty-state">Nessun tour. Crea il primo!</div>';
+                    return;
+                }
+
+                list.innerHTML = tours.map(t => {
+                    const status = getTourStatus(t);
+                    return `
+                        <div class="tour-card ${status}" data-tour-id="${t.id}" onclick="openTourDetail('${t.id}')">
+                            <div class="tour-card-header">
+                                <span class="tour-card-code">${t.code || 'N/A'}</span>
+                                <span class="tour-card-status ${status}">${getStatusLabel(status)}</span>
+                            </div>
+                            <div class="tour-card-name">${t.name || 'Tour senza nome'}</div>
+                            <div class="tour-card-info">
+                                <span>👥 ${t.pax || 0} pax</span>
+                                <span>📅 ${formatDate(t.start_date)}</span>
+                                <span>⏱️ ${t.duration || 0}gg</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch(e) {
+                console.error('Error loading tours:', e);
+                list.innerHTML = '<div class="empty-state">Errore caricamento tour</div>';
+            }
+        }
+
+        // Get tour status based on dates
+        function getTourStatus(tour) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const start = new Date(tour.start_date);
+            const end = new Date(tour.end_date || tour.start_date);
+            end.setDate(end.getDate() + (tour.duration || 1) - 1);
+
+            if (today < start) return 'upcoming';
+            if (today > end) return 'completed';
+            return 'active';
+        }
+
+        function getStatusLabel(status) {
+            const labels = { upcoming: 'PROSSIMO', active: 'IN CORSO', completed: 'COMPLETATO' };
+            return labels[status] || status;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
+        }
+
+        // Open tour detail
+        async function openTourDetail(tourId) {
+            currentTour = tours.find(t => t.id === tourId);
+            if (!currentTour) return;
+
+            // Show detail view
+            $('nodeListView').style.display = 'none';
+            $('nodeDetailView').style.display = 'block';
+
+            // Update info
+            $('tourDetailTitle').textContent = currentTour.name || 'Tour';
+            $('tourCode').textContent = currentTour.code || '-';
+            $('tourPax').textContent = currentTour.pax || '-';
+            $('tourTL').textContent = currentTour.tl_count || '1';
+
+            const startDate = currentTour.start_date ? formatDate(currentTour.start_date) : '-';
+            const duration = currentTour.duration || 0;
+            $('tourDates').textContent = `${startDate} (${duration}gg)`;
+
+            // Load tour items
+            await loadTourItems();
+
+            // Render calendar
+            renderTourCalendar();
+
+            // Hide day detail initially
+            $('dayDetail').style.display = 'none';
+            selectedDay = null;
+        }
+
+        // Back to tour list
+        $('backToTourList').addEventListener('click', () => {
+            $('nodeDetailView').style.display = 'none';
+            $('nodeListView').style.display = 'block';
+            currentTour = null;
+            selectedDay = null;
+        });
+
+        // Render tour calendar
+        function renderTourCalendar() {
+            if (!currentTour || !currentTour.start_date) return;
+
+            const container = $('calendarDays');
+            const duration = currentTour.duration || 7;
+            const startDate = new Date(currentTour.start_date);
+
+            $('calTitle').textContent = `${currentTour.name} - ${duration} giorni`;
+
+            let html = '';
+            for (let i = 0; i < duration; i++) {
+                const date = new Date(startDate);
+                date.setDate(date.getDate() + i);
+                const dayNum = i + 1;
+                const dateStr = date.toISOString().split('T')[0];
+                const dayItems = (currentTour.items || []).filter(item => item.day === dayNum);
+                const hasItems = dayItems.length > 0;
+
+                html += `
+                    <div class="cal-day ${hasItems ? 'has-items' : ''}" data-day="${dayNum}" data-date="${dateStr}" onclick="selectDay(${dayNum})">
+                        <span class="cal-day-num">${dayNum}</span>
+                        <span class="cal-day-label">${date.toLocaleDateString('it-IT', { weekday: 'short' })}</span>
+                        ${hasItems ? `<div class="cal-day-dots">${dayItems.slice(0, 3).map(() => '<span class="cal-dot"></span>').join('')}</div>` : ''}
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // Select day
+        function selectDay(dayNum) {
+            selectedDay = dayNum;
+
+            // Update calendar UI
+            $$('.cal-day').forEach(d => d.classList.remove('active'));
+            const dayEl = document.querySelector(`.cal-day[data-day="${dayNum}"]`);
+            if (dayEl) dayEl.classList.add('active');
+
+            // Show day detail
+            $('dayDetail').style.display = 'block';
+            const startDate = new Date(currentTour.start_date);
+            startDate.setDate(startDate.getDate() + dayNum - 1);
+            $('dayDetailTitle').textContent = `Giorno ${dayNum} - ${startDate.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}`;
+
+            // Load day items
+            renderDayItems(dayNum);
+        }
+
+        // Load tour items from database
+        async function loadTourItems() {
+            if (!db || !currentTour) return;
+            try {
+                const { data, error } = await db.from('tour_items').select('*').eq('tour_id', currentTour.id).order('day', { ascending: true }).order('time', { ascending: true });
+                if (error) throw error;
+                currentTour.items = data || [];
+            } catch(e) {
+                console.error('Error loading tour items:', e);
+                currentTour.items = [];
+            }
+        }
+
+        // Render day items
+        function renderDayItems(dayNum) {
+            const list = $('dayItemsList');
+            const items = (currentTour.items || []).filter(item => item.day === dayNum);
+
+            if (!items.length) {
+                list.innerHTML = '<div class="empty-state" style="padding: 20px;">Nessun elemento per questo giorno</div>';
+                return;
+            }
+
+            list.innerHTML = items.map(item => {
+                const typeClass = item.type || 'activity';
+                const icons = { activity: '🎯', restaurant: '🍽️', transport: '🚌', hotel: '🏨', info: 'ℹ️', link: '🔗', map: '🗺️' };
+                return `
+                    <div class="day-item ${typeClass}" data-item-id="${item.id}">
+                        <span class="day-item-icon">${icons[typeClass] || '📌'}</span>
+                        <div class="day-item-content">
+                            <div class="day-item-title">${item.title || 'N/A'}</div>
+                            <div class="day-item-meta">${item.description || ''}</div>
+                        </div>
+                        <span class="day-item-time">${item.time || ''}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Tour Modal handlers
+        $('addTourBtn').addEventListener('click', () => {
+            // Clear form
+            $('tourCodeInput').value = '';
+            $('tourNameInput').value = '';
+            $('tourOperator').value = '';
+            $('tourPaxInput').value = '';
+            $('tourTLInput').value = '1';
+            $('tourStartDate').value = '';
+            $('tourDuration').value = '';
+            $('tourEndDate').value = '';
+            $('tourNotesInput').value = '';
+            $('tourModal').classList.add('active');
+        });
+
+        $('closeTourModal').addEventListener('click', () => $('tourModal').classList.remove('active'));
+        $('cancelTour').addEventListener('click', () => $('tourModal').classList.remove('active'));
+
+        // Calculate duration from end date
+        $('tourEndDate').addEventListener('change', () => {
+            const start = $('tourStartDate').value;
+            const end = $('tourEndDate').value;
+            if (start && end) {
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+                const diff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                if (diff > 0) $('tourDuration').value = diff;
+            }
+        });
+
+        // Calculate end date from duration
+        $('tourDuration').addEventListener('change', () => {
+            const start = $('tourStartDate').value;
+            const dur = parseInt($('tourDuration').value);
+            if (start && dur > 0) {
+                const startDate = new Date(start);
+                startDate.setDate(startDate.getDate() + dur - 1);
+                $('tourEndDate').value = startDate.toISOString().split('T')[0];
+            }
+        });
+
+        // Save tour
+        $('saveTour').addEventListener('click', async () => {
+            const code = $('tourCodeInput').value.trim();
+            const name = $('tourNameInput').value.trim();
+            const pax = parseInt($('tourPaxInput').value) || 0;
+            const tlCount = parseInt($('tourTLInput').value) || 1;
+            const startDate = $('tourStartDate').value;
+            const duration = parseInt($('tourDuration').value) || 0;
+            const operator = $('tourOperator').value;
+            const notes = $('tourNotesInput').value.trim();
+
+            if (!code || !name || !startDate || !pax) {
+                alert('Compila i campi obbligatori: Codice, Nome, Data Inizio, Passeggeri');
+                return;
+            }
+
+            if (!db) return alert('Database non disponibile');
+
+            try {
+                const { data: { user } } = await db.auth.getUser();
+                if (!user) return alert('Utente non autenticato');
+
+                const tourData = {
+                    user_id: user.id,
+                    code,
+                    name,
+                    pax,
+                    tl_count: tlCount,
+                    start_date: startDate,
+                    duration: duration || 7,
+                    operator,
+                    notes,
+                    created_at: new Date().toISOString()
+                };
+
+                const { data, error } = await db.from('tours').insert([tourData]).select().single();
+                if (error) throw error;
+
+                $('tourModal').classList.remove('active');
+                loadTours();
+
+                if (data) {
+                    // Automatically open the new tour
+                    tours.push(data);
+                    openTourDetail(data.id);
+                }
+            } catch(e) {
+                console.error('Error creating tour:', e);
+                alert('Errore creazione tour: ' + e.message);
+            }
+        });
+
+        // Day Item Modal handlers
+        $('addDayItemBtn').addEventListener('click', () => {
+            if (!selectedDay) return alert('Seleziona prima un giorno');
+            $('dayItemType').value = 'activity';
+            $('dayItemTitle').value = '';
+            $('dayItemTime').value = '';
+            $('dayItemDesc').value = '';
+            $('dayItemLink').value = '';
+            $('dayItemModal').classList.add('active');
+        });
+
+        $('closeDayItemModal').addEventListener('click', () => $('dayItemModal').classList.remove('active'));
+        $('cancelDayItem').addEventListener('click', () => $('dayItemModal').classList.remove('active'));
+
+        // Save day item
+        $('saveDayItem').addEventListener('click', async () => {
+            if (!currentTour || !selectedDay) return;
+
+            const type = $('dayItemType').value;
+            const title = $('dayItemTitle').value.trim();
+            const time = $('dayItemTime').value;
+            const description = $('dayItemDesc').value.trim();
+            const link = $('dayItemLink').value.trim();
+
+            if (!title) return alert('Inserisci un titolo');
+            if (!db) return alert('Database non disponibile');
+
+            try {
+                const itemData = {
+                    tour_id: currentTour.id,
+                    day: selectedDay,
+                    type,
+                    title,
+                    time,
+                    description,
+                    link
+                };
+
+                const { error } = await db.from('tour_items').insert([itemData]);
+                if (error) throw error;
+
+                $('dayItemModal').classList.remove('active');
+
+                // Reload items
+                await loadTourItems();
+                renderTourCalendar();
+                renderDayItems(selectedDay);
+            } catch(e) {
+                console.error('Error adding day item:', e);
+                alert('Errore: ' + e.message);
+            }
+        });
+
+        // Delete tour
+        $('tourDeleteBtn').addEventListener('click', async () => {
+            if (!currentTour) return;
+            if (!confirm(`Eliminare il tour "${currentTour.name}"? Questa azione è irreversibile.`)) return;
+
+            try {
+                // Delete tour items first
+                await db.from('tour_items').delete().eq('tour_id', currentTour.id);
+                // Delete tour
+                const { error } = await db.from('tours').delete().eq('id', currentTour.id);
+                if (error) throw error;
+
+                // Go back to list
+                $('nodeDetailView').style.display = 'none';
+                $('nodeListView').style.display = 'block';
+                currentTour = null;
+                loadTours();
+            } catch(e) {
+                console.error('Error deleting tour:', e);
+                alert('Errore eliminazione: ' + e.message);
+            }
+        });
+
+        // QR Code button (placeholder)
+        $('tourQrBtn').addEventListener('click', () => {
+            if (!currentTour) return;
+            alert(`QR Code per ${currentTour.code}\n\nFunzionalità in sviluppo.\nGenererà un link per i passeggeri.`);
+        });
+
+        // Share button (placeholder)
+        $('tourShareBtn').addEventListener('click', () => {
+            if (!currentTour) return;
+            const shareUrl = `${location.origin}/tour/${currentTour.code}`;
+            if (navigator.share) {
+                navigator.share({ title: currentTour.name, url: shareUrl });
+            } else {
+                navigator.clipboard.writeText(shareUrl);
+                alert('Link copiato negli appunti!');
+            }
+        });
+
+        // Tool buttons (placeholders)
+        $('toolPdfOcr').addEventListener('click', () => alert('PDF OCR Engine\n\nFunzionalità in sviluppo.\nPermetterà di estrarre info da rooming list PDF.'));
+        $('toolEticket').addEventListener('click', () => alert('eTicket System\n\nFunzionalità in sviluppo.\nGestione biglietti elettronici.'));
+        $('tourEtickets')?.addEventListener('click', () => alert('eTickets per questo tour\n\nFunzionalità in sviluppo.'));
+        $('tourPdfOcr')?.addEventListener('click', () => alert('PDF OCR per questo tour\n\nFunzionalità in sviluppo.'));
+        $('tourRooming')?.addEventListener('click', () => alert('Rooming List\n\nFunzionalità in sviluppo.'));
+        $('tourFeedback')?.addEventListener('click', () => alert('Feedback passeggeri\n\nFunzionalità in sviluppo.'));
 
         console.log('🚀 BlueRiot Ready');
     </script>

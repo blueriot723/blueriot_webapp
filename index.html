@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BlueRiot Syndicate</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,16 +12,15 @@
         :root {
             --neon-cyan: #00eaff;
             --neon-blue: #00C8FF;
-            --neon-pink: #ff4fd8;
             --neon-fuchsia: #ff4fd8;
             --bg-pure-dark: #050505;
-            --bg-sidebar: #0c0f13;
+            --bg-sidebar: #0a0d10;
             --bg-card: #0D1117;
-            --bg-input: #0A0E13;
             --text-primary: #FFFFFF;
             --text-secondary: #8B9DC3;
             --text-muted: #525866;
             --error: #FF4757;
+            --success: #00FF88;
         }
 
         * {
@@ -30,9 +29,8 @@
             box-sizing: border-box;
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
+        html {
+            font-size: 16px;
             overflow-x: hidden;
         }
 
@@ -41,84 +39,95 @@
             background: var(--bg-pure-dark);
             color: var(--text-primary);
             min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
         }
 
-        /* ===== LOGIN CONTAINER ===== */
-        .login-container {
+        /* ===== SCREENS ===== */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .app-container {
             display: flex;
             width: 100%;
             min-height: 100vh;
+            min-height: 100dvh;
         }
 
-        /* ===== SIDEBAR 20% ===== */
-        .login-sidebar {
-            width: 20%;
-            min-width: 260px;
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            min-width: 280px;
             background: var(--bg-sidebar);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            padding: 48px 24px;
-            border-right: 1px solid rgba(0, 234, 255, 0.15);
+            padding: 32px 20px;
+            border-right: 1px solid rgba(0, 234, 255, 0.1);
+            position: relative;
+            z-index: 100;
         }
 
-        .logo-section {
+        .sidebar-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 24px;
+            margin-bottom: 40px;
         }
 
         .logo-container {
             background: white;
-            padding: 20px;
+            padding: 16px 20px;
             border-radius: 12px;
-            box-shadow:
-                0 0 20px rgba(255, 255, 255, 0.3),
-                0 0 40px rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.1);
         }
 
         .blueriot-logo {
-            width: 180px;
+            width: 160px;
             height: auto;
             display: block;
         }
 
         .matrix-logo {
-            width: 140px;
+            width: 120px;
             height: auto;
-            margin-top: 16px;
-            filter: drop-shadow(0 0 12px rgba(0, 234, 255, 0.6));
+            filter: drop-shadow(0 0 15px rgba(0, 234, 255, 0.6));
         }
 
-        /* ===== LANGUAGE BUTTONS ===== */
-        .language-buttons {
+        /* ===== NAV BUTTONS - RIGHT NEON 45° ===== */
+        .nav-buttons {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            width: 100%;
-            max-width: 140px;
+            gap: 8px;
+            flex: 1;
         }
 
-        .lang-btn {
+        .nav-btn {
             position: relative;
             width: 100%;
-            height: 48px;
-            background: rgba(10, 14, 39, 0.9);
+            height: 52px;
+            background: rgba(10, 14, 20, 0.95);
             border: none;
             color: var(--text-primary);
             font-family: 'Share Tech Mono', monospace;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             letter-spacing: 2px;
             cursor: pointer;
-            overflow: hidden;
+            text-align: left;
+            padding-left: 20px;
             transition: all 0.3s ease;
-            clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%);
+            clip-path: polygon(0 0, 100% 0, 100% 65%, 94% 100%, 0 100%);
         }
 
-        .lang-btn::before {
+        .nav-btn::after {
             content: '';
             position: absolute;
             right: 0;
@@ -126,83 +135,103 @@
             width: 4px;
             height: 50%;
             background: linear-gradient(180deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
-            box-shadow: 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            transition: all 0.3s ease;
         }
 
-        .lang-btn.active::before,
-        .lang-btn:hover::before {
+        .nav-btn:hover::after,
+        .nav-btn.active::after {
             background: linear-gradient(180deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
-            box-shadow: 0 0 12px var(--neon-fuchsia), 0 0 24px var(--neon-fuchsia);
+            box-shadow: 0 0 10px var(--neon-fuchsia), 0 0 20px var(--neon-fuchsia);
         }
 
-        .lang-btn.active {
+        .nav-btn.active {
             background: rgba(255, 79, 216, 0.1);
         }
 
-        /* ===== MAIN LOGIN AREA 80% ===== */
-        .login-main {
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
             flex: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 48px;
-            background: var(--bg-pure-dark);
+            flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
 
-        .login-main::before {
+        /* Top neon line */
+        .main-content::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 20%, var(--neon-cyan) 80%, transparent 100%);
+            background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-cyan) 70%, transparent 100%);
             box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            z-index: 10;
         }
 
-        .login-content {
+        .content-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        /* ===== LOGIN OPTIONS - LEFT NEON 45° ===== */
+        .login-options {
             width: 100%;
-            max-width: 450px;
+            max-width: 420px;
         }
 
-        /* ===== LOGIN OPTIONS ===== */
         .login-option {
             position: relative;
-            background: rgba(10, 14, 39, 0.7);
-            padding: 24px;
-            margin-bottom: 20px;
-            clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%, 0 30%);
+            background: rgba(10, 14, 20, 0.8);
+            padding: 0;
+            margin-bottom: 16px;
+            clip-path: polygon(6% 0, 100% 0, 100% 100%, 0 100%, 0 35%);
+            transition: all 0.3s ease;
         }
 
         .login-option::before {
             content: '';
             position: absolute;
             left: 0;
-            top: 0;
+            bottom: 0;
             width: 4px;
             height: 50%;
-            background: linear-gradient(180deg, transparent 0%, var(--neon-cyan) 20%, var(--neon-cyan) 100%);
-            box-shadow: 0 0 12px var(--neon-cyan), 0 0 24px var(--neon-cyan);
+            background: linear-gradient(0deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
+            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            transition: all 0.3s ease;
+            z-index: 2;
         }
 
         .login-option:hover::before,
-        .login-option:focus-within::before,
         .login-option.active::before {
-            background: linear-gradient(180deg, transparent 0%, var(--neon-fuchsia) 20%, var(--neon-fuchsia) 100%);
-            box-shadow: 0 0 12px var(--neon-fuchsia), 0 0 24px var(--neon-fuchsia);
+            background: linear-gradient(0deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
+            box-shadow: 0 0 10px var(--neon-fuchsia), 0 0 20px var(--neon-fuchsia);
         }
 
-        /* ===== GOOGLE BUTTON ===== */
-        .google-signin-btn {
+        .login-option.active {
+            background: rgba(255, 79, 216, 0.1);
+        }
+
+        .login-option-inner {
+            padding: 20px 24px;
+        }
+
+        /* Google Button */
+        .google-btn {
             width: 100%;
             height: 50px;
             background: white;
             color: #444;
-            border: 1px solid #ddd;
+            border: none;
             border-radius: 4px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
+            font-family: 'Roboto', Arial, sans-serif;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             display: flex;
@@ -212,254 +241,1047 @@
             transition: all 0.2s ease;
         }
 
-        .google-signin-btn:hover {
-            background: #f8f8f8;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        .google-btn:hover {
+            background: #f5f5f5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        .google-signin-btn:disabled {
+        .google-btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
         }
 
-        /* ===== EMAIL TOGGLE ===== */
-        .email-toggle-btn {
+        /* Email Toggle */
+        .email-toggle {
             width: 100%;
             height: 50px;
-            background: rgba(10, 14, 39, 0.9);
+            background: transparent;
             border: 1px solid rgba(0, 234, 255, 0.3);
             color: var(--text-primary);
             border-radius: 4px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             letter-spacing: 1px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             transition: all 0.3s ease;
         }
 
-        .email-toggle-btn:hover {
+        .email-toggle:hover {
             border-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 234, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.2);
         }
 
-        .email-toggle-btn.expanded {
+        .email-toggle.expanded {
             border-color: var(--neon-fuchsia);
-            box-shadow: 0 0 15px rgba(255, 79, 216, 0.3);
         }
 
-        .toggle-icon {
+        .toggle-arrow {
             transition: transform 0.3s ease;
-            display: inline-block;
         }
 
-        .toggle-icon.rotated {
+        .toggle-arrow.rotated {
             transform: rotate(180deg);
         }
 
-        /* ===== EMAIL FORM ===== */
+        /* Email Form */
         .email-form {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease, margin-top 0.3s ease;
+            transition: max-height 0.3s ease;
         }
 
         .email-form.expanded {
-            max-height: 200px;
-            margin-top: 20px;
+            max-height: 180px;
+            margin-top: 16px;
         }
 
-        .login-input {
+        .form-input {
             width: 100%;
-            height: 48px;
-            background: rgba(10, 14, 39, 0.9);
+            height: 46px;
+            background: rgba(5, 5, 5, 0.9);
             border: 1px solid rgba(0, 234, 255, 0.2);
             border-radius: 4px;
             padding: 0 16px;
             color: var(--text-primary);
             font-family: 'Share Tech Mono', monospace;
-            font-size: 15px;
+            font-size: 14px;
             margin-bottom: 12px;
             transition: all 0.2s ease;
         }
 
-        .login-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .login-input:focus {
+        .form-input:focus {
             outline: none;
             border-color: var(--neon-cyan);
             box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
         }
 
-        .login-submit-btn {
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .submit-btn {
             width: 100%;
-            height: 48px;
+            height: 46px;
             background: var(--neon-cyan);
             border: none;
             border-radius: 4px;
             color: #000;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             letter-spacing: 1px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .login-submit-btn:hover {
+        .submit-btn:hover {
             box-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
         }
 
-        .login-submit-btn:disabled {
+        .submit-btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
         }
 
-        /* ===== ERROR MESSAGE ===== */
-        .error-message {
+        /* Error Message */
+        .error-msg {
             display: none;
             padding: 12px;
             background: rgba(255, 71, 87, 0.1);
             border: 1px solid rgba(255, 71, 87, 0.3);
             border-radius: 4px;
             color: var(--error);
-            font-size: 14px;
+            font-size: 13px;
             margin-top: 16px;
         }
 
-        .error-message.show {
+        .error-msg.show {
             display: block;
         }
 
-        /* ===== DASHBOARD (hidden by default) ===== */
-        .dashboard-container {
-            display: none;
-            min-height: 100vh;
+        /* ===== MATRIX DASHBOARD ===== */
+        .matrix-home {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .matrix-logo-large {
+            width: 200px;
+            height: auto;
+            filter: drop-shadow(0 0 20px rgba(0, 234, 255, 0.5));
+            margin-bottom: 40px;
+        }
+
+        .matrix-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 20px rgba(0, 234, 255, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+
+        .matrix-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        /* ===== SECTION CARDS ===== */
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            width: 100%;
+        }
+
+        .section-card {
+            position: relative;
+            background: rgba(10, 14, 20, 0.9);
             padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            clip-path: polygon(0 0, 94% 0, 100% 35%, 100% 100%, 0 100%);
         }
 
-        .dashboard-container.active {
+        .section-card::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 4px;
+            height: 50%;
+            background: linear-gradient(180deg, var(--neon-cyan) 0%, var(--neon-cyan) 80%, transparent 100%);
+            box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover::after {
+            background: linear-gradient(180deg, var(--neon-fuchsia) 0%, var(--neon-fuchsia) 80%, transparent 100%);
+            box-shadow: 0 0 10px var(--neon-fuchsia), 0 0 20px var(--neon-fuchsia);
+        }
+
+        .section-card:hover {
+            background: rgba(255, 79, 216, 0.1);
+        }
+
+        .section-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .section-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ===== USER INFO ===== */
+        .user-info {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 234, 255, 0.1);
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+
+        .logout-btn {
+            width: 100%;
+            height: 40px;
+            background: transparent;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: var(--error);
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 71, 87, 0.1);
+            border-color: var(--error);
+        }
+
+        /* ===== HAMBURGER MENU (Mobile) ===== */
+        .hamburger {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 1000;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-sidebar);
+            border: 1px solid rgba(0, 234, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            width: 22px;
+            height: 2px;
+            background: var(--neon-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 90;
+        }
+
+        .sidebar-overlay.active {
             display: block;
         }
 
-        /* ===== MOBILE ===== */
+        /* ===== DATABASE SCREENS ===== */
+        .db-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: var(--bg-sidebar);
+            border-bottom: 1px solid rgba(0, 234, 255, 0.1);
+        }
+
+        .db-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .add-btn {
+            height: 42px;
+            padding: 0 20px;
+            background: var(--neon-cyan);
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-btn:hover {
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+        }
+
+        .db-content {
+            flex: 1;
+            padding: 24px 30px;
+            overflow-y: auto;
+        }
+
+        /* Filters */
+        .filters {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 234, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            height: 40px;
+            background: var(--bg-pure-dark);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            border-radius: 4px;
+            padding: 0 12px;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        /* Data Cards */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .data-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 234, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .data-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 234, 255, 0.2);
+        }
+
+        .data-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .data-card-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .data-card-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(0, 234, 255, 0.1);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--neon-cyan);
+            margin-right: 6px;
+            margin-top: 8px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(0, 234, 255, 0.1);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 71, 87, 0.1);
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .modal-form-group input,
+        .modal-form-group select,
+        .modal-form-group textarea {
+            width: 100%;
+            background: var(--bg-pure-dark);
+            border: 1px solid rgba(0, 234, 255, 0.2);
+            border-radius: 4px;
+            padding: 12px;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+        }
+
+        .modal-form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            padding: 20px 24px;
+            border-top: 1px solid rgba(0, 234, 255, 0.1);
+        }
+
+        .modal-actions button {
+            flex: 1;
+            height: 44px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-save {
+            background: var(--neon-cyan);
+            border: none;
+            color: #000;
+        }
+
+        .btn-save:hover {
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
+            .hamburger {
+                display: flex;
             }
 
-            .login-sidebar {
+            .sidebar {
+                position: fixed;
+                left: -300px;
+                top: 0;
+                height: 100%;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .main-content {
                 width: 100%;
-                min-width: 100%;
-                padding: 24px;
-                flex-direction: row;
-                justify-content: space-between;
             }
 
-            .logo-section {
-                flex-direction: row;
+            .content-area {
+                padding: 80px 20px 20px;
+            }
+
+            .section-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .db-header {
+                padding: 70px 20px 20px;
+                flex-direction: column;
                 gap: 16px;
+                align-items: flex-start;
             }
 
-            .logo-container {
-                padding: 12px;
+            .db-content {
+                padding: 20px;
             }
 
-            .blueriot-logo {
-                width: 100px;
+            .data-grid {
+                grid-template-columns: 1fr;
             }
 
-            .matrix-logo {
-                width: 80px;
-                margin-top: 0;
+            .filters-grid {
+                grid-template-columns: 1fr;
             }
+        }
 
-            .language-buttons {
-                flex-direction: row;
-                flex-wrap: wrap;
-                max-width: none;
-                gap: 8px;
-            }
+        /* ===== LOADING ===== */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
 
-            .lang-btn {
-                width: 60px;
-                height: 40px;
-                font-size: 14px;
-            }
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(0, 234, 255, 0.2);
+            border-top-color: var(--neon-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
 
-            .login-main {
-                padding: 24px;
-            }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="login-container">
-        <!-- Sidebar -->
-        <div class="login-sidebar">
-            <div class="logo-section">
-                <div class="logo-container">
-                    <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
-                </div>
-                <img src="matrix.png" alt="Matrix" class="matrix-logo">
-            </div>
+    <!-- Hamburger Menu -->
+    <button class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            <div class="language-buttons">
-                <button class="lang-btn active" data-lang="it">IT</button>
-                <button class="lang-btn" data-lang="en">EN</button>
-                <button class="lang-btn" data-lang="es">ES</button>
-                <button class="lang-btn" data-lang="de">DE</button>
-                <button class="lang-btn" data-lang="fr">FR</button>
-            </div>
-        </div>
-
-        <!-- Main Login Area -->
-        <div class="login-main">
-            <div class="login-content">
-                <!-- Google Sign-In -->
-                <div class="login-option" id="googleOption">
-                    <button class="google-signin-btn" id="googleSigninBtn">
-                        <svg width="20" height="20" viewBox="0 0 18 18">
-                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
-                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                            <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
-                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                        </svg>
-                        Sign in with Google
-                    </button>
-                </div>
-
-                <!-- Email Login -->
-                <div class="login-option" id="emailOption">
-                    <button class="email-toggle-btn" id="emailToggleBtn">
-                        <span class="toggle-icon" id="emailToggleIcon">&#9660;</span>
-                        EMAIL LOGIN
-                    </button>
-
-                    <div class="email-form" id="emailForm">
-                        <input type="email" id="emailInput" placeholder="email@example.com" class="login-input">
-                        <input type="password" id="passwordInput" placeholder="Password" class="login-input">
-                        <button class="login-submit-btn" id="emailLoginBtn">ACCEDI</button>
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="loginScreen" class="screen active">
+        <div class="app-container">
+            <aside class="sidebar" id="loginSidebar">
+                <div class="sidebar-header">
+                    <div class="logo-container">
+                        <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="blueriot-logo">
                     </div>
-
-                    <div class="error-message" id="errorMessage"></div>
+                    <img src="matrix.png" alt="Matrix" class="matrix-logo">
                 </div>
+
+                <nav class="nav-buttons">
+                    <button class="nav-btn active" data-lang="it">IT</button>
+                    <button class="nav-btn" data-lang="en">EN</button>
+                    <button class="nav-btn" data-lang="es">ES</button>
+                    <button class="nav-btn" data-lang="de">DE</button>
+                    <button class="nav-btn" data-lang="fr">FR</button>
+                </nav>
+            </aside>
+
+            <main class="main-content">
+                <div class="content-area">
+                    <div class="login-options">
+                        <!-- Google Login -->
+                        <div class="login-option" id="googleOption">
+                            <div class="login-option-inner">
+                                <button class="google-btn" id="googleBtn">
+                                    <svg width="18" height="18" viewBox="0 0 18 18">
+                                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                                        <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.335z"/>
+                                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                                    </svg>
+                                    Sign in with Google
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Email Login -->
+                        <div class="login-option" id="emailOption">
+                            <div class="login-option-inner">
+                                <button class="email-toggle" id="emailToggle">
+                                    <span class="toggle-arrow" id="toggleArrow">▼</span>
+                                    EMAIL LOGIN
+                                </button>
+
+                                <div class="email-form" id="emailForm">
+                                    <input type="email" id="emailInput" class="form-input" placeholder="email@example.com">
+                                    <input type="password" id="passwordInput" class="form-input" placeholder="Password">
+                                    <button class="submit-btn" id="emailSubmit">ACCEDI</button>
+                                </div>
+                            </div>
+                            <div class="error-msg" id="errorMsg"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MATRIX DASHBOARD ==================== -->
+    <div id="matrixScreen" class="screen">
+        <div class="app-container">
+            <aside class="sidebar" id="matrixSidebar">
+                <div class="sidebar-header">
+                    <div class="logo-container">
+                        <img src="blueriot-logo.png" alt="BlueRiot Syndicate" class="blueriot-logo">
+                    </div>
+                    <img src="matrix.png" alt="Matrix" class="matrix-logo">
+                </div>
+
+                <nav class="nav-buttons" id="mainNav">
+                    <button class="nav-btn active" data-section="home">mαtrιχ</button>
+                    <button class="nav-btn" data-section="tastes">ΤΔSΤΞ5</button>
+                    <button class="nav-btn" data-section="routes">R0UT35</button>
+                    <button class="nav-btn" data-section="stay">SΤΔΥ</button>
+                    <button class="nav-btn" data-section="node">NODΞ</button>
+                </nav>
+
+                <div class="user-info">
+                    <div class="user-email" id="userEmail"></div>
+                    <button class="logout-btn" id="logoutBtn">LOGOUT</button>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <!-- HOME -->
+                <div class="content-area" id="homeContent">
+                    <div class="matrix-home">
+                        <img src="matrix.png" alt="Matrix" class="matrix-logo-large">
+                        <h1 class="matrix-title">mαtrιχ</h1>
+                        <p class="matrix-subtitle">Seleziona un servizio per iniziare</p>
+
+                        <div class="section-grid">
+                            <div class="section-card" data-goto="tastes">
+                                <div class="section-icon">🍽️</div>
+                                <div class="section-title">ΤΔSΤΞ5</div>
+                                <div class="section-desc">Database ristoranti, bar, gelaterie e locali testati</div>
+                            </div>
+                            <div class="section-card" data-goto="routes">
+                                <div class="section-icon">🚌</div>
+                                <div class="section-title">R0UT35</div>
+                                <div class="section-desc">Database trasporti: bus, treni, ferry, taxi, NCC</div>
+                            </div>
+                            <div class="section-card" data-goto="stay">
+                                <div class="section-icon">🏨</div>
+                                <div class="section-title">SΤΔΥ</div>
+                                <div class="section-desc">Database hotel alternativi, B&B e strutture</div>
+                            </div>
+                            <div class="section-card" data-goto="node">
+                                <div class="section-icon">⚡</div>
+                                <div class="section-title">NODΞ</div>
+                                <div class="section-desc">eTickets, PDF OCR, gestione tour completa</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TASTES -->
+                <div id="tastesContent" style="display:none; flex-direction:column; flex:1;">
+                    <div class="db-header">
+                        <h1 class="db-title">🍽️ ΤΔSΤΞ5 - Database Locali</h1>
+                        <button class="add-btn" id="addTasteBtn">+ Aggiungi Locale</button>
+                    </div>
+                    <div class="db-content">
+                        <div class="filters">
+                            <div class="filters-grid">
+                                <div class="filter-group">
+                                    <label>Città</label>
+                                    <input type="text" id="filterTasteCity" placeholder="es. Roma">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Tipo Cucina</label>
+                                    <input type="text" id="filterTasteCuisine" placeholder="es. Italiana">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Vantaggi TL</label>
+                                    <select id="filterTasteAdvantage">
+                                        <option value="">Tutti</option>
+                                        <option value="sconto">Sconto</option>
+                                        <option value="omaggio">Omaggio</option>
+                                        <option value="priorita">Priorità</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tastesList" class="data-grid">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🍽️</div>
+                                <p>Nessun locale trovato. Aggiungi il primo!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROUTES -->
+                <div id="routesContent" style="display:none; flex-direction:column; flex:1;">
+                    <div class="db-header">
+                        <h1 class="db-title">🚌 R0UT35 - Database Trasporti</h1>
+                        <button class="add-btn" id="addRouteBtn">+ Aggiungi Tratta</button>
+                    </div>
+                    <div class="db-content">
+                        <div class="filters">
+                            <div class="filters-grid">
+                                <div class="filter-group">
+                                    <label>Partenza</label>
+                                    <input type="text" id="filterRouteFrom" placeholder="es. Roma">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Arrivo</label>
+                                    <input type="text" id="filterRouteTo" placeholder="es. Firenze">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Tipo</label>
+                                    <select id="filterRouteType">
+                                        <option value="">Tutti</option>
+                                        <option value="bus">Bus</option>
+                                        <option value="treno">Treno</option>
+                                        <option value="ferry">Ferry</option>
+                                        <option value="taxi">Taxi/NCC</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="routesList" class="data-grid">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🚌</div>
+                                <p>Nessuna tratta trovata. Aggiungi la prima!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STAY -->
+                <div id="stayContent" style="display:none; flex-direction:column; flex:1;">
+                    <div class="db-header">
+                        <h1 class="db-title">🏨 SΤΔΥ - Database Hotel</h1>
+                        <button class="add-btn" id="addStayBtn">+ Aggiungi Struttura</button>
+                    </div>
+                    <div class="db-content">
+                        <div class="filters">
+                            <div class="filters-grid">
+                                <div class="filter-group">
+                                    <label>Città</label>
+                                    <input type="text" id="filterStayCity" placeholder="es. Firenze">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Tipo</label>
+                                    <select id="filterStayType">
+                                        <option value="">Tutti</option>
+                                        <option value="hotel">Hotel</option>
+                                        <option value="bb">B&B</option>
+                                        <option value="appartamento">Appartamento</option>
+                                        <option value="ostello">Ostello</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="stayList" class="data-grid">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🏨</div>
+                                <p>Nessuna struttura trovata. Aggiungi la prima!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NODE -->
+                <div id="nodeContent" style="display:none; flex-direction:column; flex:1;">
+                    <div class="db-header">
+                        <h1 class="db-title">⚡ NODΞ - Gestione Tour</h1>
+                    </div>
+                    <div class="db-content">
+                        <div class="section-grid" style="max-width: 600px;">
+                            <div class="section-card" id="eticketCard">
+                                <div class="section-icon">🎫</div>
+                                <div class="section-title">eTickets</div>
+                                <div class="section-desc">Importa e gestisci biglietti elettronici</div>
+                            </div>
+                            <div class="section-card" id="pdfOcrCard">
+                                <div class="section-icon">📄</div>
+                                <div class="section-title">PDF OCR</div>
+                                <div class="section-desc">Estrai dati da documenti PDF</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+    <!-- Taste Modal -->
+    <div class="modal" id="tasteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Aggiungi Locale</h2>
+                <button class="modal-close" id="closeTasteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-form-group">
+                    <label>Nome Locale *</label>
+                    <input type="text" id="tasteName" placeholder="es. Ristorante Da Mario">
+                </div>
+                <div class="modal-form-group">
+                    <label>Città *</label>
+                    <input type="text" id="tasteCity" placeholder="es. Roma">
+                </div>
+                <div class="modal-form-group">
+                    <label>Tipo Cucina</label>
+                    <input type="text" id="tasteCuisine" placeholder="es. Italiana, Pizza, Pesce">
+                </div>
+                <div class="modal-form-group">
+                    <label>Indirizzo</label>
+                    <input type="text" id="tasteAddress" placeholder="es. Via Roma 123">
+                </div>
+                <div class="modal-form-group">
+                    <label>Telefono</label>
+                    <input type="text" id="tastePhone" placeholder="es. +39 06 1234567">
+                </div>
+                <div class="modal-form-group">
+                    <label>Note</label>
+                    <textarea id="tasteNotes" placeholder="Vantaggi TL, orari, info utili..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelTaste">Annulla</button>
+                <button class="btn-save" id="saveTaste">Salva</button>
             </div>
         </div>
     </div>
 
-    <!-- DASHBOARD SCREEN -->
-    <div id="dashboardScreen" class="dashboard-container">
-        <h1 style="color: var(--neon-cyan);">Dashboard</h1>
-        <p>Benvenuto!</p>
-        <button id="logoutBtn" style="margin-top: 20px; padding: 10px 20px; background: var(--neon-fuchsia); border: none; color: white; cursor: pointer;">Logout</button>
+    <!-- Route Modal -->
+    <div class="modal" id="routeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Aggiungi Tratta</h2>
+                <button class="modal-close" id="closeRouteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-form-group">
+                    <label>Partenza *</label>
+                    <input type="text" id="routeFrom" placeholder="es. Roma Termini">
+                </div>
+                <div class="modal-form-group">
+                    <label>Arrivo *</label>
+                    <input type="text" id="routeTo" placeholder="es. Firenze SMN">
+                </div>
+                <div class="modal-form-group">
+                    <label>Tipo Trasporto *</label>
+                    <select id="routeType">
+                        <option value="bus">Bus</option>
+                        <option value="treno">Treno</option>
+                        <option value="ferry">Ferry</option>
+                        <option value="taxi">Taxi/NCC</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label>Compagnia</label>
+                    <input type="text" id="routeCompany" placeholder="es. Trenitalia, Flixbus">
+                </div>
+                <div class="modal-form-group">
+                    <label>Durata</label>
+                    <input type="text" id="routeDuration" placeholder="es. 1h 30min">
+                </div>
+                <div class="modal-form-group">
+                    <label>Prezzo Indicativo</label>
+                    <input type="text" id="routePrice" placeholder="es. €15-25">
+                </div>
+                <div class="modal-form-group">
+                    <label>Note</label>
+                    <textarea id="routeNotes" placeholder="Frequenza, affidabilità, tips..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelRoute">Annulla</button>
+                <button class="btn-save" id="saveRoute">Salva</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stay Modal -->
+    <div class="modal" id="stayModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Aggiungi Struttura</h2>
+                <button class="modal-close" id="closeStayModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-form-group">
+                    <label>Nome Struttura *</label>
+                    <input type="text" id="stayName" placeholder="es. Hotel Bella Vista">
+                </div>
+                <div class="modal-form-group">
+                    <label>Città *</label>
+                    <input type="text" id="stayCity" placeholder="es. Firenze">
+                </div>
+                <div class="modal-form-group">
+                    <label>Tipo *</label>
+                    <select id="stayType">
+                        <option value="hotel">Hotel</option>
+                        <option value="bb">B&B</option>
+                        <option value="appartamento">Appartamento</option>
+                        <option value="ostello">Ostello</option>
+                    </select>
+                </div>
+                <div class="modal-form-group">
+                    <label>Indirizzo</label>
+                    <input type="text" id="stayAddress" placeholder="es. Via Firenze 45">
+                </div>
+                <div class="modal-form-group">
+                    <label>Prezzo/Notte</label>
+                    <input type="text" id="stayPrice" placeholder="es. €60-90">
+                </div>
+                <div class="modal-form-group">
+                    <label>Contatto</label>
+                    <input type="text" id="stayContact" placeholder="es. +39 055 1234567">
+                </div>
+                <div class="modal-form-group">
+                    <label>Note</label>
+                    <textarea id="stayNotes" placeholder="Commissioni, convenzioni, tips..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelStay">Annulla</button>
+                <button class="btn-save" id="saveStay">Salva</button>
+            </div>
+        </div>
     </div>
 
     <!-- Supabase -->
@@ -468,165 +1290,403 @@
     <script>
         // ===== CONFIG =====
         const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
+        const SUPABASE_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
 
-        // ===== INIT SUPABASE =====
-        let supabaseClient = null;
+        let db = null;
+        let currentUser = null;
+
+        // Init Supabase
         try {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase initialized');
+            db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase ready');
         } catch (e) {
-            console.error('Supabase init error:', e);
+            console.error('❌ Supabase error:', e);
         }
 
-        // ===== DOM ELEMENTS =====
-        const loginScreen = document.getElementById('loginScreen');
-        const dashboardScreen = document.getElementById('dashboardScreen');
-        const googleSigninBtn = document.getElementById('googleSigninBtn');
-        const googleOption = document.getElementById('googleOption');
-        const emailToggleBtn = document.getElementById('emailToggleBtn');
-        const emailForm = document.getElementById('emailForm');
-        const emailToggleIcon = document.getElementById('emailToggleIcon');
-        const emailOption = document.getElementById('emailOption');
-        const emailInput = document.getElementById('emailInput');
-        const passwordInput = document.getElementById('passwordInput');
-        const emailLoginBtn = document.getElementById('emailLoginBtn');
-        const errorMessage = document.getElementById('errorMessage');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const langBtns = document.querySelectorAll('.lang-btn');
+        // ===== DOM =====
+        const $ = id => document.getElementById(id);
+        const $$ = sel => document.querySelectorAll(sel);
 
-        // ===== NAVIGATION =====
-        function showLogin() {
-            loginScreen.style.display = 'flex';
-            dashboardScreen.classList.remove('active');
-        }
+        // Screens
+        const loginScreen = $('loginScreen');
+        const matrixScreen = $('matrixScreen');
 
-        function showDashboard() {
-            loginScreen.style.display = 'none';
-            dashboardScreen.classList.add('active');
+        // Login elements
+        const googleBtn = $('googleBtn');
+        const googleOption = $('googleOption');
+        const emailToggle = $('emailToggle');
+        const emailForm = $('emailForm');
+        const toggleArrow = $('toggleArrow');
+        const emailOption = $('emailOption');
+        const emailInput = $('emailInput');
+        const passwordInput = $('passwordInput');
+        const emailSubmit = $('emailSubmit');
+        const errorMsg = $('errorMsg');
+
+        // Dashboard elements
+        const userEmailEl = $('userEmail');
+        const logoutBtn = $('logoutBtn');
+        const mainNav = $('mainNav');
+
+        // Content areas
+        const homeContent = $('homeContent');
+        const tastesContent = $('tastesContent');
+        const routesContent = $('routesContent');
+        const stayContent = $('stayContent');
+        const nodeContent = $('nodeContent');
+
+        // Mobile
+        const hamburger = $('hamburger');
+        const sidebarOverlay = $('sidebarOverlay');
+        const loginSidebar = $('loginSidebar');
+        const matrixSidebar = $('matrixSidebar');
+
+        // ===== HELPERS =====
+        function showScreen(screen) {
+            $$('.screen').forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
         }
 
         function showError(msg) {
-            errorMessage.textContent = msg;
-            errorMessage.classList.add('show');
-            setTimeout(() => errorMessage.classList.remove('show'), 5000);
+            errorMsg.textContent = msg;
+            errorMsg.classList.add('show');
+            setTimeout(() => errorMsg.classList.remove('show'), 5000);
         }
 
-        // ===== LANGUAGE BUTTONS =====
-        langBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                langBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
+        function showSection(section) {
+            // Hide all content
+            homeContent.style.display = 'none';
+            tastesContent.style.display = 'none';
+            routesContent.style.display = 'none';
+            stayContent.style.display = 'none';
+            nodeContent.style.display = 'none';
 
-        // ===== EMAIL TOGGLE =====
-        let emailExpanded = false;
-        emailToggleBtn.addEventListener('click', () => {
-            emailExpanded = !emailExpanded;
-            emailForm.classList.toggle('expanded', emailExpanded);
-            emailToggleBtn.classList.toggle('expanded', emailExpanded);
-            emailToggleIcon.classList.toggle('rotated', emailExpanded);
-            emailOption.classList.toggle('active', emailExpanded);
-        });
+            // Update nav
+            $$('#mainNav .nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`#mainNav .nav-btn[data-section="${section}"]`)?.classList.add('active');
 
-        // ===== GOOGLE SIGN IN =====
-        googleSigninBtn.addEventListener('click', async () => {
-            if (!supabaseClient) {
-                showError('Supabase non inizializzato');
-                return;
+            // Show selected
+            switch(section) {
+                case 'home':
+                    homeContent.style.display = 'flex';
+                    break;
+                case 'tastes':
+                    tastesContent.style.display = 'flex';
+                    loadTastes();
+                    break;
+                case 'routes':
+                    routesContent.style.display = 'flex';
+                    loadRoutes();
+                    break;
+                case 'stay':
+                    stayContent.style.display = 'flex';
+                    loadStay();
+                    break;
+                case 'node':
+                    nodeContent.style.display = 'flex';
+                    break;
             }
 
+            // Close mobile sidebar
+            closeSidebar();
+        }
+
+        function closeSidebar() {
+            hamburger.classList.remove('active');
+            loginSidebar.classList.remove('open');
+            matrixSidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        // ===== AUTH =====
+        // Google login
+        googleBtn.addEventListener('click', async () => {
+            if (!db) return showError('Database non disponibile');
+
             googleOption.classList.add('active');
-            googleSigninBtn.disabled = true;
-            googleSigninBtn.textContent = 'Reindirizzamento...';
+            googleBtn.disabled = true;
+            googleBtn.textContent = 'Reindirizzamento...';
 
             try {
-                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                const { error } = await db.auth.signInWithOAuth({
                     provider: 'google',
-                    options: {
-                        redirectTo: window.location.origin + window.location.pathname
-                    }
+                    options: { redirectTo: window.location.origin + window.location.pathname }
                 });
-
                 if (error) throw error;
             } catch (e) {
-                console.error('Google login error:', e);
-                showError(e.message || 'Errore Google login');
-                googleSigninBtn.disabled = false;
-                googleSigninBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 18 18">
-                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
-                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                    <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707 0-.593.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9c0 1.452.348 2.827.957 4.042l3.007-2.335z"/>
-                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                </svg> Sign in with Google`;
+                showError(e.message || 'Errore login Google');
+                googleBtn.disabled = false;
+                googleBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.17.282-1.709V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.335z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg> Sign in with Google`;
                 googleOption.classList.remove('active');
             }
         });
 
-        // ===== EMAIL LOGIN =====
-        emailLoginBtn.addEventListener('click', async () => {
+        // Email toggle
+        let emailExpanded = false;
+        emailToggle.addEventListener('click', () => {
+            emailExpanded = !emailExpanded;
+            emailForm.classList.toggle('expanded', emailExpanded);
+            toggleArrow.classList.toggle('rotated', emailExpanded);
+            emailOption.classList.toggle('active', emailExpanded);
+        });
+
+        // Email login
+        emailSubmit.addEventListener('click', async () => {
             const email = emailInput.value.trim();
             const password = passwordInput.value;
 
-            if (!email || !password) {
-                showError('Inserisci email e password');
-                return;
-            }
+            if (!email || !password) return showError('Inserisci email e password');
+            if (!db) return showError('Database non disponibile');
 
-            if (!supabaseClient) {
-                showError('Supabase non inizializzato');
-                return;
-            }
-
-            emailLoginBtn.disabled = true;
-            emailLoginBtn.textContent = 'ACCESSO...';
+            emailSubmit.disabled = true;
+            emailSubmit.textContent = 'ACCESSO...';
 
             try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
-                });
-
+                const { error } = await db.auth.signInWithPassword({ email, password });
                 if (error) throw error;
-                // Auth state change will handle navigation
             } catch (e) {
-                console.error('Email login error:', e);
                 showError(e.message || 'Errore login');
-                emailLoginBtn.disabled = false;
-                emailLoginBtn.textContent = 'ACCEDI';
+                emailSubmit.disabled = false;
+                emailSubmit.textContent = 'ACCEDI';
             }
         });
 
-        // ===== LOGOUT =====
+        // Logout
         logoutBtn.addEventListener('click', async () => {
-            if (supabaseClient) {
-                await supabaseClient.auth.signOut();
-            }
-            showLogin();
+            if (db) await db.auth.signOut();
+            currentUser = null;
+            showScreen(loginScreen);
         });
 
-        // ===== AUTH STATE LISTENER =====
-        if (supabaseClient) {
-            supabaseClient.auth.onAuthStateChange((event, session) => {
-                console.log('Auth state:', event);
+        // Auth state
+        if (db) {
+            db.auth.onAuthStateChange((event, session) => {
+                console.log('Auth:', event);
                 if (event === 'SIGNED_IN' && session) {
-                    console.log('User signed in:', session.user.email);
-                    showDashboard();
+                    currentUser = session.user;
+                    userEmailEl.textContent = session.user.email;
+                    showScreen(matrixScreen);
+                    showSection('home');
                 } else if (event === 'SIGNED_OUT') {
-                    showLogin();
+                    currentUser = null;
+                    showScreen(loginScreen);
                 }
             });
 
-            // Check initial session
-            supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            // Check session
+            db.auth.getSession().then(({ data: { session } }) => {
                 if (session) {
-                    showDashboard();
+                    currentUser = session.user;
+                    userEmailEl.textContent = session.user.email;
+                    showScreen(matrixScreen);
+                    showSection('home');
                 }
             });
         }
 
-        console.log('BlueRiot Login Ready');
+        // ===== NAVIGATION =====
+        // Language buttons
+        $$('#loginScreen .nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('#loginScreen .nav-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Main nav
+        mainNav.addEventListener('click', e => {
+            const btn = e.target.closest('.nav-btn');
+            if (btn) showSection(btn.dataset.section);
+        });
+
+        // Section cards
+        $$('.section-card[data-goto]').forEach(card => {
+            card.addEventListener('click', () => showSection(card.dataset.goto));
+        });
+
+        // ===== MOBILE =====
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            const isLogin = loginScreen.classList.contains('active');
+            const sidebar = isLogin ? loginSidebar : matrixSidebar;
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+        });
+
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // ===== DATA LOADING =====
+        async function loadTastes() {
+            if (!db) return;
+            const list = $('tastesList');
+            list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
+
+            try {
+                const { data, error } = await db.from('tastes').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍽️</div><p>Nessun locale trovato. Aggiungi il primo!</p></div>';
+                    return;
+                }
+
+                list.innerHTML = data.map(item => `
+                    <div class="data-card">
+                        <div class="data-card-title">${item.name || 'Senza nome'}</div>
+                        <div class="data-card-meta">
+                            📍 ${item.city || 'N/A'}<br>
+                            🍽️ ${item.cuisine || 'N/A'}
+                        </div>
+                        ${item.advantages ? `<span class="data-card-tag">${item.advantages}</span>` : ''}
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Load tastes error:', e);
+                list.innerHTML = '<div class="empty-state"><p>Errore caricamento dati</p></div>';
+            }
+        }
+
+        async function loadRoutes() {
+            if (!db) return;
+            const list = $('routesList');
+            list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
+
+            try {
+                const { data, error } = await db.from('routes').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚌</div><p>Nessuna tratta trovata. Aggiungi la prima!</p></div>';
+                    return;
+                }
+
+                list.innerHTML = data.map(item => `
+                    <div class="data-card">
+                        <div class="data-card-title">${item.from_location || '?'} → ${item.to_location || '?'}</div>
+                        <div class="data-card-meta">
+                            🚌 ${item.type || 'N/A'}<br>
+                            ⏱️ ${item.duration || 'N/A'} | 💰 ${item.price || 'N/A'}
+                        </div>
+                        ${item.company ? `<span class="data-card-tag">${item.company}</span>` : ''}
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Load routes error:', e);
+                list.innerHTML = '<div class="empty-state"><p>Errore caricamento dati</p></div>';
+            }
+        }
+
+        async function loadStay() {
+            if (!db) return;
+            const list = $('stayList');
+            list.innerHTML = '<div class="loading"><div class="spinner"></div>Caricamento...</div>';
+
+            try {
+                const { data, error } = await db.from('stay').select('*').order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏨</div><p>Nessuna struttura trovata. Aggiungi la prima!</p></div>';
+                    return;
+                }
+
+                list.innerHTML = data.map(item => `
+                    <div class="data-card">
+                        <div class="data-card-title">${item.name || 'Senza nome'}</div>
+                        <div class="data-card-meta">
+                            📍 ${item.city || 'N/A'}<br>
+                            🏨 ${item.type || 'N/A'} | 💰 ${item.price || 'N/A'}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Load stay error:', e);
+                list.innerHTML = '<div class="empty-state"><p>Errore caricamento dati</p></div>';
+            }
+        }
+
+        // ===== MODALS =====
+        // Taste Modal
+        $('addTasteBtn').addEventListener('click', () => $('tasteModal').classList.add('active'));
+        $('closeTasteModal').addEventListener('click', () => $('tasteModal').classList.remove('active'));
+        $('cancelTaste').addEventListener('click', () => $('tasteModal').classList.remove('active'));
+        $('saveTaste').addEventListener('click', async () => {
+            if (!db) return;
+            const data = {
+                name: $('tasteName').value,
+                city: $('tasteCity').value,
+                cuisine: $('tasteCuisine').value,
+                address: $('tasteAddress').value,
+                phone: $('tastePhone').value,
+                notes: $('tasteNotes').value
+            };
+            if (!data.name || !data.city) return alert('Nome e Città obbligatori');
+
+            try {
+                const { error } = await db.from('tastes').insert([data]);
+                if (error) throw error;
+                $('tasteModal').classList.remove('active');
+                loadTastes();
+            } catch (e) {
+                alert('Errore salvataggio: ' + e.message);
+            }
+        });
+
+        // Route Modal
+        $('addRouteBtn').addEventListener('click', () => $('routeModal').classList.add('active'));
+        $('closeRouteModal').addEventListener('click', () => $('routeModal').classList.remove('active'));
+        $('cancelRoute').addEventListener('click', () => $('routeModal').classList.remove('active'));
+        $('saveRoute').addEventListener('click', async () => {
+            if (!db) return;
+            const data = {
+                from_location: $('routeFrom').value,
+                to_location: $('routeTo').value,
+                type: $('routeType').value,
+                company: $('routeCompany').value,
+                duration: $('routeDuration').value,
+                price: $('routePrice').value,
+                notes: $('routeNotes').value
+            };
+            if (!data.from_location || !data.to_location) return alert('Partenza e Arrivo obbligatori');
+
+            try {
+                const { error } = await db.from('routes').insert([data]);
+                if (error) throw error;
+                $('routeModal').classList.remove('active');
+                loadRoutes();
+            } catch (e) {
+                alert('Errore salvataggio: ' + e.message);
+            }
+        });
+
+        // Stay Modal
+        $('addStayBtn').addEventListener('click', () => $('stayModal').classList.add('active'));
+        $('closeStayModal').addEventListener('click', () => $('stayModal').classList.remove('active'));
+        $('cancelStay').addEventListener('click', () => $('stayModal').classList.remove('active'));
+        $('saveStay').addEventListener('click', async () => {
+            if (!db) return;
+            const data = {
+                name: $('stayName').value,
+                city: $('stayCity').value,
+                type: $('stayType').value,
+                address: $('stayAddress').value,
+                price: $('stayPrice').value,
+                contact: $('stayContact').value,
+                notes: $('stayNotes').value
+            };
+            if (!data.name || !data.city) return alert('Nome e Città obbligatori');
+
+            try {
+                const { error } = await db.from('stay').insert([data]);
+                if (error) throw error;
+                $('stayModal').classList.remove('active');
+                loadStay();
+            } catch (e) {
+                alert('Errore salvataggio: ' + e.message);
+            }
+        });
+
+        console.log('🚀 BlueRiot Matrix Ready');
     </script>
 </body>
 </html>

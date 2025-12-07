@@ -2,16 +2,18 @@
 
 **Ultimo aggiornamento:** 7 Dicembre 2024
 **Repository:** blueriot723/blueriot_webapp
+**Domini:** joinblueriot.com | blueriot.world | (pending) matrixblueriot.world
 
 ---
 
 ## Overview del Progetto
 
 BlueRiot Syndicate e' una web app per Tour Leaders (TL) che gestisce:
-- **NODΞ**: Sistema di gestione tour con calendario, passeggeri, PDF OCR, eTicketing
+- **NODΞ**: Sistema di gestione tour con calendario, passeggeri, meteo, eTicketing
 - **ΤΔSΤΞ5**: Database condiviso ristoranti
 - **R0UT35**: Database condiviso trasporti (bus, treno, ferry, taxi)
 - **SΤΔΥ**: Database condiviso hotel
+- **T00L5**: Strumenti (eTicketing, PDF OCR)
 
 ---
 
@@ -19,30 +21,57 @@ BlueRiot Syndicate e' una web app per Tour Leaders (TL) che gestisce:
 
 | Componente | Tecnologia |
 |------------|------------|
-| Frontend | Single HTML file (index.html) con CSS/JS inline |
+| Frontend | ES6 Modules + Web Components |
 | Backend | Supabase (PostgreSQL + Auth + Storage) |
 | Auth | Supabase Auth (Google OAuth + Email/Password) |
+| Weather API | Open-Meteo (gratuito, no API key) |
+| PDF Processing | PDF.js (client-side) |
 | Hosting | GitHub Pages |
 | Font | Google Fonts (Orbitron, Share Tech Mono) |
 
 ---
 
-## File Principali
+## Architettura File
 
 ```
 blueriot_webapp/
-├── index.html                    # APP PRINCIPALE (tutto inline)
-├── index-old-monolith.html       # Vecchio codice completo (~8500 righe) - RIFERIMENTO
-├── COMPLETE_DATABASE_SETUP.sql   # SQL per creare tutte le tabelle Supabase
-├── matrix.svg                    # Logo Matrix (280KB, animato)
-├── design-reference.png          # Design reference UI
-├── nodex/                        # Backend Node.js (NON USATO attualmente)
+├── index.html                    # Entry point principale
+├── matrix.svg                    # Logo Matrix animato
+├── blueriot-logo.png             # Logo BlueRiot
+│
+├── src/
+│   ├── components/               # Web Components
+│   │   ├── dashboard-frame.js    # Frame principale con navigazione
+│   │   ├── eticket-panel.js      # Sistema eTicketing completo
+│   │   ├── pdf-ocr-panel.js      # OCR per PDF (hotel/passeggeri)
+│   │   ├── tour-weather-panel.js # Dettaglio tour con meteo
+│   │   └── node-panel.js         # Database citta' (non usato)
+│   │
+│   ├── utils/
+│   │   ├── auth.js               # Gestione autenticazione
+│   │   └── weather.js            # Servizio meteo Open-Meteo
+│   │
+│   └── styles/
+│       ├── base.css              # Variabili CSS e reset
+│       ├── layout.css            # Layout e grid
+│       └── components.css        # Stili componenti
+│
+├── database/
+│   ├── migrations/               # Migration SQL
+│   │   ├── 001_*.sql → 006_*.sql
+│   │   └── 004_weather_cache.sql # Cache meteo
+│   └── *.sql                     # Script setup completi
+│
+├── nodex/                        # Backend Node.js (opzionale)
 │   └── backend/
-│       ├── routes/               # API routes
-│       ├── controllers/          # Business logic
-│       ├── services/             # PDF, weather, eTicket services
-│       └── lib/                  # Database, templates, parsers
-└── src/                          # Componenti modulari (NON USATI - Shadow DOM problematico)
+│       ├── routes/
+│       ├── controllers/
+│       └── services/
+│
+└── docs/
+    ├── HANDOVER.md               # Questo file
+    ├── README.md                 # Documentazione generale
+    └── DEPLOYMENT.md             # Guida deployment
 ```
 
 ---
@@ -55,230 +84,227 @@ const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
 ```
 
-**NOTA:** La chiave usa il nuovo formato JWT asimmetrico (`sb_publishable_*`)
-
 ### Tabelle Database
 
 | Tabella | Descrizione | Sezione UI |
 |---------|-------------|------------|
 | `tl_users` | Tour Leaders registrati | Auth |
-| `tours` | Tour creati | NODΞ |
-| `tour_items` | Elementi giornalieri tour | NODΞ |
+| `tours` | Tour creati (tl_id, name, code, dates) | NODΞ |
+| `tour_days` | Giorni del tour (day_number, city, date) | NODΞ |
+| `day_items` | Elementi giornalieri | NODΞ |
+| `tour_passengers` | Passeggeri per tour | NODΞ/eTickets |
+| `ticket_templates` | Template biglietti | eTickets |
+| `weather_cache` | Cache previsioni meteo | NODΞ |
 | `blueriot_tastes` | Ristoranti | ΤΔSΤΞ5 |
 | `blueriot_routes` | Trasporti | R0UT35 |
 | `blueriot_stay` | Hotel | SΤΔΥ |
-| `tour_passengers` | Passeggeri per eTicket | NODΞ |
-| `ticket_templates` | Template biglietti | NODΞ |
-| `tour_restaurants` | Ristoranti assegnati a tour | NODΞ |
-| `hotels` | Hotel assegnati a tour | NODΞ |
-| `tour_pdf_extractions` | Risultati OCR | NODΞ |
-| `taste_ratings` | Valutazioni ristoranti | ΤΔSΤΞ5 |
 
----
+### Colonne Importanti
 
-## Struttura UI
+**tours:**
+- `tl_id` (UUID) - FK a tl_users.id
+- `name`, `code`, `start_date`, `end_date`
+- `passenger_count`, `status`, `cities` (JSONB array)
 
-### Design
-- **Tema:** TRON/Cyberpunk neon
-- **Colori principali:**
-  - Cyan: `#00d4ff` (hover, elementi attivi)
-  - Fuchsia: `#ff4fd8` (selezione attiva)
-  - Background: `#0a0a0a`
-- **Effetti:** Box-shadow neon, glow su hover
+**tour_days:**
+- `tour_id`, `day_number`, `calendar_date`, `city`, `title`
 
-### Menu Navigazione
-```
-mαtrιχ     → Home
-ΤΔSΤΞ5    → Tastes (Ristoranti)
-R0UT35    → Routes (Trasporti)
-SΤΔΥ      → Stay (Hotel)
-NODΞ      → Tour Management
-```
+**blueriot_routes:**
+- `start_point`, `end_point` (NON from_location/to_location)
+- `transport_type`, `operator_name`, `duration`
 
-### Comportamento Nav Items
-- **Hover:** Cyan glow + border-left cyan
-- **Active:** Fuchsia glow + border-left fuchsia + background rgba
+**blueriot_stay:**
+- `location` (NON city)
+- `price_range` (NON price)
 
 ---
 
 ## Funzionalita' Implementate
 
-### Login (index.html:1139-1198)
+### 1. Autenticazione
 - Google OAuth
 - Email/Password
-- Cambio lingua (IT/EN/ES/DE/FR)
+- Profilo TL (tl_users)
 
-### ΤΔSΤΞ5 - Tastes (index.html:1243-1257, 1714-1758)
-- Lista ristoranti con filtri citta'/cucina
+### 2. ΤΔSΤΞ5 (Ristoranti)
+- Lista con rating
+- Filtri per citta'/cucina
 - Aggiunta nuovo ristorante
-- Visualizzazione gerarchica: Paese → Regione → Citta'
-- Campi: name, city, cuisine, address, phone, notes
 
-### R0UT35 - Routes (index.html:1259-1273, 1726-1767)
+### 3. R0UT35 (Trasporti)
 - Lista tratte
-- Aggiunta nuova tratta
-- Campi: from_location, to_location, type, company, duration, price, notes
+- Info: partenza, arrivo, operatore, durata
 
-### SΤΔΥ - Stay (index.html:1277-1290, 1738-1776)
+### 4. SΤΔΥ (Hotel)
 - Lista strutture
-- Aggiunta nuova struttura
-- Campi: name, city, type, address, price, contact, notes
+- Info: location, tipo, fascia prezzo
 
-### NODΞ - Tour Management (index.html:1292-1390, 1778-2181)
-- **Lista Tour:** Card con codice, nome, pax, date, status
-- **Creazione Tour:** Modal con tutti i campi
-- **Dettaglio Tour:**
-  - Info bar (codice, pax, TL, date)
-  - Calendario giorni
-  - Selezione giorno → mostra elementi
-  - Aggiunta elementi (attivita', ristoranti, trasporti, hotel)
-- **Tool Buttons:** PDF OCR, eTickets, Rooming, Feedback (placeholder)
+### 5. NODΞ (Tour Management)
+- **Lista Tour**: Card cliccabili con info base
+- **Dettaglio Tour**:
+  - Header con codice, date, pax
+  - Timeline giorni con meteo 7 giorni
+  - Previsioni da Open-Meteo (cached in Supabase)
+- **Navigazione**: Back button per tornare alla lista
+
+### 6. T00L5
+#### eTicketing (eticket-panel.js)
+- Selezione tour
+- Upload template biglietto (immagine)
+- Posizionamento nome con drag & click
+- Gestione lista passeggeri
+- Generazione Canvas con nome sovrapposto
+- Download singolo o ZIP multiplo
+
+#### PDF OCR (pdf-ocr-panel.js)
+- Due modalita':
+  - **Hotel & Ristoranti**: Estrae nome, indirizzo, telefono
+  - **Lista Passeggeri**: Estrae nomi da rooming list
+- Preview risultati prima del salvataggio
+- Salvataggio nel tour selezionato
+
+### 7. Weather Service (weather.js)
+- Integrazione Open-Meteo API
+- Cache 6 ore in Supabase
+- 50+ citta' italiane pre-mappate
+- Geocoding automatico per altre citta'
+- WMO codes → condizioni italiano + emoji
 
 ---
 
-## Funzionalita' da Implementare
+## UI/UX Design
+
+### Tema: Cyberpunk/TRON
+```css
+--neon-cyan: #00f0ff
+--neon-fuchsia: #ff00ff
+--bg-dark: #0a0a0a
+--bg-sidebar: #0d0d0d
+--text-primary: #FFFFFF
+--text-secondary: #8899aa
+```
+
+### Navigazione
+```
+┌─────────────────┐
+│  BLUERIOT LOGO  │
+│   SYNDICATE     │
+│  MATRIX LOGO    │
+├─────────────────┤
+│ Database        │
+│  • ΤΔSΤΞ5       │
+│  • R0UT35       │
+│  • SΤΔΥ         │
+│  • NODΞ         │
+├─────────────────┤
+│ T00L5           │
+│  • eTICKΞTS     │
+│  • PDF 0CR      │
+└─────────────────┘
+```
+
+### Effetti
+- Glow neon su hover
+- Clip-path per bottoni nav
+- Gradient backgrounds
+- Shadow blur per enfasi
+
+---
+
+## Mobile Responsiveness
+
+### Breakpoint: 768px
+- Sidebar nascosta (hamburger menu)
+- Grid single column
+- Touch-friendly buttons
+- Swipe navigation (TODO)
+
+---
+
+## TODO - Prossimi Step
 
 ### Priorita' Alta
-1. **QR Code Generation** - Per accesso passeggeri al tour
-2. **PDF OCR Engine** - Estrazione dati da rooming list PDF
-3. **eTicketing System** - Generazione biglietti personalizzati
+1. [ ] Migliorare UI mobile (test su device reali)
+2. [ ] QR Code per accesso passeggeri
+3. [ ] Push notifications
 
 ### Priorita' Media
-4. **Collegamento ΤΔSΤΞ5 ↔ NODΞ** - Selezionare ristoranti dal database per tour
-5. **Collegamento SΤΔΥ ↔ NODΞ** - Selezionare hotel dal database per tour
-6. **Push Notifications** - Notifiche ai passeggeri
+4. [ ] Collegamento ΤΔSΤΞ5 ↔ NODΞ (seleziona ristorante per giorno)
+5. [ ] Collegamento SΤΔΥ ↔ NODΞ (seleziona hotel per tour)
+6. [ ] Export PDF itinerario completo
 
 ### Priorita' Bassa
-7. **Weather API Integration** - Meteo per ogni citta' del tour
-8. **Menu Ordering** - Preordine pasti
-9. **Feedback System** - Raccolta feedback passeggeri
-
----
-
-## Problemi Noti e Soluzioni
-
-### 1. Pagina Nera
-**Causa:** Shadow DOM non eredita CSS variables
-**Soluzione:** Usare single-file HTML senza Shadow DOM
-
-### 2. Supabase Auth Non Funziona
-**Causa:** Chiave API formato sbagliato
-**Soluzione:** Usare formato `sb_publishable_*` (JWT asimmetrico)
-
-### 3. Tabelle Non Trovate
-**Causa:** Nomi tabelle errati
-**Soluzione:**
-- `blueriot_tastes` (NON `tastes`)
-- `blueriot_routes` (NON `routes`)
-- `blueriot_stay` (NON `stay`)
-
-### 4. Matrix.svg Non Carica
-**Causa:** File troppo grande (280KB) o problemi CORS
-**Soluzione:** Usare matrix.png o ridurre dimensioni SVG
+7. [ ] Menu pre-ordering
+8. [ ] Feedback system passeggeri
+9. [ ] Analytics dashboard
 
 ---
 
 ## Come Testare
 
-1. **Locale:**
-   ```bash
-   cd blueriot_webapp
-   python3 -m http.server 8000
-   # Apri http://localhost:8000
-   ```
-
-2. **GitHub Pages:**
-   - Push su main branch
-   - Vai a https://blueriot723.github.io/blueriot_webapp
-
----
-
-## Comandi Git Utili
-
+### Locale
 ```bash
-# Stato
-git status
+cd blueriot_webapp
+python3 -m http.server 8000
+# Apri http://localhost:8000
+```
 
-# Commit
-git add -A && git commit -m "descrizione"
-
-# Push
-git push -u origin nome-branch
-
-# Pull
-git pull origin main
+### GitHub Pages
+```
+https://blueriot723.github.io/blueriot_webapp
 ```
 
 ---
 
-## Riferimenti Codice
+## Changelog
 
-### Funzioni Principali (index.html)
+### 7 Dicembre 2024 - Sessione 3
+- Aggiunto Weather Integration per NODΞ:
+  - weather.js: servizio client-side Open-Meteo
+  - tour-weather-panel.js: vista dettaglio tour con meteo
+  - Cache Supabase per previsioni
+  - 50+ citta' italiane mappate
+- Rinominato "Strumenti" → "T00L5"
+- Tour cards cliccabili con preview meteo
 
-| Funzione | Linea | Descrizione |
-|----------|-------|-------------|
-| `showScreen()` | 1586 | Mostra login/dashboard |
-| `showSection()` | 1592 | Cambia sezione (home/tastes/routes/stay/node) |
-| `loadTastes()` | 1714 | Carica ristoranti da Supabase |
-| `loadRoutes()` | 1726 | Carica tratte da Supabase |
-| `loadStay()` | 1738 | Carica hotel da Supabase |
-| `loadTours()` | 1795 | Carica tour utente |
-| `openTourDetail()` | 1861 | Apre dettaglio tour |
-| `renderTourCalendar()` | 1899 | Renderizza calendario tour |
-| `selectDay()` | 1929 | Seleziona giorno nel calendario |
-| `renderDayItems()` | 1961 | Mostra elementi del giorno |
+### 7 Dicembre 2024 - Sessione 2
+- Aggiunto eTicketing completo (eticket-panel.js)
+- Aggiunto PDF OCR migliorato (pdf-ocr-panel.js)
+- Migrato a architettura Web Components
+- Integrato nel dashboard-frame.js
 
-### CSS Variables (index.html:12-23)
-
-```css
---neon-cyan: #00d4ff
---neon-fuchsia: #ff4fd8
---bg-dark: #0a0a0a
---bg-sidebar: #0d0d0d
---border-subtle: rgba(80, 90, 100, 0.3)
---text-primary: #FFFFFF
---text-secondary: #8899aa
-```
+### 7 Dicembre 2024 - Sessione 1
+- Allineamento schema database con Supabase
+- Fix nomi colonne (start_point, end_point, etc.)
+- Creato COMPLETE_DATABASE_SETUP.sql
+- Aggiunto RLS policies per day_items
 
 ---
 
-## Contatti
+## Riferimenti
 
 - **Repository:** https://github.com/blueriot723/blueriot_webapp
-- **Issues:** https://github.com/blueriot723/blueriot_webapp/issues
+- **Supabase Dashboard:** https://supabase.com/dashboard
+- **Open-Meteo API:** https://open-meteo.com/
+- **PDF.js:** https://mozilla.github.io/pdf.js/
 
 ---
 
-## Changelog Recente
+## Note per lo Sviluppo
 
-### 7 Dicembre 2024 (Sessione 2)
-- Implementato sistema eTicketing completo:
-  - Upload template biglietto (immagine)
-  - Selezione posizione nome con click
-  - Gestione lista passeggeri
-  - Generazione biglietti con Canvas API
-  - Download biglietti PNG
-- Aggiunto CSS per eTicket section
+### Web Components
+Tutti i componenti usano Shadow DOM per incapsulamento CSS.
+Import styles con `@import url('../styles/base.css')` nel template.
 
-### 7 Dicembre 2024 (Sessione 1)
-- Reimplementato tutto in single-file HTML (no modules, no Shadow DOM)
-- Aggiunto NODΞ tour management completo
-- Corretto nomi tabelle Supabase
-- Creato SQL completo per setup database
-- Creato documento handover
+### Supabase Client
+Accessibile globalmente come `window.supabaseClient`.
 
-### Problemi Risolti
-- Pagina nera → Single file HTML
-- Auth non funziona → Chiave JWT asimmetrica
-- TASTES non carica → Nome tabella `blueriot_tastes`
+### Eventi Custom
+- `tour-weather-panel` emette `back` quando si torna alla lista
+- Altri componenti comunicano tramite props/methods
 
----
-
-## Come Usare eTicketing
-
-1. **Vai su NODΞ** → Seleziona un tour → Clicca **🎫 eTickets**
-2. **Carica Template**: Immagine del biglietto vuoto (JPG/PNG)
-3. **Posiziona Nome**: Clicca 📍 poi clicca sull'immagine dove vuoi il nome
-4. **Aggiungi Passeggeri**: Manualmente o con inserimento multiplo
-5. **Genera Biglietti**: Crea automaticamente un biglietto per ogni passeggero
-6. **Scarica**: Ogni biglietto puo' essere scaricato come PNG
+### Debug
+```javascript
+// Console browser
+window.supabaseClient.from('tours').select('*').then(console.log)
+```

@@ -4,6 +4,7 @@
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
+import './tour-weather-panel.js';
 
 export class DashboardFrame extends HTMLElement {
     constructor() {
@@ -12,6 +13,7 @@ export class DashboardFrame extends HTMLElement {
         this.currentView = 'home';
         this.user = null;
         this.currentTL = null;
+        this.toursData = [];
         this.render();
     }
     async connectedCallback() {
@@ -86,7 +88,10 @@ export class DashboardFrame extends HTMLElement {
                         <div id="tastes" class="page"><h1>ΤΔSΤΞ5</h1><div id="tastes-c">Caricamento...</div></div>
                         <div id="routes" class="page"><h1>R0UT35</h1><div id="routes-c">Caricamento...</div></div>
                         <div id="stay" class="page"><h1>SΤΔΥ</h1><div id="stay-c">Caricamento...</div></div>
-                        <div id="node" class="page"><h1>NODΞ</h1><div id="node-c">Caricamento...</div></div>
+                        <div id="node" class="page">
+                            <div id="node-list"><h1>NODΞ</h1><div id="node-c">Caricamento...</div></div>
+                            <div id="node-detail" style="display:none;"><tour-weather-panel></tour-weather-panel></div>
+                        </div>
                         <div id="etickets" class="page"><eticket-panel></eticket-panel></div>
                         <div id="pdfocr" class="page"><pdf-ocr-panel></pdf-ocr-panel></div>
                     </div>
@@ -106,6 +111,12 @@ export class DashboardFrame extends HTMLElement {
                 this.load(v);
                 if(window.innerWidth <= 768) this.shadowRoot.getElementById('sidebar').classList.remove('open');
             };
+        });
+
+        // Listen for back event from tour-weather-panel
+        this.shadowRoot.querySelector('tour-weather-panel').addEventListener('back', () => {
+            this.shadowRoot.getElementById('node-list').style.display = 'block';
+            this.shadowRoot.getElementById('node-detail').style.display = 'none';
         });
     }
     async load(v) {
@@ -142,6 +153,10 @@ export class DashboardFrame extends HTMLElement {
                     '<div class="grid">' + data.map(h=>`<div class="card"><h3>${h.name||'N/A'}</h3><p>📍 ${h.location||'N/A'}</p><p>🏨 ${h.type||'Hotel'}</p>${h.price_range ? `<p>💰 ${h.price_range}</p>` : ''}</div>`).join('') + '</div>';
 
             } else if(v==='node') {
+                // Reset to list view
+                this.shadowRoot.getElementById('node-list').style.display = 'block';
+                this.shadowRoot.getElementById('node-detail').style.display = 'none';
+
                 // Get TL profile first
                 const { data: user } = await window.supabaseClient.auth.getUser();
                 if (!user?.user) {
@@ -157,13 +172,31 @@ export class DashboardFrame extends HTMLElement {
 
                 const {data,error} = await window.supabaseClient.from('tours').select('*').eq('tl_id',tlProfile.id).order('start_date',{ascending:false}).limit(20);
                 if(error) throw error;
+                this.toursData = data || [];
+
                 c.innerHTML = !data?.length ? '<p style="color:#8899aa;">Nessun tour. Usa la sezione eTickets per gestire i passeggeri.</p>' :
-                    '<div class="grid">' + data.map(t=>`<div class="card"><h3>${t.name||'N/A'}</h3><p>📋 ${t.code||'N/A'}</p><p>📅 ${t.start_date} → ${t.end_date||'N/A'}</p><p>👥 ${t.passenger_count||0} pax</p><p>📊 ${t.status||'upcoming'}</p></div>`).join('') + '</div>';
+                    '<p style="color:#8899aa;margin-bottom:16px;">Clicca su un tour per vedere il meteo</p><div class="grid">' + data.map((t,i)=>`<div class="card tour-card" data-idx="${i}" style="cursor:pointer;"><h3>${t.name||'N/A'}</h3><p>📋 ${t.code||'N/A'}</p><p>📅 ${t.start_date} → ${t.end_date||'N/A'}</p><p>👥 ${t.passenger_count||0} pax</p><p>📊 ${t.status||'upcoming'}</p><p style="color:#00f0ff;font-size:12px;margin-top:8px;">🌤️ Vedi meteo →</p></div>`).join('') + '</div>';
+
+                // Add click handlers to tour cards
+                c.querySelectorAll('.tour-card').forEach(card => {
+                    card.onclick = () => {
+                        const idx = parseInt(card.dataset.idx);
+                        const tour = this.toursData[idx];
+                        if (tour) this.showTourWeather(tour);
+                    };
+                });
             }
         } catch(e) {
             console.error('Load error:', e);
             c.innerHTML = '<p style="color:#ff4757;">Errore: ' + e.message + '</p>';
         }
+    }
+
+    showTourWeather(tour) {
+        this.shadowRoot.getElementById('node-list').style.display = 'none';
+        this.shadowRoot.getElementById('node-detail').style.display = 'block';
+        const weatherPanel = this.shadowRoot.querySelector('tour-weather-panel');
+        weatherPanel.loadTour(tour);
     }
 }
 customElements.define('dashboard-frame', DashboardFrame);

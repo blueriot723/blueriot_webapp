@@ -94,9 +94,9 @@
             width: 100%;
             max-width: 160px;
             height: auto;
-            margin: 0 auto 32px;
+            margin: 0 auto 24px;
             display: block;
-            filter: brightness(0.8);
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 40px rgba(255, 255, 255, 0.3));
         }
 
         /* ===== NAV MENU ===== */
@@ -115,27 +115,25 @@
             color: var(--text-secondary);
             background: none;
             border: none;
+            border-left: 2px solid transparent;
             text-align: left;
-            padding: 12px 8px;
+            padding: 12px 16px;
             cursor: pointer;
-            transition: color 0.2s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .nav-item:hover {
             color: var(--text-primary);
+            border-left-color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
         }
 
         .nav-item.active {
-            color: var(--neon-cyan);
-        }
-
-        .sidebar-bottom-logo {
-            width: 100%;
-            max-width: 140px;
-            height: auto;
-            margin: auto auto 0;
-            display: block;
-            filter: brightness(0.7);
+            color: var(--neon-fuchsia);
+            border-left-color: var(--neon-fuchsia);
+            text-shadow: 0 0 15px var(--neon-fuchsia);
+            background: rgba(255, 79, 216, 0.1);
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -148,21 +146,11 @@
             position: relative;
         }
 
-        /* Top decoration */
+        /* Top neon line decoration */
         .top-decoration {
             position: relative;
-            height: 80px;
-            margin-bottom: 16px;
-        }
-
-        .top-logo {
-            width: 200px;
-            height: auto;
-            filter: brightness(0.6) blur(1px);
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            height: 20px;
+            margin-bottom: 24px;
         }
 
         /* Neon top line with 45° angle */
@@ -173,7 +161,7 @@
             right: 40px;
             height: 2px;
             background: var(--neon-cyan);
-            box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan-dim);
+            box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan-dim), 0 0 24px var(--neon-cyan-dim);
         }
 
         .neon-line-top::after {
@@ -781,13 +769,10 @@
                     <button class="nav-item" data-lang="de">DE</button>
                     <button class="nav-item" data-lang="fr">FR</button>
                 </nav>
-
-                <img src="matrix.png" alt="" class="sidebar-bottom-logo">
             </aside>
 
             <main class="main-content">
                 <div class="top-decoration">
-                    <img src="matrix.png" alt="" class="top-logo">
                     <div class="neon-line-top"></div>
                 </div>
 
@@ -839,24 +824,21 @@
                 <img src="matrix.png" alt="" class="sidebar-logo">
 
                 <nav class="nav-menu" id="mainNav">
-                    <button class="nav-item active" data-section="home">HOME</button>
-                    <button class="nav-item" data-section="tastes">TASTES</button>
-                    <button class="nav-item" data-section="routes">ROUTES</button>
-                    <button class="nav-item" data-section="stay">STAY</button>
-                    <button class="nav-item" data-section="syndicate">SYNDICATE</button>
+                    <button class="nav-item active" data-section="home">mαtrιχ</button>
+                    <button class="nav-item" data-section="tastes">ΤΔSΤΞ5</button>
+                    <button class="nav-item" data-section="routes">R0UT35</button>
+                    <button class="nav-item" data-section="stay">SΤΔΥ</button>
+                    <button class="nav-item" data-section="node">NODΞ</button>
                 </nav>
 
                 <div class="user-info">
                     <div class="user-email" id="userEmail"></div>
                     <button class="logout-btn" id="logoutBtn">LOGOUT</button>
                 </div>
-
-                <img src="matrix.png" alt="" class="sidebar-bottom-logo">
             </aside>
 
             <main class="main-content">
                 <div class="top-decoration">
-                    <img src="matrix.png" alt="" class="top-logo">
                     <div class="neon-line-top"></div>
                 </div>
 
@@ -865,7 +847,7 @@
                     <div class="work-content">
                         <!-- HOME -->
                         <div id="homeSection">
-                            <div class="section-title">MATRIX</div>
+                            <div class="section-title">mαtrιχ</div>
                             <div class="content-box">
                                 <div class="matrix-home">
                                     <img src="matrix.png" alt="Matrix" class="matrix-logo-large">
@@ -877,7 +859,7 @@
                         <!-- TASTES -->
                         <div id="tastesSection" style="display:none;">
                             <div class="section-header">
-                                <div class="section-title">TASTES</div>
+                                <div class="section-title">ΤΔSΤΞ5</div>
                                 <button class="add-btn" id="addTasteBtn">+ AGGIUNGI</button>
                             </div>
                             <div class="content-box">
@@ -894,7 +876,7 @@
                         <!-- ROUTES -->
                         <div id="routesSection" style="display:none;">
                             <div class="section-header">
-                                <div class="section-title">ROUTES</div>
+                                <div class="section-title">R0UT35</div>
                                 <button class="add-btn" id="addRouteBtn">+ AGGIUNGI</button>
                             </div>
                             <div class="content-box">
@@ -911,7 +893,7 @@
                         <!-- STAY -->
                         <div id="staySection" style="display:none;">
                             <div class="section-header">
-                                <div class="section-title">STAY</div>
+                                <div class="section-title">SΤΔΥ</div>
                                 <button class="add-btn" id="addStayBtn">+ AGGIUNGI</button>
                             </div>
                             <div class="content-box">
@@ -924,9 +906,9 @@
                             </div>
                         </div>
 
-                        <!-- SYNDICATE (NODE) -->
-                        <div id="syndicateSection" style="display:none;">
-                            <div class="section-title">SYNDICATE</div>
+                        <!-- NODE -->
+                        <div id="nodeSection" style="display:none;">
+                            <div class="section-title">NODΞ</div>
                             <div class="content-box">
                                 <div class="data-grid">
                                     <div class="data-card" id="eticketCard">
@@ -1035,7 +1017,7 @@
 
         // Show section
         function showSection(section) {
-            ['home', 'tastes', 'routes', 'stay', 'syndicate'].forEach(s => {
+            ['home', 'tastes', 'routes', 'stay', 'node'].forEach(s => {
                 const el = $(s + 'Section');
                 if (el) el.style.display = s === section ? 'block' : 'none';
             });

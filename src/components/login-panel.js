@@ -19,9 +19,8 @@ export class LoginPanel extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap">
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-
                 /* CSS Variables - must be defined here for Shadow DOM */
                 :host {
                     --neon-cyan: #00eaff;

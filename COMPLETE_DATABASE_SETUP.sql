@@ -1,178 +1,299 @@
 -- =====================================================
--- BLUERIOT COMPLETE DATABASE SETUP
+-- BLUERIOT DATABASE SCHEMA REFERENCE
 -- =====================================================
--- ESEGUI QUESTO FILE IN SUPABASE SQL EDITOR
--- Copia TUTTO e incolla in: SQL Editor → New Query → Run
+-- Questo file documenta lo schema ESISTENTE in Supabase
+-- Ultima modifica: 2025-12-07
 -- =====================================================
--- Ultima modifica: 2024-12-07
--- Creato per BlueRiot Syndicate Web App
+-- NOTA: Le tabelle esistono già! Questo file è solo
+-- documentazione di riferimento per gli sviluppatori.
 -- =====================================================
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 1: TABELLE UTENTI E AUTENTICAZIONE
--- ═══════════════════════════════════════════════════
 
--- Tabella TL (Tour Leaders)
-CREATE TABLE IF NOT EXISTS tl_users (
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 1: tl_users (Tour Leaders)
+-- ═══════════════════════════════════════════════════════════════
+-- Profili Tour Leader collegati a auth.users
+
+/*
+CREATE TABLE tl_users (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-    full_name text,
-    email text,
-    phone text,
-    company text,
-    role text DEFAULT 'tl',
+    user_id uuid UNIQUE REFERENCES auth.users(id),
+    username varchar UNIQUE,
+    full_name varchar,
+    email varchar,
+    phone varchar,
+    role varchar,                    -- 'tl', 'admin', etc.
+    membership_status varchar,
     avatar_url text,
     created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now()
+    updated_at timestamptz
 );
+*/
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 2: TABELLA ΤΔSΤΞ5 (TASTES - Ristoranti)
--- ═══════════════════════════════════════════════════
 
-CREATE TABLE IF NOT EXISTS blueriot_tastes (
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 2: tours (NODΞ Tour Management)
+-- ═══════════════════════════════════════════════════════════════
+-- Tour gestiti dai TL
+
+/*
+CREATE TABLE tours (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    tl_id uuid REFERENCES tl_users(id),          -- FK a Tour Leader
+    code text UNIQUE NOT NULL,                   -- es. ITL240315
     name text NOT NULL,
-    city text,
-    location text,               -- Fallback per city
-    region text,
-    country text DEFAULT 'Italy',
-    cuisine text,
-    price_range text,            -- €, €€, €€€, €€€€
-    address text,
-    phone text,                  -- Può contenere più numeri separati da virgola
-    google_maps_link text,
-    opening_hours text,
-    booking_needed boolean DEFAULT false,
-    min_group_size integer,
-    max_group_size integer,
-    gratuity boolean DEFAULT false,        -- TL mangia gratis
-    commission boolean DEFAULT false,
-    commission_percentage decimal(5,2),
-    discount_percentage decimal(5,2),
-    notes text,
-    tested_by text,
-    tested_date date,
-    rating_avg decimal(3,2) DEFAULT 0,
-    total_ratings integer DEFAULT 0,
-    created_by uuid,
-    created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now()
-);
-
--- ═══════════════════════════════════════════════════
--- SEZIONE 3: TABELLA R0UT35 (ROUTES - Trasporti)
--- ═══════════════════════════════════════════════════
-
-CREATE TABLE IF NOT EXISTS blueriot_routes (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    from_location text NOT NULL,
-    to_location text NOT NULL,
-    type text DEFAULT 'Bus',     -- Bus, Treno, Ferry, Taxi, NCC
-    company text,
-    duration text,               -- es. "2h 30m"
-    distance text,               -- es. "150 km"
-    price text,
-    price_per_person decimal(10,2),
-    booking_url text,
-    phone text,
-    notes text,
-    created_by uuid,
-    created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now()
-);
-
--- ═══════════════════════════════════════════════════
--- SEZIONE 4: TABELLA SΤΔΥ (STAY - Hotel)
--- ═══════════════════════════════════════════════════
-
-CREATE TABLE IF NOT EXISTS blueriot_stay (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    name text NOT NULL,
-    city text,
-    region text,
-    country text DEFAULT 'Italy',
-    type text DEFAULT 'Hotel',   -- Hotel, B&B, Appartamento, Ostello
-    stars integer,               -- 1-5
-    address text,
-    phone text,
-    email text,
-    website text,
-    price text,                  -- es. "€80-120"
-    price_per_night decimal(10,2),
-    breakfast_included boolean DEFAULT true,
-    commission boolean DEFAULT false,
-    commission_percentage decimal(5,2),
-    contact text,                -- Nome del contatto
-    notes text,
-    created_by uuid,
-    created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now()
-);
-
--- ═══════════════════════════════════════════════════
--- SEZIONE 5: TABELLA TOURS (NODΞ - Tour Management)
--- ═══════════════════════════════════════════════════
-
-CREATE TABLE IF NOT EXISTS tours (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id uuid,                -- Owner del tour
-    tl_id uuid REFERENCES tl_users(id),
-    code text NOT NULL,          -- es. ITL240315
-    name text NOT NULL,          -- es. "Best of Italy"
-    operator text,               -- Tour Operator
-    pax integer DEFAULT 0,       -- Numero passeggeri
-    tl_count integer DEFAULT 1,  -- Numero Tour Leaders
+    operator text,                               -- Tour Operator
     start_date date NOT NULL,
-    end_date date,
-    duration integer DEFAULT 7,  -- Giorni
-    status text DEFAULT 'upcoming', -- upcoming, active, completed
-    notes text,
-    settings jsonb,              -- Impostazioni tour
-    created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now()
-);
-
--- ═══════════════════════════════════════════════════
--- SEZIONE 6: TABELLA TOUR_ITEMS (Elementi giornalieri)
--- ═══════════════════════════════════════════════════
-
-CREATE TABLE IF NOT EXISTS tour_items (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    tour_id uuid REFERENCES tours(id) ON DELETE CASCADE,
-    day integer NOT NULL,        -- Giorno del tour (1, 2, 3...)
-    type text DEFAULT 'activity', -- activity, restaurant, transport, hotel, info, link, map
-    title text NOT NULL,
-    description text,
-    time text,                   -- Orario (es. "09:00")
-    link text,                   -- URL opzionale
-    location text,               -- Indirizzo/luogo
-    ref_id uuid,                 -- Riferimento a tastes/routes/stay
-    sort_order integer DEFAULT 0,
+    end_date date,                               -- Durata calcolata da date
+    status text DEFAULT 'upcoming',              -- upcoming, active, completed
+    passenger_count integer DEFAULT 0,           -- Numero passeggeri
+    feedback_count integer DEFAULT 0,
+    map_url text,
+    operator_website text,
     created_at timestamptz DEFAULT now()
 );
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 7: TABELLE ETICKET SYSTEM
--- ═══════════════════════════════════════════════════
+-- NOTA: Non esiste colonna 'duration' - calcola da (end_date - start_date)
+-- NOTA: Non esiste 'user_id' - usa 'tl_id' tramite tl_users
+*/
 
-CREATE TABLE IF NOT EXISTS tour_passengers (
+
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 3: tour_days (Giorni del Tour)
+-- ═══════════════════════════════════════════════════════════════
+
+/*
+CREATE TABLE tour_days (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    tour_id uuid REFERENCES tours(id) ON DELETE CASCADE,
+    day_number integer NOT NULL,                 -- 1, 2, 3...
+    date date,
+    city text,
+    cities text[],                               -- Array di città
+    title text,
+    description text,
+    wake_up_time time,
+    morning_schedule text,
+    afternoon_schedule text,
+    evening_schedule text,
+    notes text,
+    hotel_id uuid,
+    tastes_ids uuid[],
+    routes_ids uuid[],
+    ticket_ids uuid[],
+    is_hiking_day boolean DEFAULT false,
+    activities jsonb,
+    created_at timestamptz DEFAULT now(),
+    UNIQUE(tour_id, day_number)
+);
+*/
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 4: day_items (Elementi Giornalieri)
+-- ═══════════════════════════════════════════════════════════════
+
+/*
+CREATE TABLE day_items (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    day_id uuid REFERENCES tour_days(id) ON DELETE CASCADE,
+    tour_id uuid REFERENCES tours(id) ON DELETE CASCADE,
+    item_type varchar NOT NULL,                  -- activity, restaurant, transport, hotel, info
+    color varchar,
+    position integer DEFAULT 0,                  -- Ordine elementi
+    start_time time,
+    end_time time,
+    duration integer,                            -- Minuti
+    title varchar NOT NULL,
+    description text,
+    location varchar,
+    address text,
+    tastes_id uuid REFERENCES blueriot_tastes(id),
+    routes_id uuid REFERENCES blueriot_routes(id),
+    stay_id uuid REFERENCES blueriot_stay(id),
+    ticket_id uuid,
+    price numeric,
+    currency varchar DEFAULT 'EUR',
+    notes text,
+    is_mandatory boolean DEFAULT false,
+    is_booking_required boolean DEFAULT false,
+    booking_status varchar,
+    metadata jsonb,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz
+);
+
+-- NOTA: Usa 'item_type' non 'type'
+-- NOTA: Usa 'start_time' (time) non 'time' (text)
+-- NOTA: 'position' per ordinamento, non 'sort_order'
+*/
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 5: blueriot_tastes (ΤΔSΤΞ5 - Ristoranti)
+-- ═══════════════════════════════════════════════════════════════
+
+/*
+CREATE TABLE blueriot_tastes (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    name varchar NOT NULL,
+    type varchar NOT NULL,                       -- ristorante, bar, pizzeria, etc.
+    cuisine varchar,
+    price_range varchar,                         -- €, €€, €€€, €€€€
+    location varchar,
+    city varchar,
+    region varchar,
+    country varchar DEFAULT 'Italy',
+    address text,
+    google_maps_link text,
+    phone text,
+    contact_person text,
+    opening_hours text,
+    closed_days text[],                          -- Array giorni chiusura
+    booking_needed boolean DEFAULT false,
+    suitable_for_groups boolean DEFAULT true,
+    min_group_size integer,
+    max_group_size integer,
+    tours_relevant text[],
+    gratuity boolean DEFAULT false,              -- TL mangia gratis
+    commission boolean DEFAULT false,
+    commission_percentage integer,
+    discount boolean DEFAULT false,
+    discount_percentage integer,
+    notes text,
+    tested_by varchar,
+    tested_date date,
+    rating_avg numeric,
+    rating_count integer DEFAULT 0,
+    added_by uuid,
+    verified boolean DEFAULT false,
+    verified_by uuid,
+    times_used integer DEFAULT 0,
+    last_used date,
+    created_at timestamp DEFAULT now(),
+    updated_at timestamp
+);
+*/
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 6: blueriot_routes (R0UT35 - Trasporti)
+-- ═══════════════════════════════════════════════════════════════
+
+/*
+CREATE TABLE blueriot_routes (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    transport_type varchar NOT NULL,             -- Bus, Train, Ferry, etc.
+    train_category varchar,
+    operator_name varchar NOT NULL,
+    area_served varchar,
+    start_point varchar,                         -- Partenza
+    end_point varchar,                           -- Arrivo
+    frequency varchar,
+    duration varchar,
+    price varchar,
+    ticket_info text,
+    reliability varchar,
+    reliability_notes text,
+    contacts text,
+    website varchar,
+    booking_url varchar,
+    maps_link text,
+    route_map_url text,
+    notes text,
+    tips text,
+    rating_avg numeric,
+    rating_count integer DEFAULT 0,
+    added_by uuid,
+    verified boolean DEFAULT false,
+    verified_by uuid,
+    times_used integer DEFAULT 0,
+    last_used date,
+    created_at timestamp DEFAULT now(),
+    updated_at timestamp
+);
+
+-- NOTA: Usa 'start_point' e 'end_point', non 'from_location' e 'to_location'
+-- NOTA: Usa 'transport_type' non 'type'
+-- NOTA: Usa 'operator_name' non 'company'
+*/
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 7: blueriot_stay (SΤΔΥ - Hotel)
+-- ═══════════════════════════════════════════════════════════════
+
+/*
+CREATE TABLE blueriot_stay (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    name varchar NOT NULL,
+    type varchar NOT NULL,                       -- Hotel, B&B, Apartment, Hostel
+    location varchar,                            -- Città/zona
+    address text,
+    google_maps_link text,
+    distance_from_center varchar,
+    price_range varchar,                         -- €, €€, €€€
+    contact varchar,
+    phone varchar,
+    website varchar,
+    booking_url varchar,
+    suitable_for_families boolean DEFAULT true,
+    suitable_for_groups boolean DEFAULT true,
+    max_guests integer,
+    facilities text,
+    facilities_array text[],
+    commission boolean DEFAULT false,
+    commission_percentage integer,
+    special_tl_rate boolean DEFAULT false,
+    special_rate_details text,
+    notes text,
+    tested_by varchar,
+    tested_date date,
+    recommended_for text,
+    rating_avg numeric,
+    rating_count integer DEFAULT 0,
+    added_by uuid,
+    verified boolean DEFAULT false,
+    verified_by uuid,
+    times_used integer DEFAULT 0,
+    last_used date,
+    created_at timestamp DEFAULT now(),
+    updated_at timestamp
+);
+
+-- NOTA: Usa 'location' non 'city'
+-- NOTA: Usa 'price_range' non 'price'
+-- NOTA: Non esiste colonna 'stars'
+*/
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 8: tour_passengers (eTicket System)
+-- ═══════════════════════════════════════════════════════════════
+
+/*
+CREATE TABLE tour_passengers (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     tour_id uuid REFERENCES tours(id) ON DELETE CASCADE,
     full_name text NOT NULL,
     email text,
     phone text,
-    room_number text,
-    room_type text,              -- Single, Double, Triple, Twin
     ticket_generated boolean DEFAULT false,
     ticket_url text,
     wallet_pass_url text,
-    qr_code text,
-    notes text,
     created_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS ticket_templates (
+-- NOTA: Non esistono colonne 'room_number', 'room_type', 'qr_code', 'notes'
+*/
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 9: ticket_templates
+-- ═══════════════════════════════════════════════════════════════
+
+/*
+CREATE TABLE ticket_templates (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     tour_id uuid UNIQUE REFERENCES tours(id) ON DELETE CASCADE,
     template_name text NOT NULL,
@@ -184,211 +305,142 @@ CREATE TABLE IF NOT EXISTS ticket_templates (
     font_color text DEFAULT '#000000',
     created_at timestamptz DEFAULT now()
 );
+*/
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 8: TABELLE TOUR RESTAURANTS & HOTELS
--- ═══════════════════════════════════════════════════
 
--- Ristoranti specifici per tour (copia da blueriot_tastes)
-CREATE TABLE IF NOT EXISTS tour_restaurants (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    tour_id uuid REFERENCES tours(id) ON DELETE CASCADE,
-    taste_id uuid REFERENCES blueriot_tastes(id),
-    day integer,
-    meal_type text,              -- breakfast, lunch, dinner
-    time text,
-    pax integer,
-    confirmed boolean DEFAULT false,
-    notes text,
-    city text,
-    region text,
-    country text,
-    created_at timestamptz DEFAULT now()
-);
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 10: tour_pdf_extractions (PDF OCR)
+-- ═══════════════════════════════════════════════════════════════
 
--- Hotel specifici per tour (copia da blueriot_stay)
-CREATE TABLE IF NOT EXISTS hotels (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    tour_id uuid REFERENCES tours(id) ON DELETE CASCADE,
-    stay_id uuid REFERENCES blueriot_stay(id),
-    day_start integer,           -- Giorno check-in
-    day_end integer,             -- Giorno check-out
-    nights integer,
-    confirmed boolean DEFAULT false,
-    confirmation_number text,
-    notes text,
-    city text,
-    region text,
-    country text,
-    created_at timestamptz DEFAULT now()
-);
-
--- ═══════════════════════════════════════════════════
--- SEZIONE 9: TABELLE PDF OCR & EXTRACTION
--- ═══════════════════════════════════════════════════
-
-CREATE TABLE IF NOT EXISTS tour_pdf_extractions (
+/*
+CREATE TABLE tour_pdf_extractions (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     tour_id uuid UNIQUE REFERENCES tours(id) ON DELETE CASCADE,
-    pdf_filename text NOT NULL,
+    pdf_filename text,
     raw_ocr_text text,
     extracted_data jsonb,
     extraction_status text DEFAULT 'pending',
-    extraction_date timestamptz DEFAULT now(),
+    extraction_date timestamptz,
     created_at timestamptz DEFAULT now()
 );
+*/
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 10: TABELLA RATINGS
--- ═══════════════════════════════════════════════════
 
-CREATE TABLE IF NOT EXISTS taste_ratings (
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 11: restaurant_ratings
+-- ═══════════════════════════════════════════════════════════════
+-- NOTA: Si chiama 'restaurant_ratings' NON 'taste_ratings'
+
+/*
+CREATE TABLE restaurant_ratings (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    taste_id uuid REFERENCES blueriot_tastes(id) ON DELETE CASCADE,
-    user_id uuid,
+    restaurant_id uuid REFERENCES blueriot_tastes(id),
+    tl_id uuid REFERENCES tl_users(id),
     rating integer CHECK (rating >= 1 AND rating <= 5),
     comment text,
-    created_at timestamptz DEFAULT now()
+    created_at timestamptz DEFAULT now(),
+    UNIQUE(restaurant_id, tl_id)
 );
+*/
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 11: INDEXES PER PERFORMANCE
--- ═══════════════════════════════════════════════════
 
-CREATE INDEX IF NOT EXISTS idx_tl_users_user_id ON tl_users(user_id);
-CREATE INDEX IF NOT EXISTS idx_tours_user_id ON tours(user_id);
-CREATE INDEX IF NOT EXISTS idx_tours_tl_id ON tours(tl_id);
-CREATE INDEX IF NOT EXISTS idx_tours_start_date ON tours(start_date);
-CREATE INDEX IF NOT EXISTS idx_tour_items_tour_id ON tour_items(tour_id);
-CREATE INDEX IF NOT EXISTS idx_tour_items_day ON tour_items(day);
-CREATE INDEX IF NOT EXISTS idx_blueriot_tastes_city ON blueriot_tastes(city);
-CREATE INDEX IF NOT EXISTS idx_blueriot_tastes_country ON blueriot_tastes(country);
-CREATE INDEX IF NOT EXISTS idx_blueriot_routes_from ON blueriot_routes(from_location);
-CREATE INDEX IF NOT EXISTS idx_blueriot_routes_to ON blueriot_routes(to_location);
-CREATE INDEX IF NOT EXISTS idx_blueriot_stay_city ON blueriot_stay(city);
-CREATE INDEX IF NOT EXISTS idx_tour_passengers_tour_id ON tour_passengers(tour_id);
-CREATE INDEX IF NOT EXISTS idx_tour_restaurants_tour_id ON tour_restaurants(tour_id);
-CREATE INDEX IF NOT EXISTS idx_hotels_tour_id ON hotels(tour_id);
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 12: Altre Tabelle Esistenti
+-- ═══════════════════════════════════════════════════════════════
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 12: ROW LEVEL SECURITY (RLS)
--- ═══════════════════════════════════════════════════
+/*
+Tabelle aggiuntive già presenti nel database:
 
-ALTER TABLE tl_users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tours ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tour_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blueriot_tastes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blueriot_routes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blueriot_stay ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tour_passengers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ticket_templates ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tour_restaurants ENABLE ROW LEVEL SECURITY;
-ALTER TABLE hotels ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tour_pdf_extractions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE taste_ratings ENABLE ROW LEVEL SECURITY;
+- hotels                    - Hotel specifici per tour
+- tour_restaurants          - Ristoranti specifici per tour
+- tour_hotels              - Link tour-hotel
+- tour_activities          - Attività tour
+- tour_documents           - Documenti tour
+- tour_files               - File allegati
+- tour_links               - Link utili
+- tour_emergency_contacts  - Contatti emergenza
+- tour_settings            - Impostazioni tour
+- tour_templates           - Template tour predefiniti
+- emergency_contacts       - Contatti emergenza globali
+- eticket_imports          - Import eTicket
+- syndicate_documents      - Documenti Syndicate
+- syndicate_etickets       - eTicket Syndicate
+- syndicate_feedback       - Feedback Syndicate
+- feedback_responses       - Risposte feedback
+- tickets                  - Biglietti
+- top_tastes               - Ristoranti preferiti
+- user_stats               - Statistiche utente
+- vcard_imports            - Import vCard
+- weather_cache            - Cache meteo
+- nodex_settings           - Impostazioni NODΞ
+*/
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 13: RLS POLICIES
--- ═══════════════════════════════════════════════════
 
--- TL Users - utenti possono vedere/modificare solo il proprio profilo
-CREATE POLICY "Users can view own tl profile" ON tl_users FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own tl profile" ON tl_users FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own tl profile" ON tl_users FOR UPDATE USING (auth.uid() = user_id);
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 13: RLS Policies Esistenti
+-- ═══════════════════════════════════════════════════════════════
 
--- Tours - utenti possono vedere/modificare solo i propri tour
-CREATE POLICY "Users can view own tours" ON tours FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own tours" ON tours FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own tours" ON tours FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own tours" ON tours FOR DELETE USING (auth.uid() = user_id);
+/*
+Policies già configurate:
 
--- Tour Items - collegati ai tour
-CREATE POLICY "Users can manage tour items" ON tour_items FOR ALL USING (
-    tour_id IN (SELECT id FROM tours WHERE user_id = auth.uid())
-);
+blueriot_tastes:
+  - "Public can read tastes" (SELECT) - true
+  - "TLs can insert tastes" (INSERT)
+  - "TLs can update tastes" (UPDATE)
+  - "TLs can delete tastes" (DELETE)
 
--- Database condivisi (tastes, routes, stay) - accessibili a tutti gli autenticati
-CREATE POLICY "Authenticated can view tastes" ON blueriot_tastes FOR SELECT USING (true);
-CREATE POLICY "Authenticated can insert tastes" ON blueriot_tastes FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated can update tastes" ON blueriot_tastes FOR UPDATE USING (true);
-CREATE POLICY "Authenticated can delete tastes" ON blueriot_tastes FOR DELETE USING (true);
+blueriot_routes:
+  - "TLs can view all routes" (SELECT)
+  - "TLs can insert routes" (INSERT)
+  - "TLs can update routes" (UPDATE)
+  - "TLs can delete routes" (DELETE)
 
-CREATE POLICY "Authenticated can view routes" ON blueriot_routes FOR SELECT USING (true);
-CREATE POLICY "Authenticated can insert routes" ON blueriot_routes FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated can update routes" ON blueriot_routes FOR UPDATE USING (true);
-CREATE POLICY "Authenticated can delete routes" ON blueriot_routes FOR DELETE USING (true);
+blueriot_stay:
+  - "TLs can view all stays" (SELECT)
+  - "TLs can insert stays" (INSERT)
+  - "TLs can update stays" (UPDATE)
+  - "TLs can delete stays" (DELETE)
 
-CREATE POLICY "Authenticated can view stay" ON blueriot_stay FOR SELECT USING (true);
-CREATE POLICY "Authenticated can insert stay" ON blueriot_stay FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated can update stay" ON blueriot_stay FOR UPDATE USING (true);
-CREATE POLICY "Authenticated can delete stay" ON blueriot_stay FOR DELETE USING (true);
+tours:
+  - "TLs can view their own tours" (SELECT)
+  - "TLs can insert their own tours" (INSERT)
+  - "TLs can update their own tours" (UPDATE)
+  - "TLs can delete their own tours" (DELETE)
+  - "Allow insert for authenticated users" (INSERT)
 
--- Tour Passengers
-CREATE POLICY "Allow read tour_passengers" ON tour_passengers FOR SELECT USING (true);
-CREATE POLICY "Allow insert tour_passengers" ON tour_passengers FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Allow update tour_passengers" ON tour_passengers FOR UPDATE USING (true);
-CREATE POLICY "Allow delete tour_passengers" ON tour_passengers FOR DELETE USING (true);
+tour_days:
+  - "TLs can view their tour days" (SELECT)
+  - "TLs can insert their tour days" (INSERT)
+  - "TLs can update their tour days" (UPDATE)
+  - "TLs can delete their tour days" (DELETE)
 
--- Ticket Templates
-CREATE POLICY "Allow read ticket_templates" ON ticket_templates FOR SELECT USING (true);
-CREATE POLICY "Allow insert ticket_templates" ON ticket_templates FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Allow update ticket_templates" ON ticket_templates FOR UPDATE USING (true);
-CREATE POLICY "Allow delete ticket_templates" ON ticket_templates FOR DELETE USING (true);
+tour_passengers, ticket_templates:
+  - Allow read/insert/update/delete for all authenticated
 
--- Tour Restaurants & Hotels
-CREATE POLICY "Allow manage tour_restaurants" ON tour_restaurants FOR ALL USING (true);
-CREATE POLICY "Allow manage hotels" ON hotels FOR ALL USING (true);
+tl_users:
+  - "Anon read tl_users" (SELECT) - true
+  - "Allow authenticated users to read all TL profiles" (SELECT)
+  - "Authenticated can update own profile" (UPDATE)
+*/
 
--- PDF Extractions
-CREATE POLICY "Allow manage pdf_extractions" ON tour_pdf_extractions FOR ALL USING (true);
 
--- Ratings
-CREATE POLICY "Allow manage ratings" ON taste_ratings FOR ALL USING (true);
+-- ═══════════════════════════════════════════════════════════════
+-- SEZIONE 14: Query Diagnostiche Utili
+-- ═══════════════════════════════════════════════════════════════
 
--- ═══════════════════════════════════════════════════
--- SEZIONE 14: GRANTS
--- ═══════════════════════════════════════════════════
+-- Lista tutte le tabelle
+-- SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
 
-GRANT ALL ON tl_users TO anon, authenticated;
-GRANT ALL ON tours TO anon, authenticated;
-GRANT ALL ON tour_items TO anon, authenticated;
-GRANT ALL ON blueriot_tastes TO anon, authenticated;
-GRANT ALL ON blueriot_routes TO anon, authenticated;
-GRANT ALL ON blueriot_stay TO anon, authenticated;
-GRANT ALL ON tour_passengers TO anon, authenticated;
-GRANT ALL ON ticket_templates TO anon, authenticated;
-GRANT ALL ON tour_restaurants TO anon, authenticated;
-GRANT ALL ON hotels TO anon, authenticated;
-GRANT ALL ON tour_pdf_extractions TO anon, authenticated;
-GRANT ALL ON taste_ratings TO anon, authenticated;
+-- Lista colonne di una tabella
+-- SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'tours';
 
--- ═══════════════════════════════════════════════════
--- VERIFICA SETUP
--- ═══════════════════════════════════════════════════
+-- Lista tutte le policies
+-- SELECT tablename, policyname, cmd FROM pg_policies WHERE schemaname = 'public';
 
-DO $$
-BEGIN
-    RAISE NOTICE '';
-    RAISE NOTICE '═══════════════════════════════════════════════════';
-    RAISE NOTICE '✅ BLUERIOT DATABASE SETUP COMPLETATO!';
-    RAISE NOTICE '═══════════════════════════════════════════════════';
-    RAISE NOTICE '';
-    RAISE NOTICE 'Tabelle create:';
-    RAISE NOTICE '  • tl_users          - Tour Leaders';
-    RAISE NOTICE '  • tours             - Tour NODΞ';
-    RAISE NOTICE '  • tour_items        - Elementi giornalieri';
-    RAISE NOTICE '  • blueriot_tastes   - Database ristoranti ΤΔSΤΞ5';
-    RAISE NOTICE '  • blueriot_routes   - Database trasporti R0UT35';
-    RAISE NOTICE '  • blueriot_stay     - Database hotel SΤΔΥ';
-    RAISE NOTICE '  • tour_passengers   - Passeggeri eTicket';
-    RAISE NOTICE '  • ticket_templates  - Template biglietti';
-    RAISE NOTICE '  • tour_restaurants  - Ristoranti per tour';
-    RAISE NOTICE '  • hotels            - Hotel per tour';
-    RAISE NOTICE '  • tour_pdf_extractions - PDF OCR';
-    RAISE NOTICE '  • taste_ratings     - Valutazioni ristoranti';
-    RAISE NOTICE '';
-    RAISE NOTICE '🔐 RLS abilitato su tutte le tabelle';
-    RAISE NOTICE '📊 Indexes creati per performance';
-    RAISE NOTICE '';
-    RAISE NOTICE '═══════════════════════════════════════════════════';
-END $$;
+-- Lista tutti gli indici
+-- SELECT indexname, tablename FROM pg_indexes WHERE schemaname = 'public';
+
+
+-- ═══════════════════════════════════════════════════════════════
+-- FINE DOCUMENTAZIONE SCHEMA
+-- ═══════════════════════════════════════════════════════════════

@@ -35,6 +35,7 @@ export class DashboardFrame extends HTMLElement {
                 .logo-box::after { content: ''; position: absolute; bottom: -15px; left: 20%; right: 20%; height: 2px; background: white; box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white; border-radius: 2px; }
                 .logo-blue { font-size: 18px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; }
                 .logo-white { font-size: 16px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 5px; }
+                .matrix-logo { width: 100%; max-width: 180px; height: auto; margin-top: 15px; filter: drop-shadow(0 0 8px rgba(0,240,255,0.6)); }
 
                 /* === NAV ITEMS === */
                 .nav { list-style: none; padding: 0; }
@@ -118,6 +119,7 @@ export class DashboardFrame extends HTMLElement {
                     <div class="logo-box">
                         <div class="logo-blue">BLUERIOT</div>
                         <div class="logo-white">SYNDICATE</div>
+                        <img src="matrix.svg" alt="Matrix" class="matrix-logo">
                     </div>
                     <ul class="nav">
                         <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
@@ -195,11 +197,25 @@ export class DashboardFrame extends HTMLElement {
             };
         });
 
-        // Listen for back event from tour-weather-panel
-        this.shadowRoot.querySelector('tour-weather-panel').addEventListener('back', () => {
-            this.shadowRoot.getElementById('node-list').style.display = 'block';
-            this.shadowRoot.getElementById('node-detail').style.display = 'none';
-        });
+        // Listen for back event from tour-weather-panel (with error handling)
+        const tourPanel = this.shadowRoot.querySelector('tour-weather-panel');
+        if (tourPanel) {
+            tourPanel.addEventListener('back', () => {
+                this.shadowRoot.getElementById('node-list').style.display = 'block';
+                this.shadowRoot.getElementById('node-detail').style.display = 'none';
+            });
+        } else {
+            // Retry after custom element is defined
+            customElements.whenDefined('tour-weather-panel').then(() => {
+                const panel = this.shadowRoot.querySelector('tour-weather-panel');
+                if (panel) {
+                    panel.addEventListener('back', () => {
+                        this.shadowRoot.getElementById('node-list').style.display = 'block';
+                        this.shadowRoot.getElementById('node-detail').style.display = 'none';
+                    });
+                }
+            });
+        }
     }
     async load(v) {
         const c = this.shadowRoot.getElementById(v + '-c');

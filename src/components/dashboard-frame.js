@@ -14,6 +14,8 @@ export class DashboardFrame extends HTMLElement {
         this.user = null;
         this.currentTL = null;
         this.toursData = [];
+        // Cache to prevent reloading data on page switch
+        this.loadedSections = new Set();
         this.render();
     }
     async connectedCallback() {
@@ -35,6 +37,7 @@ export class DashboardFrame extends HTMLElement {
                 .logo-box::after { content: ''; position: absolute; bottom: -15px; left: 20%; right: 20%; height: 2px; background: white; box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white; border-radius: 2px; }
                 .logo-blue { font-size: 18px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; }
                 .logo-white { font-size: 16px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 5px; }
+                .matrix-logo { width: 100%; max-width: 180px; height: auto; margin-top: 15px; filter: drop-shadow(0 0 8px rgba(0,240,255,0.6)); }
 
                 /* === NAV ITEMS === */
                 .nav { list-style: none; padding: 0; }
@@ -104,20 +107,93 @@ export class DashboardFrame extends HTMLElement {
                 .toolbar-filters select { background: rgba(10,14,39,0.8); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; padding: 8px 12px; color: white; font-size: 13px; }
                 .btn-add { background: linear-gradient(135deg, #00f0ff, #0080ff); color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; }
                 .btn-add:hover { box-shadow: 0 0 16px rgba(0,240,255,0.5); }
-                @media (max-width: 768px) {
-                    .sidebar { transform: translateX(-100%); z-index: 100; transition: transform 0.3s ease; }
-                    .sidebar.open { transform: translateX(0); }
-                    .main { margin-left: 0; }
-                    .hamburger { display: block; position: fixed; top: 20px; left: 20px; z-index: 101; width: 48px; height: 48px; background: var(--bg-sidebar); border: 1px solid #00f0ff; border-radius: 6px; color: #00f0ff; font-size: 24px; cursor: pointer; }
+                /* === MOBILE OVERLAY === */
+                .mobile-overlay {
+                    display: none;
+                    position: fixed;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0,0,0,0.7);
+                    z-index: 99;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
                 }
+                .mobile-overlay.active {
+                    display: block;
+                    opacity: 1;
+                }
+
+                /* === RESPONSIVE - TABLET === */
+                @media (max-width: 1024px) {
+                    .sidebar { width: 200px; padding: 20px 15px; }
+                    .main { margin-left: 200px; padding: 20px; }
+                    h1 { font-size: 32px; }
+                    .logo-box { padding: 15px; margin-bottom: 30px; }
+                    .nav-item { margin-bottom: 20px; }
+                    .nav-item span { font-size: 14px; }
+                }
+
+                /* === RESPONSIVE - MOBILE === */
+                @media (max-width: 768px) {
+                    .sidebar {
+                        position: fixed;
+                        width: 280px;
+                        transform: translateX(-100%);
+                        z-index: 100;
+                        transition: transform 0.3s ease;
+                        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+                    }
+                    .sidebar.open { transform: translateX(0); }
+                    .main { margin-left: 0; padding: 15px; padding-top: 70px; }
+                    .work { padding: 20px; min-height: calc(100vh - 100px); }
+                    h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 20px; }
+                    .hamburger {
+                        display: flex !important;
+                        align-items: center;
+                        justify-content: center;
+                        position: fixed;
+                        top: 15px;
+                        left: 15px;
+                        z-index: 101;
+                        width: 48px;
+                        height: 48px;
+                        background: var(--bg-black);
+                        border: 2px solid var(--neon-cyan);
+                        border-radius: 8px;
+                        color: var(--neon-cyan);
+                        font-size: 24px;
+                        cursor: pointer;
+                        box-shadow: 0 0 10px rgba(0,240,255,0.3);
+                    }
+                    .hamburger:active { transform: scale(0.95); }
+                    .grid { grid-template-columns: 1fr; }
+                    .toolbar { flex-direction: column; align-items: stretch; }
+                    .toolbar-filters { flex-direction: column; }
+                    .toolbar-filters select { width: 100%; }
+                    .btn-add { width: 100%; justify-content: center; }
+                    .content-box { padding: 15px; }
+                    .card { padding: 15px; }
+                    .modal { width: 95%; margin: 10px; }
+                }
+
+                /* === RESPONSIVE - SMALL MOBILE === */
+                @media (max-width: 480px) {
+                    h1 { font-size: 20px; }
+                    .work { padding: 15px; }
+                    .logo-box { padding: 12px; }
+                    .matrix-logo { max-width: 120px; }
+                    .nav-item span { font-size: 13px; }
+                }
+
                 .hamburger { display: none; }
             </style>
             <button class="hamburger" id="hamburger">☰</button>
+            <div class="mobile-overlay" id="mobileOverlay"></div>
             <div class="container">
                 <aside class="sidebar" id="sidebar">
                     <div class="logo-box">
                         <div class="logo-blue">BLUERIOT</div>
                         <div class="logo-white">SYNDICATE</div>
+                        <img src="matrix.svg" alt="Matrix" class="matrix-logo">
                     </div>
                     <ul class="nav">
                         <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
@@ -177,10 +253,22 @@ export class DashboardFrame extends HTMLElement {
             </div>
         `;
     }
-    toggleSidebar() { this.shadowRoot.getElementById('sidebar').classList.toggle('open'); }
+    toggleSidebar() {
+        const sidebar = this.shadowRoot.getElementById('sidebar');
+        const overlay = this.shadowRoot.getElementById('mobileOverlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+    }
+    closeSidebar() {
+        this.shadowRoot.getElementById('sidebar').classList.remove('open');
+        this.shadowRoot.getElementById('mobileOverlay').classList.remove('active');
+    }
     setupListeners() {
         // Hamburger
         this.shadowRoot.getElementById('hamburger').onclick = () => this.toggleSidebar();
+
+        // Mobile overlay - close sidebar when clicked
+        this.shadowRoot.getElementById('mobileOverlay').onclick = () => this.closeSidebar();
 
         // Nav items
         this.shadowRoot.querySelectorAll('.nav-item[data-v]').forEach(item => {
@@ -191,21 +279,43 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 this.shadowRoot.getElementById(v).classList.add('active');
                 this.load(v);
-                if(window.innerWidth <= 768) this.shadowRoot.getElementById('sidebar').classList.remove('open');
+                // Close sidebar on mobile after selection
+                if(window.innerWidth <= 768) this.closeSidebar();
             };
         });
 
-        // Listen for back event from tour-weather-panel
-        this.shadowRoot.querySelector('tour-weather-panel').addEventListener('back', () => {
-            this.shadowRoot.getElementById('node-list').style.display = 'block';
-            this.shadowRoot.getElementById('node-detail').style.display = 'none';
-        });
+        // Listen for back event from tour-weather-panel (with error handling)
+        const tourPanel = this.shadowRoot.querySelector('tour-weather-panel');
+        if (tourPanel) {
+            tourPanel.addEventListener('back', () => {
+                this.shadowRoot.getElementById('node-list').style.display = 'block';
+                this.shadowRoot.getElementById('node-detail').style.display = 'none';
+            });
+        } else {
+            // Retry after custom element is defined
+            customElements.whenDefined('tour-weather-panel').then(() => {
+                const panel = this.shadowRoot.querySelector('tour-weather-panel');
+                if (panel) {
+                    panel.addEventListener('back', () => {
+                        this.shadowRoot.getElementById('node-list').style.display = 'block';
+                        this.shadowRoot.getElementById('node-detail').style.display = 'none';
+                    });
+                }
+            });
+        }
     }
     async load(v) {
         const c = this.shadowRoot.getElementById(v + '-c');
         if(!c) return; // etickets and pdfocr don't have -c containers, they use web components
 
+        // Skip loading if already loaded (prevents reload on page switch)
+        if (this.loadedSections.has(v)) {
+            console.log(`📦 ${v} already loaded, skipping fetch`);
+            return;
+        }
+
         try {
+            console.log(`🔄 Loading ${v} data...`);
             if(v==='tastes') {
                 const {data,error} = await window.supabaseClient.from('blueriot_tastes').select('*').order('country,region,city,name');
                 if(error) throw error;
@@ -238,6 +348,7 @@ export class DashboardFrame extends HTMLElement {
 
                 // Edit/Delete listeners
                 this.setupTasteCardListeners();
+                this.loadedSections.add('tastes');
 
             } else if(v==='routes') {
                 const {data,error} = await window.supabaseClient.from('blueriot_routes').select('*').order('start_point,end_point');
@@ -257,6 +368,7 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.getElementById('filterRouteType').onchange = () => this.filterRoutes();
                 this.shadowRoot.getElementById('addRoute').onclick = () => this.openRouteModal();
                 this.setupRouteCardListeners();
+                this.loadedSections.add('routes');
 
             } else if(v==='stay') {
                 const {data,error} = await window.supabaseClient.from('blueriot_stay').select('*').order('country,region,location,name');
@@ -283,6 +395,7 @@ export class DashboardFrame extends HTMLElement {
                 });
                 this.shadowRoot.getElementById('addStay').onclick = () => this.openStayModal();
                 this.setupStayCardListeners();
+                this.loadedSections.add('stay');
 
             } else if(v==='node') {
                 // Reset to list view
@@ -317,6 +430,7 @@ export class DashboardFrame extends HTMLElement {
                         if (tour) this.showTourWeather(tour);
                     };
                 });
+                this.loadedSections.add('node');
             }
         } catch(e) {
             console.error('Load error:', e);

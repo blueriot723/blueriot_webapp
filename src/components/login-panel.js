@@ -416,7 +416,7 @@ export class LoginPanel extends HTMLElement {
                         <div class="logo-container">
                             <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
                         </div>
-                        <img src="matrix.png" alt="Matrix" class="matrix-logo">
+                        <img src="matrix.svg" alt="Matrix" class="matrix-logo">
                     </div>
 
                     <div class="language-buttons">

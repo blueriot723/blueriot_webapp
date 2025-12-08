@@ -19,9 +19,15 @@ export class DashboardFrame extends HTMLElement {
         this.render();
     }
     async connectedCallback() {
-        this.user = await auth.getCurrentUser();
-        this.currentTL = auth.getTL();
+        try {
+            this.user = await auth.getCurrentUser();
+            this.currentTL = auth.getTL();
+        } catch (e) {
+            console.warn('Auth not ready yet:', e);
+        }
+        // Always setup listeners even if auth fails
         this.setupListeners();
+        console.log('✅ Dashboard listeners initialized');
     }
     render() {
         this.shadowRoot.innerHTML = `
@@ -32,12 +38,52 @@ export class DashboardFrame extends HTMLElement {
                 .container { display: flex; min-height: 100vh; background: var(--bg-black); font-family: 'Orbitron', sans-serif; }
 
                 /* === SIDEBAR === */
-                .sidebar { width: 240px; background: var(--bg-black); padding: 30px 20px; border-right: 1px solid rgba(255,255,255,0.1); position: fixed; height: 100vh; }
-                .logo-box { border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 50px; position: relative; }
-                .logo-box::after { content: ''; position: absolute; bottom: -15px; left: 20%; right: 20%; height: 2px; background: white; box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white; border-radius: 2px; }
-                .logo-blue { font-size: 18px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; }
-                .logo-white { font-size: 16px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 5px; }
-                .matrix-logo { width: 100%; max-width: 180px; height: auto; margin-top: 15px; filter: drop-shadow(0 0 8px rgba(0,240,255,0.6)); }
+                .sidebar {
+                    width: 240px;
+                    background: var(--bg-black);
+                    padding: 30px 20px;
+                    border-right: 1px solid rgba(255,255,255,0.1);
+                    position: fixed;
+                    height: 100vh;
+                    overflow-y: auto;
+                    z-index: 100;
+                }
+                .logo-box {
+                    border: 1px solid rgba(255,255,255,0.3);
+                    border-radius: 8px;
+                    padding: 15px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    position: relative;
+                    background: rgba(20,20,30,0.5);
+                }
+                .logo-text { margin-bottom: 10px; }
+                .logo-blue { font-size: 16px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; text-transform: uppercase; }
+                .logo-white { font-size: 14px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 3px; text-transform: uppercase; }
+                .blueriot-logo {
+                    width: 100%;
+                    max-width: 160px;
+                    height: auto;
+                    margin: 10px auto;
+                    display: block;
+                    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+                }
+                .matrix-logo {
+                    width: 100%;
+                    max-width: 140px;
+                    height: auto;
+                    margin: 10px auto 0;
+                    display: block;
+                    filter: drop-shadow(0 0 12px rgba(0,240,255,0.8));
+                }
+                /* White glow line under logos */
+                .logo-glow {
+                    height: 2px;
+                    background: white;
+                    margin: 15px 20%;
+                    border-radius: 2px;
+                    box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px rgba(255,255,255,0.8);
+                }
 
                 /* === NAV ITEMS === */
                 .nav { list-style: none; padding: 0; }
@@ -122,49 +168,62 @@ export class DashboardFrame extends HTMLElement {
                     opacity: 1;
                 }
 
-                /* === RESPONSIVE - TABLET === */
+                /* === HAMBURGER BUTTON (hidden by default on desktop) === */
+                .hamburger {
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    position: fixed;
+                    top: 15px;
+                    left: 15px;
+                    z-index: 200;
+                    width: 50px;
+                    height: 50px;
+                    background: var(--bg-black);
+                    border: 2px solid var(--neon-cyan);
+                    border-radius: 8px;
+                    color: var(--neon-cyan);
+                    font-size: 26px;
+                    cursor: pointer;
+                    box-shadow: 0 0 15px rgba(0,240,255,0.4);
+                    -webkit-tap-highlight-color: transparent;
+                    touch-action: manipulation;
+                }
+                .hamburger:active {
+                    transform: scale(0.9);
+                    background: rgba(0,240,255,0.2);
+                }
+
+                /* === RESPONSIVE - TABLET & iPAD (use hamburger menu) === */
                 @media (max-width: 1024px) {
-                    .sidebar { width: 200px; padding: 20px 15px; }
-                    .main { margin-left: 200px; padding: 20px; }
-                    h1 { font-size: 32px; }
-                    .logo-box { padding: 15px; margin-bottom: 30px; }
+                    .hamburger { display: flex !important; }
+                    .sidebar {
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        width: 280px;
+                        height: 100vh;
+                        transform: translateX(-100%);
+                        transition: transform 0.3s ease;
+                        box-shadow: 4px 0 30px rgba(0,0,0,0.8);
+                        z-index: 150;
+                    }
+                    .sidebar.open { transform: translateX(0); }
+                    .main { margin-left: 0; padding: 20px; padding-top: 80px; }
+                    .work { min-height: calc(100vh - 120px); }
+                    h1 { font-size: 28px; }
+                    .logo-box { padding: 12px; }
+                    .blueriot-logo { max-width: 120px; }
+                    .matrix-logo { max-width: 100px; }
                     .nav-item { margin-bottom: 20px; }
                     .nav-item span { font-size: 14px; }
                 }
 
                 /* === RESPONSIVE - MOBILE === */
                 @media (max-width: 768px) {
-                    .sidebar {
-                        position: fixed;
-                        width: 280px;
-                        transform: translateX(-100%);
-                        z-index: 100;
-                        transition: transform 0.3s ease;
-                        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
-                    }
-                    .sidebar.open { transform: translateX(0); }
-                    .main { margin-left: 0; padding: 15px; padding-top: 70px; }
-                    .work { padding: 20px; min-height: calc(100vh - 100px); }
-                    h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 20px; }
-                    .hamburger {
-                        display: flex !important;
-                        align-items: center;
-                        justify-content: center;
-                        position: fixed;
-                        top: 15px;
-                        left: 15px;
-                        z-index: 101;
-                        width: 48px;
-                        height: 48px;
-                        background: var(--bg-black);
-                        border: 2px solid var(--neon-cyan);
-                        border-radius: 8px;
-                        color: var(--neon-cyan);
-                        font-size: 24px;
-                        cursor: pointer;
-                        box-shadow: 0 0 10px rgba(0,240,255,0.3);
-                    }
-                    .hamburger:active { transform: scale(0.95); }
+                    .main { padding: 15px; padding-top: 75px; }
+                    .work { padding: 20px; min-height: calc(100vh - 110px); }
+                    h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 20px; }
                     .grid { grid-template-columns: 1fr; }
                     .toolbar { flex-direction: column; align-items: stretch; }
                     .toolbar-filters { flex-direction: column; }
@@ -177,32 +236,36 @@ export class DashboardFrame extends HTMLElement {
 
                 /* === RESPONSIVE - SMALL MOBILE === */
                 @media (max-width: 480px) {
-                    h1 { font-size: 20px; }
-                    .work { padding: 15px; }
-                    .logo-box { padding: 12px; }
-                    .matrix-logo { max-width: 120px; }
+                    h1 { font-size: 18px; }
+                    .work { padding: 12px; }
+                    .hamburger { width: 44px; height: 44px; font-size: 22px; }
+                    .logo-box { padding: 10px; }
+                    .blueriot-logo { max-width: 100px; }
+                    .matrix-logo { max-width: 80px; }
                     .nav-item span { font-size: 13px; }
                 }
-
-                .hamburger { display: none; }
             </style>
             <button class="hamburger" id="hamburger">☰</button>
             <div class="mobile-overlay" id="mobileOverlay"></div>
             <div class="container">
                 <aside class="sidebar" id="sidebar">
                     <div class="logo-box">
-                        <div class="logo-blue">BLUERIOT</div>
-                        <div class="logo-white">SYNDICATE</div>
+                        <div class="logo-text">
+                            <div class="logo-blue">BLUERIOT</div>
+                            <div class="logo-white">SYNDICATE</div>
+                        </div>
+                        <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
                         <img src="matrix.svg" alt="Matrix" class="matrix-logo">
                     </div>
+                    <div class="logo-glow"></div>
                     <ul class="nav">
-                        <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
-                        <li class="nav-item" data-v="routes"><span>R0UT35</span></li>
-                        <li class="nav-item" data-v="stay"><span>SΤΔΥ</span></li>
-                        <li class="nav-item" data-v="node"><span>NODΞ</span></li>
+                        <li class="nav-item" data-v="tastes"><span>TASTES</span></li>
+                        <li class="nav-item" data-v="routes"><span>ROUTES</span></li>
+                        <li class="nav-item" data-v="stay"><span>STAY</span></li>
+                        <li class="nav-item" data-v="node"><span>NODE</span></li>
                         <li class="nav-section">T00L5</li>
-                        <li class="nav-item" data-v="etickets"><span>eTICKΞTS</span></li>
-                        <li class="nav-item" data-v="pdfocr"><span>PDF 0CR</span></li>
+                        <li class="nav-item" data-v="etickets"><span>eTICKETS</span></li>
+                        <li class="nav-item" data-v="pdfocr"><span>PDF OCR</span></li>
                     </ul>
                 </aside>
                 <main class="main">
@@ -264,11 +327,27 @@ export class DashboardFrame extends HTMLElement {
         this.shadowRoot.getElementById('mobileOverlay').classList.remove('active');
     }
     setupListeners() {
-        // Hamburger
-        this.shadowRoot.getElementById('hamburger').onclick = () => this.toggleSidebar();
+        const hamburger = this.shadowRoot.getElementById('hamburger');
+        const overlay = this.shadowRoot.getElementById('mobileOverlay');
 
-        // Mobile overlay - close sidebar when clicked
-        this.shadowRoot.getElementById('mobileOverlay').onclick = () => this.closeSidebar();
+        // Hamburger - both click and touch
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleSidebar();
+        });
+        hamburger.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleSidebar();
+        }, { passive: false });
+
+        // Mobile overlay - close sidebar when clicked/touched
+        overlay.addEventListener('click', () => this.closeSidebar());
+        overlay.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.closeSidebar();
+        }, { passive: false });
 
         // Nav items
         this.shadowRoot.querySelectorAll('.nav-item[data-v]').forEach(item => {

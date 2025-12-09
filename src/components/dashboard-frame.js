@@ -1,14 +1,18 @@
 /**
  * Dashboard - Main application frame with navigation
+ * VERSION: 2024-12-08-v2
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
+console.log('📦 dashboard-frame.js loaded');
+
 export class DashboardFrame extends HTMLElement {
     constructor() {
         super();
+        console.log('🏗️ DashboardFrame constructor called');
         this.attachShadow({ mode: 'open' });
         this.currentView = 'home';
         this.user = null;
@@ -17,8 +21,10 @@ export class DashboardFrame extends HTMLElement {
         // Cache to prevent reloading data on page switch
         this.loadedSections = new Set();
         this.render();
+        console.log('🎨 DashboardFrame render() completed');
     }
     async connectedCallback() {
+        console.log('🔌 DashboardFrame connectedCallback');
         try {
             this.user = await auth.getCurrentUser();
             this.currentTL = auth.getTL();

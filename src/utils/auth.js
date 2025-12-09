@@ -16,18 +16,24 @@ class AuthManager {
      */
     init() {
         try {
-            const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
+            // Use already-initialized supabaseClient from index.html
+            if (window.supabaseClient) {
+                this.supabase = window.supabaseClient;
+                console.log('✅ Using pre-initialized Supabase client');
+            } else {
+                // Fallback: create client if not pre-initialized
+                const SUPABASE_URL = 'https://kvomxtzcnczvbcscybcy.supabase.co';
+                const SUPABASE_ANON_KEY = 'sb_publishable_WgMzf0xMBQ6a8WMcun3fvg_sUfBQ8qC';
 
-            if (!window.supabase) {
-                console.error('❌ Supabase library not loaded');
-                return;
+                if (!window.supabase) {
+                    console.error('❌ Supabase library not loaded');
+                    return;
+                }
+
+                this.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                window.supabaseClient = this.supabase;
+                console.log('✅ Created new Supabase client');
             }
-
-            this.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-            // Expose globally for components
-            window.supabaseClient = this.supabase;
 
             // Setup auth state listener
             this.supabase.auth.onAuthStateChange(async (event, session) => {

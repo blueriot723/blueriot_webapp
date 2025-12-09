@@ -1,25 +1,40 @@
 /**
  * Dashboard - Main application frame with navigation
+ * VERSION: 2024-12-09-v3
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
+const VERSION = '2024-12-09-v3';
+console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
+
 export class DashboardFrame extends HTMLElement {
     constructor() {
         super();
+        console.log('🏗️ DashboardFrame constructor called');
         this.attachShadow({ mode: 'open' });
         this.currentView = 'home';
         this.user = null;
         this.currentTL = null;
         this.toursData = [];
+        // Cache to prevent reloading data on page switch
+        this.loadedSections = new Set();
         this.render();
+        console.log('🎨 DashboardFrame render() completed');
     }
     async connectedCallback() {
-        this.user = await auth.getCurrentUser();
-        this.currentTL = auth.getTL();
+        console.log('🔌 DashboardFrame connectedCallback');
+        try {
+            this.user = await auth.getCurrentUser();
+            this.currentTL = auth.getTL();
+        } catch (e) {
+            console.warn('Auth not ready yet:', e);
+        }
+        // Always setup listeners even if auth fails
         this.setupListeners();
+        console.log('✅ Dashboard listeners initialized');
     }
     render() {
         this.shadowRoot.innerHTML = `
@@ -30,11 +45,58 @@ export class DashboardFrame extends HTMLElement {
                 .container { display: flex; min-height: 100vh; background: var(--bg-black); font-family: 'Orbitron', sans-serif; }
 
                 /* === SIDEBAR === */
-                .sidebar { width: 240px; background: var(--bg-black); padding: 30px 20px; border-right: 1px solid rgba(255,255,255,0.1); position: fixed; height: 100vh; }
-                .logo-box { border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 50px; position: relative; }
-                .logo-box::after { content: ''; position: absolute; bottom: -15px; left: 20%; right: 20%; height: 2px; background: white; box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px white; border-radius: 2px; }
-                .logo-blue { font-size: 18px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; }
-                .logo-white { font-size: 16px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 5px; }
+                .sidebar {
+                    width: 240px;
+                    background: var(--bg-black);
+                    padding: 30px 20px;
+                    border-right: 1px solid rgba(255,255,255,0.1);
+                    position: fixed;
+                    height: 100vh;
+                    overflow-y: auto;
+                    z-index: 100;
+                }
+                .logo-box {
+                    border: 1px solid rgba(255,255,255,0.3);
+                    border-radius: 8px;
+                    padding: 15px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    position: relative;
+                    background: rgba(20,20,30,0.5);
+                }
+                .logo-text { margin-bottom: 10px; }
+                .logo-blue { font-size: 16px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; text-transform: uppercase; }
+                .logo-white { font-size: 14px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 3px; text-transform: uppercase; }
+                .blueriot-logo {
+                    width: 100%;
+                    max-width: 160px;
+                    height: auto;
+                    margin: 10px auto;
+                    display: block;
+                    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+                    /* Ensure image displays even if broken */
+                    min-height: 60px;
+                    background: rgba(255,255,255,0.05);
+                    border-radius: 4px;
+                }
+                .matrix-logo {
+                    width: 100%;
+                    max-width: 140px;
+                    height: auto;
+                    margin: 10px auto 0;
+                    display: block;
+                    filter: drop-shadow(0 0 12px rgba(0,240,255,0.8));
+                    /* Ensure SVG displays */
+                    min-height: 40px;
+                }
+                /* White glow line under logos */
+                .logo-glow {
+                    height: 2px;
+                    background: white;
+                    margin: 15px 20%;
+                    border-radius: 2px;
+                    box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px rgba(255,255,255,0.8);
+                }
 
                 /* === NAV ITEMS === */
                 .nav { list-style: none; padding: 0; }
@@ -104,29 +166,119 @@ export class DashboardFrame extends HTMLElement {
                 .toolbar-filters select { background: rgba(10,14,39,0.8); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; padding: 8px 12px; color: white; font-size: 13px; }
                 .btn-add { background: linear-gradient(135deg, #00f0ff, #0080ff); color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; }
                 .btn-add:hover { box-shadow: 0 0 16px rgba(0,240,255,0.5); }
-                @media (max-width: 768px) {
-                    .sidebar { transform: translateX(-100%); z-index: 100; transition: transform 0.3s ease; }
-                    .sidebar.open { transform: translateX(0); }
-                    .main { margin-left: 0; }
-                    .hamburger { display: block; position: fixed; top: 20px; left: 20px; z-index: 101; width: 48px; height: 48px; background: var(--bg-sidebar); border: 1px solid #00f0ff; border-radius: 6px; color: #00f0ff; font-size: 24px; cursor: pointer; }
+                /* === MOBILE OVERLAY === */
+                .mobile-overlay {
+                    display: none;
+                    position: fixed;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0,0,0,0.7);
+                    z-index: 99;
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
                 }
-                .hamburger { display: none; }
+                .mobile-overlay.active {
+                    display: block;
+                    opacity: 1;
+                }
+
+                /* === HAMBURGER BUTTON (hidden by default on desktop) === */
+                .hamburger {
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    position: fixed;
+                    top: 15px;
+                    left: 15px;
+                    z-index: 200;
+                    width: 50px;
+                    height: 50px;
+                    background: var(--bg-black);
+                    border: 2px solid var(--neon-cyan);
+                    border-radius: 8px;
+                    color: var(--neon-cyan);
+                    font-size: 26px;
+                    cursor: pointer;
+                    box-shadow: 0 0 15px rgba(0,240,255,0.4);
+                    -webkit-tap-highlight-color: transparent;
+                    touch-action: manipulation;
+                }
+                .hamburger:active {
+                    transform: scale(0.9);
+                    background: rgba(0,240,255,0.2);
+                }
+
+                /* === RESPONSIVE - TABLET & iPAD (use hamburger menu) === */
+                @media (max-width: 1024px) {
+                    .hamburger { display: flex !important; }
+                    .sidebar {
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        width: 280px;
+                        height: 100vh;
+                        transform: translateX(-100%);
+                        transition: transform 0.3s ease;
+                        box-shadow: 4px 0 30px rgba(0,0,0,0.8);
+                        z-index: 150;
+                    }
+                    .sidebar.open { transform: translateX(0); }
+                    .main { margin-left: 0; padding: 20px; padding-top: 80px; }
+                    .work { min-height: calc(100vh - 120px); }
+                    h1 { font-size: 28px; }
+                    .logo-box { padding: 12px; }
+                    .blueriot-logo { max-width: 120px; }
+                    .matrix-logo { max-width: 100px; }
+                    .nav-item { margin-bottom: 20px; }
+                    .nav-item span { font-size: 14px; }
+                }
+
+                /* === RESPONSIVE - MOBILE === */
+                @media (max-width: 768px) {
+                    .main { padding: 15px; padding-top: 75px; }
+                    .work { padding: 20px; min-height: calc(100vh - 110px); }
+                    h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 20px; }
+                    .grid { grid-template-columns: 1fr; }
+                    .toolbar { flex-direction: column; align-items: stretch; }
+                    .toolbar-filters { flex-direction: column; }
+                    .toolbar-filters select { width: 100%; }
+                    .btn-add { width: 100%; justify-content: center; }
+                    .content-box { padding: 15px; }
+                    .card { padding: 15px; }
+                    .modal { width: 95%; margin: 10px; }
+                }
+
+                /* === RESPONSIVE - SMALL MOBILE === */
+                @media (max-width: 480px) {
+                    h1 { font-size: 18px; }
+                    .work { padding: 12px; }
+                    .hamburger { width: 44px; height: 44px; font-size: 22px; }
+                    .logo-box { padding: 10px; }
+                    .blueriot-logo { max-width: 100px; }
+                    .matrix-logo { max-width: 80px; }
+                    .nav-item span { font-size: 13px; }
+                }
             </style>
             <button class="hamburger" id="hamburger">☰</button>
+            <div class="mobile-overlay" id="mobileOverlay"></div>
             <div class="container">
                 <aside class="sidebar" id="sidebar">
                     <div class="logo-box">
-                        <div class="logo-blue">BLUERIOT</div>
-                        <div class="logo-white">SYNDICATE</div>
+                        <div class="logo-text">
+                            <div class="logo-blue">BLUERIOT</div>
+                            <div class="logo-white">SYNDICATE</div>
+                        </div>
+                        <img src="./blueriot-logo.png" alt="BlueRiot" class="blueriot-logo" onerror="this.style.display='none'">
+                        <img src="./matrix.svg" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
                     </div>
+                    <div class="logo-glow"></div>
                     <ul class="nav">
-                        <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
-                        <li class="nav-item" data-v="routes"><span>R0UT35</span></li>
-                        <li class="nav-item" data-v="stay"><span>SΤΔΥ</span></li>
-                        <li class="nav-item" data-v="node"><span>NODΞ</span></li>
+                        <li class="nav-item" data-v="tastes"><span>TASTES</span></li>
+                        <li class="nav-item" data-v="routes"><span>ROUTES</span></li>
+                        <li class="nav-item" data-v="stay"><span>STAY</span></li>
+                        <li class="nav-item" data-v="node"><span>NODE</span></li>
                         <li class="nav-section">T00L5</li>
-                        <li class="nav-item" data-v="etickets"><span>eTICKΞTS</span></li>
-                        <li class="nav-item" data-v="pdfocr"><span>PDF 0CR</span></li>
+                        <li class="nav-item" data-v="etickets"><span>eTICKETS</span></li>
+                        <li class="nav-item" data-v="pdfocr"><span>PDF OCR</span></li>
                     </ul>
                 </aside>
                 <main class="main">
@@ -177,10 +329,38 @@ export class DashboardFrame extends HTMLElement {
             </div>
         `;
     }
-    toggleSidebar() { this.shadowRoot.getElementById('sidebar').classList.toggle('open'); }
+    toggleSidebar() {
+        const sidebar = this.shadowRoot.getElementById('sidebar');
+        const overlay = this.shadowRoot.getElementById('mobileOverlay');
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+    }
+    closeSidebar() {
+        this.shadowRoot.getElementById('sidebar').classList.remove('open');
+        this.shadowRoot.getElementById('mobileOverlay').classList.remove('active');
+    }
     setupListeners() {
-        // Hamburger
-        this.shadowRoot.getElementById('hamburger').onclick = () => this.toggleSidebar();
+        const hamburger = this.shadowRoot.getElementById('hamburger');
+        const overlay = this.shadowRoot.getElementById('mobileOverlay');
+
+        // Hamburger - both click and touch
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleSidebar();
+        });
+        hamburger.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleSidebar();
+        }, { passive: false });
+
+        // Mobile overlay - close sidebar when clicked/touched
+        overlay.addEventListener('click', () => this.closeSidebar());
+        overlay.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.closeSidebar();
+        }, { passive: false });
 
         // Nav items
         this.shadowRoot.querySelectorAll('.nav-item[data-v]').forEach(item => {
@@ -191,21 +371,49 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 this.shadowRoot.getElementById(v).classList.add('active');
                 this.load(v);
-                if(window.innerWidth <= 768) this.shadowRoot.getElementById('sidebar').classList.remove('open');
+                // Close sidebar on tablet/mobile after selection
+                if(window.innerWidth <= 1024) this.closeSidebar();
             };
         });
 
-        // Listen for back event from tour-weather-panel
-        this.shadowRoot.querySelector('tour-weather-panel').addEventListener('back', () => {
-            this.shadowRoot.getElementById('node-list').style.display = 'block';
-            this.shadowRoot.getElementById('node-detail').style.display = 'none';
-        });
+        // Listen for back event from tour-weather-panel (with error handling)
+        const tourPanel = this.shadowRoot.querySelector('tour-weather-panel');
+        if (tourPanel) {
+            tourPanel.addEventListener('back', () => {
+                this.shadowRoot.getElementById('node-list').style.display = 'block';
+                this.shadowRoot.getElementById('node-detail').style.display = 'none';
+            });
+        } else {
+            // Retry after custom element is defined
+            customElements.whenDefined('tour-weather-panel').then(() => {
+                const panel = this.shadowRoot.querySelector('tour-weather-panel');
+                if (panel) {
+                    panel.addEventListener('back', () => {
+                        this.shadowRoot.getElementById('node-list').style.display = 'block';
+                        this.shadowRoot.getElementById('node-detail').style.display = 'none';
+                    });
+                }
+            });
+        }
     }
-    async load(v) {
+    async load(v, forceRefresh = false) {
         const c = this.shadowRoot.getElementById(v + '-c');
         if(!c) return; // etickets and pdfocr don't have -c containers, they use web components
 
+        // Skip loading if already loaded (prevents reload on page switch), unless force refresh
+        if (this.loadedSections.has(v) && !forceRefresh) {
+            console.log(`📦 ${v} already loaded, skipping fetch`);
+            return;
+        }
+
+        // Clear from cache if forcing refresh
+        if (forceRefresh) {
+            this.loadedSections.delete(v);
+            console.log(`🔄 Force refreshing ${v}`);
+        }
+
         try {
+            console.log(`🔄 Loading ${v} data...`);
             if(v==='tastes') {
                 const {data,error} = await window.supabaseClient.from('blueriot_tastes').select('*').order('country,region,city,name');
                 if(error) throw error;
@@ -238,6 +446,7 @@ export class DashboardFrame extends HTMLElement {
 
                 // Edit/Delete listeners
                 this.setupTasteCardListeners();
+                this.loadedSections.add('tastes');
 
             } else if(v==='routes') {
                 const {data,error} = await window.supabaseClient.from('blueriot_routes').select('*').order('start_point,end_point');
@@ -257,6 +466,7 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.getElementById('filterRouteType').onchange = () => this.filterRoutes();
                 this.shadowRoot.getElementById('addRoute').onclick = () => this.openRouteModal();
                 this.setupRouteCardListeners();
+                this.loadedSections.add('routes');
 
             } else if(v==='stay') {
                 const {data,error} = await window.supabaseClient.from('blueriot_stay').select('*').order('country,region,location,name');
@@ -283,6 +493,7 @@ export class DashboardFrame extends HTMLElement {
                 });
                 this.shadowRoot.getElementById('addStay').onclick = () => this.openStayModal();
                 this.setupStayCardListeners();
+                this.loadedSections.add('stay');
 
             } else if(v==='node') {
                 // Reset to list view
@@ -317,6 +528,7 @@ export class DashboardFrame extends HTMLElement {
                         if (tour) this.showTourWeather(tour);
                     };
                 });
+                this.loadedSections.add('node');
             }
         } catch(e) {
             console.error('Load error:', e);

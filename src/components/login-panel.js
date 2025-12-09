@@ -1,8 +1,12 @@
 /**
  * Login Panel Component - Cyberpunk TRON Design
  * 20% sidebar (logos + language) + 80% login area
+ * VERSION: 2024-12-09-v2
  */
 import { auth } from '../utils/auth.js';
+
+const VERSION = '2024-12-09-v2';
+console.log(`📦 login-panel.js loaded (${VERSION})`);
 
 export class LoginPanel extends HTMLElement {
     constructor() {
@@ -414,9 +418,9 @@ export class LoginPanel extends HTMLElement {
                 <div class="login-sidebar">
                     <div class="logo-section">
                         <div class="logo-container">
-                            <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
+                            <img src="./blueriot-logo.png" alt="BlueRiot" class="blueriot-logo" onerror="this.style.display='none'">
                         </div>
-                        <img src="matrix.svg" alt="Matrix" class="matrix-logo">
+                        <img src="./matrix.svg" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
                     </div>
 
                     <div class="language-buttons">

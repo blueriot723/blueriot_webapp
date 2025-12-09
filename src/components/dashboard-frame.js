@@ -1,591 +1,422 @@
 /**
- * Dashboard - Main application frame with navigation
- * VERSION: 2024-12-09-v4 - Neon Design Layout
+ * Dashboard - Simple Clean Design
+ * VERSION: 2024-12-09-v6
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-const VERSION = '2024-12-09-v4';
+const VERSION = '2024-12-09-v6';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
     constructor() {
         super();
-        console.log('🏗️ DashboardFrame constructor called');
         this.attachShadow({ mode: 'open' });
         this.currentView = 'home';
-        this.user = null;
-        this.currentTL = null;
-        this.toursData = [];
-        // Cache to prevent reloading data on page switch
         this.loadedSections = new Set();
+        this.tastesData = [];
+        this.routesData = [];
+        this.stayData = [];
+        this.toursData = [];
         this.render();
-        console.log('🎨 DashboardFrame render() completed');
     }
-    async connectedCallback() {
-        console.log('🔌 DashboardFrame connectedCallback');
+
+    connectedCallback() {
         try {
-            this.user = await auth.getCurrentUser();
-            this.currentTL = auth.getTL();
-        } catch (e) {
-            console.warn('Auth not ready yet:', e);
+            this.setupListeners();
+            console.log('✅ Dashboard ready');
+        } catch(e) {
+            console.error('Dashboard error:', e);
         }
-        // Always setup listeners even if auth fails
-        this.setupListeners();
-        console.log('✅ Dashboard listeners initialized');
     }
+
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
-                * { box-sizing: border-box; margin: 0; padding: 0; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 :host {
-                    --neon-cyan: #00e5ff;
-                    --neon-fuchsia: #ff00ff;
-                    --neon-pink: #ff4fd8;
-                    --text-gray: #6b7280;
-                    --bg-black: #0a0a0a;
-                    --bg-darker: #050505;
+                    display: block;
+                    font-family: 'Courier New', Courier, monospace;
+                    background: #000;
+                    color: #0f0;
+                    min-height: 100vh;
                 }
-                .container { display: flex; min-height: 100vh; background: var(--bg-black); font-family: 'Orbitron', sans-serif; }
 
-                /* === SIDEBAR === */
+                .container {
+                    display: flex;
+                    min-height: 100vh;
+                }
+
+                /* SIDEBAR */
                 .sidebar {
-                    width: 260px;
-                    background: var(--bg-darker);
-                    padding: 30px 20px;
-                    border-right: none;
-                    position: fixed;
-                    height: 100vh;
-                    overflow-y: auto;
-                    z-index: 100;
-                }
-                .logo-box {
-                    border: 1px solid rgba(255,255,255,0.25);
-                    border-radius: 6px;
-                    padding: 20px 15px;
-                    text-align: center;
-                    margin-bottom: 25px;
-                    position: relative;
-                    background: rgba(15,15,20,0.8);
-                }
-                .logo-text { margin-bottom: 10px; }
-                .logo-blue { font-size: 15px; font-weight: 700; color: #7ba3c9; letter-spacing: 3px; text-transform: uppercase; }
-                .logo-white { font-size: 13px; font-weight: 700; color: white; letter-spacing: 4px; margin-top: 4px; text-transform: uppercase; }
-                .blueriot-logo {
-                    width: 100%;
-                    max-width: 150px;
-                    height: auto;
-                    margin: 12px auto;
-                    display: block;
-                    filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
-                    min-height: 60px;
-                    background: rgba(255,255,255,0.03);
-                    border-radius: 4px;
-                }
-                .matrix-logo {
-                    width: 100%;
-                    max-width: 130px;
-                    height: auto;
-                    margin: 12px auto 0;
-                    display: block;
-                    filter: drop-shadow(0 0 10px rgba(0,229,255,0.7));
-                    min-height: 40px;
-                }
-                /* Glow line under logos */
-                .logo-glow {
-                    height: 2px;
-                    background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 30%, var(--neon-cyan) 70%, transparent 100%);
-                    margin: 20px 10%;
-                    border-radius: 2px;
-                    box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan);
+                    width: 200px;
+                    background: #000;
+                    border-right: 1px solid #0f0;
+                    padding: 20px;
+                    display: flex;
+                    flex-direction: column;
                 }
 
-                /* === NAV ITEMS - Stile immagine === */
-                .nav { list-style: none; padding: 0; margin-top: 10px; }
+                .logo {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 1px solid #0f0;
+                }
+                .logo img {
+                    max-width: 120px;
+                    height: auto;
+                    margin-bottom: 10px;
+                }
+
+                /* NAV */
+                .nav {
+                    list-style: none;
+                    flex: 1;
+                }
                 .nav-item {
-                    margin-bottom: 12px;
-                    position: relative;
+                    padding: 12px 10px;
+                    margin-bottom: 8px;
                     cursor: pointer;
-                    padding: 10px 0 10px 5px;
-                    transition: all 0.3s ease;
+                    border: 1px solid transparent;
+                    transition: all 0.2s;
+                }
+                .nav-item:hover {
+                    border-color: #0f0;
+                    background: rgba(0,255,0,0.1);
+                }
+                .nav-item.active {
+                    border-color: #0f0;
+                    background: rgba(0,255,0,0.2);
+                    color: #fff;
                 }
                 .nav-item span {
-                    font-size: 15px;
-                    font-weight: 700;
-                    color: var(--text-gray);
-                    letter-spacing: 2px;
-                    transition: all 0.3s ease;
-                    display: block;
-                    text-transform: uppercase;
-                }
-                .nav-item:hover span { color: #a0a0a0; }
-                .nav-item.active span {
-                    color: var(--neon-pink);
-                    text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
-                }
-                /* Sottolineatura fuchsia con freccia - stile immagine */
-                .nav-item.active::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 2px;
-                    left: 0;
-                    width: 70%;
-                    height: 2px;
-                    background: var(--neon-pink);
-                    box-shadow: 0 0 8px var(--neon-pink), 0 0 16px var(--neon-pink);
-                }
-                .nav-item.active::before {
-                    content: '';
-                    position: absolute;
-                    bottom: -2px;
-                    left: calc(70% - 8px);
-                    width: 12px;
-                    height: 12px;
-                    border-right: 2px solid var(--neon-pink);
-                    border-bottom: 2px solid var(--neon-pink);
-                    transform: rotate(-45deg);
-                    box-shadow: 2px 2px 6px var(--neon-pink);
-                }
-                .nav-section {
-                    color: #445566;
-                    font-size: 10px;
-                    letter-spacing: 3px;
-                    margin: 35px 0 15px;
-                    text-transform: uppercase;
-                    padding-left: 5px;
+                    font-size: 14px;
+                    letter-spacing: 1px;
                 }
 
-                /* === MAIN CONTENT === */
-                .main { margin-left: 260px; flex: 1; padding: 40px; background: var(--bg-black); min-height: 100vh; }
-
-                /* === NEON FRAME - Stile immagine con angoli elaborati === */
-                .work {
-                    position: relative;
-                    background: var(--bg-darker);
-                    min-height: calc(100vh - 80px);
-                    padding: 50px 40px;
-                    margin: 0;
+                .nav-divider {
+                    border-top: 1px dashed #0f0;
+                    margin: 15px 0;
+                    opacity: 0.5;
                 }
 
-                /* Bordo superiore con angolo tagliato */
-                .work::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 40px;
-                    right: 0;
-                    height: 2px;
-                    background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-cyan) calc(100% - 80px), transparent calc(100% - 80px));
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+                .logout-btn {
+                    padding: 10px;
+                    background: transparent;
+                    border: 1px solid #f00;
+                    color: #f00;
+                    font-family: inherit;
+                    cursor: pointer;
+                    margin-top: auto;
+                }
+                .logout-btn:hover {
+                    background: rgba(255,0,0,0.2);
                 }
 
-                /* Linea diagonale angolo superiore destro */
-                .work::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 80px;
-                    height: 50px;
-                    border-right: 2px solid var(--neon-cyan);
-                    border-top: none;
-                    background: linear-gradient(135deg, transparent 49%, var(--neon-cyan) 49%, var(--neon-cyan) 51%, transparent 51%);
-                    box-shadow: 2px 0 10px var(--neon-cyan);
-                }
-
-                /* Frame container per gli altri lati */
-                .neon-frame-sides {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    pointer-events: none;
-                    z-index: 1;
-                }
-
-                /* Linea sinistra */
-                .frame-left {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 2px;
-                    height: calc(100% - 50px);
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-                }
-
-                /* Angolo inferiore sinistro con estensione */
-                .frame-bottom-left {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 50px;
-                    height: 50px;
-                }
-                .frame-bottom-left::before {
-                    content: '';
-                    position: absolute;
-                    bottom: 50px;
-                    left: 0;
-                    width: 2px;
-                    height: 30px;
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                }
-                .frame-bottom-left::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 80px;
-                    height: 2px;
-                    background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 20px, var(--neon-cyan) 100%);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                }
-
-                /* Bordo inferiore */
-                .frame-bottom {
-                    position: absolute;
-                    bottom: 0;
-                    left: 50px;
-                    right: 60px;
-                    height: 2px;
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-                }
-
-                /* Angolo inferiore destro con curva */
-                .frame-bottom-right {
-                    position: absolute;
-                    bottom: 0;
-                    right: 0;
-                    width: 60px;
-                    height: 60px;
-                }
-                .frame-bottom-right::before {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    right: 30px;
-                    width: 40px;
-                    height: 2px;
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                    transform-origin: right center;
-                    transform: rotate(-30deg);
-                }
-                .frame-bottom-right::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 20px;
-                    right: 0;
-                    width: 2px;
-                    height: calc(100% - 70px);
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                }
-
-                /* Linea destra */
-                .frame-right {
-                    position: absolute;
-                    top: 50px;
-                    right: 0;
-                    width: 2px;
-                    height: calc(100% - 130px);
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+                /* MAIN */
+                .main {
+                    flex: 1;
+                    padding: 30px;
+                    overflow-y: auto;
                 }
 
                 .page { display: none; }
                 .page.active { display: block; }
+
                 h1 {
-                    font-size: 38px;
-                    font-weight: 900;
-                    color: white;
-                    letter-spacing: 6px;
-                    margin-bottom: 30px;
-                    text-transform: uppercase;
+                    font-size: 24px;
+                    margin-bottom: 20px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid #0f0;
+                    color: #0f0;
                 }
 
-                /* === CONTENT BOX - Stile immagine con bordo sottile === */
                 .content-box {
-                    background: rgba(8,12,25,0.4);
-                    border: 1px solid rgba(255,255,255,0.15);
-                    border-radius: 4px;
-                    padding: 30px;
-                    min-height: 300px;
-                    position: relative;
+                    border: 1px solid #0f0;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    background: rgba(0,255,0,0.02);
                 }
-                .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 20px; }
+
+                /* GRID */
+                .grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                    gap: 15px;
+                }
+
                 .card {
-                    background: rgba(12,16,30,0.7);
-                    border: 1px solid rgba(0,229,255,0.15);
-                    border-radius: 6px;
-                    padding: 22px;
-                    transition: all 0.3s ease;
-                    position: relative;
+                    border: 1px solid #0f0;
+                    padding: 15px;
+                    background: rgba(0,255,0,0.05);
                 }
-                .card:hover {
-                    border-color: rgba(0,229,255,0.35);
-                    box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05);
+                .card-title {
+                    font-size: 16px;
+                    color: #fff;
+                    margin-bottom: 10px;
                 }
-                .card h3 { color: var(--neon-cyan); margin-bottom: 10px; font-size: 16px; letter-spacing: 1px; }
-                .card p { color: #8899aa; font-size: 13px; margin: 5px 0; }
-                .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
-                .card:hover .card-actions { opacity: 1; }
-                .card-actions button { width: 28px; height: 28px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-                .btn-edit { background: rgba(0,240,255,0.2); color: #00f0ff; }
-                .btn-edit:hover { background: rgba(0,240,255,0.4); }
-                .btn-delete { background: rgba(255,0,100,0.2); color: #ff0064; }
-                .btn-delete:hover { background: rgba(255,0,100,0.4); }
-                .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-                .modal-overlay.active { display: flex; }
-                .modal { background: #0a0e27; border: 1px solid rgba(0,240,255,0.3); border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-                .modal-header { padding: 20px; border-bottom: 1px solid rgba(0,240,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-                .modal-header h2 { color: #00f0ff; margin: 0; font-size: 20px; }
-                .modal-close { background: none; border: none; color: #8899aa; font-size: 24px; cursor: pointer; }
-                .modal-close:hover { color: #ff0064; }
-                .modal-body { padding: 20px; }
-                .form-group { margin-bottom: 16px; }
-                .form-group label { display: block; color: #8899aa; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; }
-                .form-group input, .form-group select, .form-group textarea { width: 100%; background: rgba(10,14,39,0.8); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; padding: 12px; color: white; font-size: 14px; }
-                .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #00f0ff; box-shadow: 0 0 8px rgba(0,240,255,0.3); }
-                .form-group textarea { min-height: 80px; resize: vertical; }
-                .modal-footer { padding: 20px; border-top: 1px solid rgba(0,240,255,0.1); display: flex; justify-content: flex-end; gap: 12px; }
-                .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-                .btn-primary { background: linear-gradient(135deg, #00f0ff, #0080ff); color: white; }
-                .btn-primary:hover { box-shadow: 0 0 16px rgba(0,240,255,0.5); }
-                .btn-secondary { background: rgba(255,255,255,0.1); color: #8899aa; }
-                .btn-secondary:hover { background: rgba(255,255,255,0.2); }
-                .btn-danger { background: rgba(255,0,100,0.2); color: #ff0064; }
-                .btn-danger:hover { background: rgba(255,0,100,0.4); }
-                .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-                .toolbar-filters { display: flex; gap: 12px; flex-wrap: wrap; }
-                .toolbar-filters select { background: rgba(10,14,39,0.8); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; padding: 8px 12px; color: white; font-size: 13px; }
-                .btn-add { background: linear-gradient(135deg, #00f0ff, #0080ff); color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-                .btn-add:hover { box-shadow: 0 0 16px rgba(0,240,255,0.5); }
-                /* === MOBILE OVERLAY === */
-                .mobile-overlay {
+                .card-info {
+                    font-size: 12px;
+                    color: #0f0;
+                    margin: 5px 0;
+                }
+                .card-actions {
+                    margin-top: 10px;
+                    display: flex;
+                    gap: 10px;
+                }
+
+                /* BUTTONS */
+                .btn {
+                    padding: 8px 15px;
+                    border: 1px solid #0f0;
+                    background: transparent;
+                    color: #0f0;
+                    font-family: inherit;
+                    font-size: 12px;
+                    cursor: pointer;
+                }
+                .btn:hover {
+                    background: rgba(0,255,0,0.2);
+                }
+                .btn-add {
+                    border-color: #0ff;
+                    color: #0ff;
+                }
+                .btn-add:hover {
+                    background: rgba(0,255,255,0.2);
+                }
+                .btn-danger {
+                    border-color: #f00;
+                    color: #f00;
+                }
+                .btn-danger:hover {
+                    background: rgba(255,0,0,0.2);
+                }
+
+                /* TOOLBAR */
+                .toolbar {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+                .toolbar select, .toolbar input {
+                    padding: 8px;
+                    border: 1px solid #0f0;
+                    background: #000;
+                    color: #0f0;
+                    font-family: inherit;
+                }
+
+                /* T00L5 SECTION */
+                .tools-section {
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 1px dashed #0f0;
+                }
+                .tools-section h2 {
+                    color: #0ff;
+                    font-size: 16px;
+                    margin-bottom: 15px;
+                }
+                .tools-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                }
+
+                /* MODAL */
+                .modal-overlay {
                     display: none;
                     position: fixed;
                     top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0,0,0,0.7);
-                    z-index: 99;
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
-                }
-                .mobile-overlay.active {
-                    display: block;
-                    opacity: 1;
-                }
-
-                /* === HAMBURGER BUTTON (hidden by default on desktop) === */
-                .hamburger {
-                    display: none;
+                    background: rgba(0,0,0,0.9);
+                    z-index: 1000;
                     align-items: center;
                     justify-content: center;
-                    position: fixed;
-                    top: 15px;
-                    left: 15px;
-                    z-index: 200;
-                    width: 50px;
-                    height: 50px;
-                    background: var(--bg-black);
-                    border: 2px solid var(--neon-cyan);
-                    border-radius: 8px;
-                    color: var(--neon-cyan);
-                    font-size: 26px;
-                    cursor: pointer;
-                    box-shadow: 0 0 15px rgba(0,240,255,0.4);
-                    -webkit-tap-highlight-color: transparent;
-                    touch-action: manipulation;
                 }
-                .hamburger:active {
-                    transform: scale(0.9);
-                    background: rgba(0,240,255,0.2);
+                .modal-overlay.active { display: flex; }
+                .modal {
+                    background: #000;
+                    border: 2px solid #0f0;
+                    padding: 30px;
+                    max-width: 500px;
+                    width: 90%;
+                }
+                .modal h2 {
+                    margin-bottom: 20px;
+                    color: #0f0;
+                }
+                .modal-close {
+                    float: right;
+                    background: none;
+                    border: none;
+                    color: #f00;
+                    font-size: 24px;
+                    cursor: pointer;
+                }
+                .form-group {
+                    margin-bottom: 15px;
+                }
+                .form-group label {
+                    display: block;
+                    margin-bottom: 5px;
+                    color: #0f0;
+                }
+                .form-group input, .form-group select, .form-group textarea {
+                    width: 100%;
+                    padding: 10px;
+                    border: 1px solid #0f0;
+                    background: #000;
+                    color: #0f0;
+                    font-family: inherit;
                 }
 
-                /* === RESPONSIVE - TABLET & iPAD (use hamburger menu) === */
-                @media (max-width: 1024px) {
-                    .hamburger { display: flex !important; }
+                /* MOBILE */
+                .hamburger {
+                    display: none;
+                    position: fixed;
+                    top: 10px;
+                    left: 10px;
+                    z-index: 200;
+                    background: #000;
+                    border: 1px solid #0f0;
+                    color: #0f0;
+                    width: 40px;
+                    height: 40px;
+                    font-size: 20px;
+                    cursor: pointer;
+                }
+
+                @media (max-width: 768px) {
+                    .hamburger { display: block; }
                     .sidebar {
                         position: fixed;
-                        left: 0;
+                        left: -220px;
                         top: 0;
-                        width: 280px;
                         height: 100vh;
-                        transform: translateX(-100%);
-                        transition: transform 0.3s ease;
-                        box-shadow: 4px 0 30px rgba(0,0,0,0.9);
                         z-index: 150;
+                        transition: left 0.3s;
                     }
-                    .sidebar.open { transform: translateX(0); }
-                    .main { margin-left: 0; padding: 25px; padding-top: 85px; }
-                    .work { min-height: calc(100vh - 130px); padding: 35px 25px; }
-                    h1 { font-size: 26px; letter-spacing: 4px; }
-                    .logo-box { padding: 15px; }
-                    .blueriot-logo { max-width: 120px; }
-                    .matrix-logo { max-width: 100px; }
-                    .nav-item { margin-bottom: 10px; padding: 8px 0 8px 5px; }
-                    .nav-item span { font-size: 14px; }
-                    /* Nasconde elementi frame complessi su tablet */
-                    .neon-frame-sides { display: none; }
-                    .work::before, .work::after {
-                        box-shadow: 0 0 8px var(--neon-cyan);
-                    }
-                }
-
-                /* === RESPONSIVE - MOBILE === */
-                @media (max-width: 768px) {
-                    .main { padding: 15px; padding-top: 75px; }
-                    .work { padding: 25px 18px; min-height: calc(100vh - 110px); }
-                    h1 { font-size: 20px; letter-spacing: 3px; margin-bottom: 20px; }
-                    .grid { grid-template-columns: 1fr; }
-                    .toolbar { flex-direction: column; align-items: stretch; }
-                    .toolbar-filters { flex-direction: column; }
-                    .toolbar-filters select { width: 100%; }
-                    .btn-add { width: 100%; justify-content: center; }
-                    .content-box { padding: 18px; }
-                    .card { padding: 18px; }
-                    .modal { width: 95%; margin: 10px; }
-                    /* Frame semplificato su mobile */
-                    .work::before {
-                        left: 20px;
-                        background: var(--neon-cyan);
-                    }
-                    .work::after {
-                        width: 40px;
-                        height: 30px;
-                    }
-                }
-
-                /* === RESPONSIVE - SMALL MOBILE === */
-                @media (max-width: 480px) {
-                    h1 { font-size: 16px; letter-spacing: 2px; }
-                    .work { padding: 18px 12px; }
-                    .hamburger { width: 44px; height: 44px; font-size: 22px; }
-                    .logo-box { padding: 12px; }
-                    .blueriot-logo { max-width: 100px; }
-                    .matrix-logo { max-width: 80px; }
-                    .nav-item span { font-size: 13px; letter-spacing: 1px; }
-                    .content-box { padding: 14px; }
+                    .sidebar.open { left: 0; }
+                    .main { padding: 60px 15px 15px; }
+                    .tools-grid { grid-template-columns: 1fr; }
                 }
             </style>
+
             <button class="hamburger" id="hamburger">☰</button>
-            <div class="mobile-overlay" id="mobileOverlay"></div>
+
             <div class="container">
                 <aside class="sidebar" id="sidebar">
-                    <div class="logo-box">
-                        <div class="logo-text">
-                            <div class="logo-blue">BLUERIOT</div>
-                            <div class="logo-white">SYNDICATE</div>
-                        </div>
-                        <img src="./blueriot-logo.png" alt="BlueRiot" class="blueriot-logo" onerror="this.style.display='none'">
-                        <img src="./matrix.svg" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
+                    <div class="logo">
+                        <img src="./blueriot-logo.png" alt="BlueRiot" onerror="this.style.display='none'">
+                        <img src="./matrix.svg" alt="Matrix" style="max-width:100px;" onerror="this.style.display='none'">
                     </div>
-                    <div class="logo-glow"></div>
                     <ul class="nav">
-                        <li class="nav-item" data-v="tastes"><span>TASTES</span></li>
-                        <li class="nav-item" data-v="routes"><span>ROUTES</span></li>
-                        <li class="nav-item" data-v="stay"><span>STAY</span></li>
-                        <li class="nav-item" data-v="node"><span>NODE</span></li>
-                        <li class="nav-section">T00L5</li>
-                        <li class="nav-item" data-v="etickets"><span>eTICKETS</span></li>
-                        <li class="nav-item" data-v="pdfocr"><span>PDF OCR</span></li>
+                        <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
+                        <li class="nav-item" data-v="routes"><span>R0UT35</span></li>
+                        <li class="nav-item" data-v="stay"><span>SΤΔΥ</span></li>
+                        <div class="nav-divider"></div>
+                        <li class="nav-item" data-v="node"><span>NODΞ</span></li>
                     </ul>
+                    <button class="logout-btn" id="logoutBtn">[ LOGOUT ]</button>
                 </aside>
+
                 <main class="main">
-                    <div class="work">
-                        <!-- Neon Frame Elements -->
-                        <div class="neon-frame-sides">
-                            <div class="frame-left"></div>
-                            <div class="frame-right"></div>
-                            <div class="frame-bottom"></div>
-                            <div class="frame-bottom-left"></div>
-                            <div class="frame-bottom-right"></div>
+                    <div id="home" class="page active">
+                        <h1>BLUERIOT MATRIX</h1>
+                        <div class="content-box">
+                            <p>> Seleziona una sezione dal menu</p>
+                            <p>> Sistema pronto</p>
                         </div>
-                        <div id="home" class="page active" style="text-align:center;padding:60px 20px;">
-                            <div style="font-size:64px;margin-bottom:20px;opacity:0.5;color:var(--neon-cyan);">⬡</div>
-                            <h1>MATRIX</h1>
-                            <p style="color:#6b7280;font-size:13px;letter-spacing:1px;">Seleziona una sezione dal menu</p>
+                    </div>
+
+                    <div id="tastes" class="page">
+                        <h1>ΤΔSΤΞ5</h1>
+                        <div class="toolbar">
+                            <div id="tastes-filters"></div>
+                            <button class="btn btn-add" id="addTaste">+ AGGIUNGI</button>
                         </div>
-                        <div id="tastes" class="page">
-                            <h1>TASTES</h1>
-                            <div class="content-box" id="tastes-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                        <div class="content-box" id="tastes-c">
+                            <p>> Caricamento...</p>
                         </div>
-                        <div id="routes" class="page">
-                            <h1>ROUTES</h1>
-                            <div class="content-box" id="routes-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                    </div>
+
+                    <div id="routes" class="page">
+                        <h1>R0UT35</h1>
+                        <div class="toolbar">
+                            <div id="routes-filters"></div>
+                            <button class="btn btn-add" id="addRoute">+ AGGIUNGI</button>
                         </div>
-                        <div id="stay" class="page">
-                            <h1>STAY</h1>
-                            <div class="content-box" id="stay-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                        <div class="content-box" id="routes-c">
+                            <p>> Caricamento...</p>
                         </div>
-                        <div id="node" class="page">
-                            <div id="node-list">
-                                <h1>NODE</h1>
-                                <div class="content-box" id="node-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                    </div>
+
+                    <div id="stay" class="page">
+                        <h1>SΤΔΥ</h1>
+                        <div class="toolbar">
+                            <div id="stay-filters"></div>
+                            <button class="btn btn-add" id="addStay">+ AGGIUNGI</button>
+                        </div>
+                        <div class="content-box" id="stay-c">
+                            <p>> Caricamento...</p>
+                        </div>
+                    </div>
+
+                    <div id="node" class="page">
+                        <div id="node-list">
+                            <h1>NODΞ - Tour</h1>
+                            <div class="content-box" id="node-c">
+                                <p>> Caricamento tour...</p>
                             </div>
-                            <div id="node-detail" style="display:none;"><tour-weather-panel></tour-weather-panel></div>
                         </div>
-                        <div id="etickets" class="page"><h1>eTICKETS</h1><eticket-panel></eticket-panel></div>
-                        <div id="pdfocr" class="page"><h1>PDF OCR</h1><pdf-ocr-panel></pdf-ocr-panel></div>
+                        <div id="node-detail" style="display:none;">
+                            <tour-weather-panel></tour-weather-panel>
+                            <div class="tools-section">
+                                <h2>T00L5</h2>
+                                <div class="tools-grid">
+                                    <div class="content-box">
+                                        <h3 style="color:#0ff;margin-bottom:10px;">eTICKETS</h3>
+                                        <eticket-panel></eticket-panel>
+                                    </div>
+                                    <div class="content-box">
+                                        <h3 style="color:#0ff;margin-bottom:10px;">PDF OCR</h3>
+                                        <pdf-ocr-panel></pdf-ocr-panel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
 
-            <!-- Modal per CRUD -->
+            <!-- Modal CRUD -->
             <div class="modal-overlay" id="crudModal">
                 <div class="modal">
-                    <div class="modal-header">
-                        <h2 id="modalTitle">Aggiungi</h2>
-                        <button class="modal-close" id="modalClose">×</button>
-                    </div>
-                    <div class="modal-body" id="modalBody"></div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" id="modalCancel">Annulla</button>
-                        <button class="btn btn-primary" id="modalSave">Salva</button>
+                    <button class="modal-close" id="modalClose">×</button>
+                    <h2 id="modalTitle">Aggiungi</h2>
+                    <form id="crudForm"></form>
+                    <div style="margin-top:20px;text-align:right;">
+                        <button type="button" class="btn" id="modalCancel">Annulla</button>
+                        <button type="submit" class="btn btn-add" id="modalSave">Salva</button>
                     </div>
                 </div>
             </div>
         `;
     }
-    toggleSidebar() {
-        const sidebar = this.shadowRoot.getElementById('sidebar');
-        const overlay = this.shadowRoot.getElementById('mobileOverlay');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-    }
-    closeSidebar() {
-        this.shadowRoot.getElementById('sidebar').classList.remove('open');
-        this.shadowRoot.getElementById('mobileOverlay').classList.remove('active');
-    }
+
     setupListeners() {
-        const hamburger = this.shadowRoot.getElementById('hamburger');
-        const overlay = this.shadowRoot.getElementById('mobileOverlay');
-
-        // Hamburger - both click and touch
-        hamburger.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleSidebar();
-        });
-        hamburger.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleSidebar();
-        }, { passive: false });
-
-        // Mobile overlay - close sidebar when clicked/touched
-        overlay.addEventListener('click', () => this.closeSidebar());
-        overlay.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.closeSidebar();
-        }, { passive: false });
+        // Hamburger
+        this.shadowRoot.getElementById('hamburger').onclick = () => {
+            this.shadowRoot.getElementById('sidebar').classList.toggle('open');
+        };
 
         // Nav items
         this.shadowRoot.querySelectorAll('.nav-item[data-v]').forEach(item => {
@@ -596,504 +427,257 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 this.shadowRoot.getElementById(v).classList.add('active');
                 this.load(v);
-                // Close sidebar on tablet/mobile after selection
-                if(window.innerWidth <= 1024) this.closeSidebar();
+                // Close sidebar on mobile
+                this.shadowRoot.getElementById('sidebar').classList.remove('open');
             };
         });
 
-        // Listen for back event from tour-weather-panel (with error handling)
+        // Logout
+        this.shadowRoot.getElementById('logoutBtn').onclick = async () => {
+            await window.supabaseClient.auth.signOut();
+            window.location.reload();
+        };
+
+        // Add buttons
+        this.shadowRoot.getElementById('addTaste').onclick = () => this.openModal('tastes');
+        this.shadowRoot.getElementById('addRoute').onclick = () => this.openModal('routes');
+        this.shadowRoot.getElementById('addStay').onclick = () => this.openModal('stay');
+
+        // Modal
+        this.shadowRoot.getElementById('modalClose').onclick = () => this.closeModal();
+        this.shadowRoot.getElementById('modalCancel').onclick = () => this.closeModal();
+        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveModal();
+
+        // Tour weather panel back
         const tourPanel = this.shadowRoot.querySelector('tour-weather-panel');
         if (tourPanel) {
             tourPanel.addEventListener('back', () => {
                 this.shadowRoot.getElementById('node-list').style.display = 'block';
                 this.shadowRoot.getElementById('node-detail').style.display = 'none';
             });
-        } else {
-            // Retry after custom element is defined
-            customElements.whenDefined('tour-weather-panel').then(() => {
-                const panel = this.shadowRoot.querySelector('tour-weather-panel');
-                if (panel) {
-                    panel.addEventListener('back', () => {
-                        this.shadowRoot.getElementById('node-list').style.display = 'block';
-                        this.shadowRoot.getElementById('node-detail').style.display = 'none';
-                    });
-                }
-            });
         }
     }
-    async load(v, forceRefresh = false) {
-        const c = this.shadowRoot.getElementById(v + '-c');
-        if(!c) return; // etickets and pdfocr don't have -c containers, they use web components
 
-        // Skip loading if already loaded (prevents reload on page switch), unless force refresh
-        if (this.loadedSections.has(v) && !forceRefresh) {
-            console.log(`📦 ${v} already loaded, skipping fetch`);
+    async load(v, force = false) {
+        const c = this.shadowRoot.getElementById(v + '-c');
+        if (!c) return;
+
+        if (this.loadedSections.has(v) && !force) return;
+
+        try {
+            if (v === 'tastes') {
+                const { data, error } = await window.supabaseClient
+                    .from('blueriot_tastes')
+                    .select('*')
+                    .order('name');
+                if (error) throw error;
+                this.tastesData = data || [];
+                this.renderTastes(c);
+                this.loadedSections.add(v);
+            }
+            else if (v === 'routes') {
+                const { data, error } = await window.supabaseClient
+                    .from('blueriot_routes')
+                    .select('*')
+                    .order('start_point');
+                if (error) throw error;
+                this.routesData = data || [];
+                this.renderRoutes(c);
+                this.loadedSections.add(v);
+            }
+            else if (v === 'stay') {
+                const { data, error } = await window.supabaseClient
+                    .from('blueriot_stay')
+                    .select('*')
+                    .order('name');
+                if (error) throw error;
+                this.stayData = data || [];
+                this.renderStay(c);
+                this.loadedSections.add(v);
+            }
+            else if (v === 'node') {
+                const { data, error } = await window.supabaseClient
+                    .from('tours')
+                    .select('*')
+                    .order('start_date', { ascending: false });
+                if (error) throw error;
+                this.toursData = data || [];
+                this.renderTours(c);
+                this.loadedSections.add(v);
+            }
+        } catch (e) {
+            console.error('Load error:', e);
+            c.innerHTML = `<p style="color:#f00;">> Errore: ${e.message}</p>`;
+        }
+    }
+
+    renderTastes(c) {
+        if (this.tastesData.length === 0) {
+            c.innerHTML = '<p>> Nessun ristorante. Clicca + AGGIUNGI</p>';
             return;
         }
-
-        // Clear from cache if forcing refresh
-        if (forceRefresh) {
-            this.loadedSections.delete(v);
-            console.log(`🔄 Force refreshing ${v}`);
-        }
-
-        try {
-            console.log(`🔄 Loading ${v} data...`);
-            if(v==='tastes') {
-                const {data,error} = await window.supabaseClient.from('blueriot_tastes').select('*').order('country,region,city,name');
-                if(error) throw error;
-                this.tastesData = data || [];
-
-                // Build filters
-                const countries = [...new Set(data?.map(r=>r.country).filter(Boolean))].sort();
-                const regions = [...new Set(data?.map(r=>r.region).filter(Boolean))].sort();
-                const cities = [...new Set(data?.map(r=>r.city).filter(Boolean))].sort();
-
-                c.innerHTML = `
-                    <div class="toolbar">
-                        <div class="toolbar-filters">
-                            <select id="filterCountry"><option value="">🌍 Tutte le nazioni</option>${countries.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                            <select id="filterRegion"><option value="">📍 Tutte le regioni</option>${regions.map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
-                            <select id="filterCity"><option value="">🏙️ Tutte le città</option>${cities.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                        </div>
-                        <button class="btn-add" id="addTaste">+ Aggiungi</button>
-                    </div>
-                    <div id="tastesGrid" class="grid">${this.renderTastesGrid(data)}</div>
-                `;
-
-                // Filter listeners
-                ['filterCountry','filterRegion','filterCity'].forEach(id => {
-                    this.shadowRoot.getElementById(id).onchange = () => this.filterTastes();
-                });
-
-                // Add button
-                this.shadowRoot.getElementById('addTaste').onclick = () => this.openTasteModal();
-
-                // Edit/Delete listeners
-                this.setupTasteCardListeners();
-                this.loadedSections.add('tastes');
-
-            } else if(v==='routes') {
-                const {data,error} = await window.supabaseClient.from('blueriot_routes').select('*').order('start_point,end_point');
-                if(error) throw error;
-                this.routesData = data || [];
-
-                const types = [...new Set(data?.map(r=>r.transport_type).filter(Boolean))].sort();
-                c.innerHTML = `
-                    <div class="toolbar">
-                        <div class="toolbar-filters">
-                            <select id="filterRouteType"><option value="">🚌 Tutti i tipi</option>${types.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
-                        </div>
-                        <button class="btn-add" id="addRoute">+ Aggiungi</button>
-                    </div>
-                    <div id="routesGrid" class="grid">${this.renderRoutesGrid(data)}</div>
-                `;
-                this.shadowRoot.getElementById('filterRouteType').onchange = () => this.filterRoutes();
-                this.shadowRoot.getElementById('addRoute').onclick = () => this.openRouteModal();
-                this.setupRouteCardListeners();
-                this.loadedSections.add('routes');
-
-            } else if(v==='stay') {
-                const {data,error} = await window.supabaseClient.from('blueriot_stay').select('*').order('country,region,location,name');
-                if(error) throw error;
-                this.stayData = data || [];
-
-                const countries = [...new Set(data?.map(h=>h.country).filter(Boolean))].sort();
-                const regions = [...new Set(data?.map(h=>h.region).filter(Boolean))].sort();
-                const cities = [...new Set(data?.map(h=>h.location).filter(Boolean))].sort();
-
-                c.innerHTML = `
-                    <div class="toolbar">
-                        <div class="toolbar-filters">
-                            <select id="filterStayCountry"><option value="">🌍 Tutte le nazioni</option>${countries.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                            <select id="filterStayRegion"><option value="">📍 Tutte le regioni</option>${regions.map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
-                            <select id="filterStayCity"><option value="">🏙️ Tutte le città</option>${cities.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                        </div>
-                        <button class="btn-add" id="addStay">+ Aggiungi</button>
-                    </div>
-                    <div id="stayGrid" class="grid">${this.renderStayGrid(data)}</div>
-                `;
-                ['filterStayCountry','filterStayRegion','filterStayCity'].forEach(id => {
-                    this.shadowRoot.getElementById(id).onchange = () => this.filterStay();
-                });
-                this.shadowRoot.getElementById('addStay').onclick = () => this.openStayModal();
-                this.setupStayCardListeners();
-                this.loadedSections.add('stay');
-
-            } else if(v==='node') {
-                // Reset to list view
-                this.shadowRoot.getElementById('node-list').style.display = 'block';
-                this.shadowRoot.getElementById('node-detail').style.display = 'none';
-
-                // Get TL profile first
-                const { data: user } = await window.supabaseClient.auth.getUser();
-                if (!user?.user) {
-                    c.innerHTML = '<p style="color:#8899aa;">Utente non autenticato</p>';
-                    return;
-                }
-
-                const { data: tlProfile } = await window.supabaseClient.from('tl_users').select('id').eq('user_id', user.user.id).single();
-                if (!tlProfile) {
-                    c.innerHTML = '<p style="color:#8899aa;">Profilo TL non trovato</p>';
-                    return;
-                }
-
-                const {data,error} = await window.supabaseClient.from('tours').select('*').eq('tl_id',tlProfile.id).order('start_date',{ascending:false}).limit(20);
-                if(error) throw error;
-                this.toursData = data || [];
-
-                c.innerHTML = !data?.length ? '<p style="color:#8899aa;">Nessun tour. Usa la sezione eTickets per gestire i passeggeri.</p>' :
-                    '<p style="color:#8899aa;margin-bottom:16px;">Clicca su un tour per vedere il meteo</p><div class="grid">' + data.map((t,i)=>`<div class="card tour-card" data-idx="${i}" style="cursor:pointer;"><h3>${t.name||'N/A'}</h3><p>📋 ${t.code||'N/A'}</p><p>📅 ${t.start_date} → ${t.end_date||'N/A'}</p><p>👥 ${t.passenger_count||0} pax</p><p>📊 ${t.status||'upcoming'}</p><p style="color:#00f0ff;font-size:12px;margin-top:8px;">🌤️ Vedi meteo →</p></div>`).join('') + '</div>';
-
-                // Add click handlers to tour cards
-                c.querySelectorAll('.tour-card').forEach(card => {
-                    card.onclick = () => {
-                        const idx = parseInt(card.dataset.idx);
-                        const tour = this.toursData[idx];
-                        if (tour) this.showTourWeather(tour);
-                    };
-                });
-                this.loadedSections.add('node');
-            }
-        } catch(e) {
-            console.error('Load error:', e);
-            c.innerHTML = '<p style="color:#ff4757;">Errore: ' + e.message + '</p>';
-        }
+        c.innerHTML = '<div class="grid">' + this.tastesData.map((r, i) => `
+            <div class="card">
+                <div class="card-title">${r.name || 'N/A'}</div>
+                <div class="card-info">📍 ${r.city || r.location || '-'}</div>
+                <div class="card-info">🍽️ ${r.cuisine || r.type || '-'}</div>
+                <div class="card-info">📞 ${r.phone || '-'}</div>
+                <div class="card-actions">
+                    <button class="btn" onclick="this.getRootNode().host.editTaste(${i})">Modifica</button>
+                    <button class="btn btn-danger" onclick="this.getRootNode().host.deleteTaste('${r.id}')">Elimina</button>
+                </div>
+            </div>
+        `).join('') + '</div>';
     }
 
-    showTourWeather(tour) {
+    renderRoutes(c) {
+        if (this.routesData.length === 0) {
+            c.innerHTML = '<p>> Nessuna tratta. Clicca + AGGIUNGI</p>';
+            return;
+        }
+        c.innerHTML = '<div class="grid">' + this.routesData.map((r, i) => `
+            <div class="card">
+                <div class="card-title">${r.start_point || '?'} → ${r.end_point || '?'}</div>
+                <div class="card-info">🚗 ${r.transport_type || '-'}</div>
+                <div class="card-info">⏱️ ${r.duration || '-'}</div>
+                <div class="card-info">💰 ${r.price || '-'}</div>
+                <div class="card-actions">
+                    <button class="btn" onclick="this.getRootNode().host.editRoute(${i})">Modifica</button>
+                    <button class="btn btn-danger" onclick="this.getRootNode().host.deleteRoute('${r.id}')">Elimina</button>
+                </div>
+            </div>
+        `).join('') + '</div>';
+    }
+
+    renderStay(c) {
+        if (this.stayData.length === 0) {
+            c.innerHTML = '<p>> Nessun hotel. Clicca + AGGIUNGI</p>';
+            return;
+        }
+        c.innerHTML = '<div class="grid">' + this.stayData.map((r, i) => `
+            <div class="card">
+                <div class="card-title">${r.name || 'N/A'}</div>
+                <div class="card-info">📍 ${r.location || r.city || '-'}</div>
+                <div class="card-info">🏨 ${r.type || 'Hotel'}</div>
+                <div class="card-info">📞 ${r.phone || '-'}</div>
+                <div class="card-actions">
+                    <button class="btn" onclick="this.getRootNode().host.editStay(${i})">Modifica</button>
+                    <button class="btn btn-danger" onclick="this.getRootNode().host.deleteStay('${r.id}')">Elimina</button>
+                </div>
+            </div>
+        `).join('') + '</div>';
+    }
+
+    renderTours(c) {
+        if (this.toursData.length === 0) {
+            c.innerHTML = '<p>> Nessun tour. Crea un tour in Supabase.</p>';
+            return;
+        }
+        c.innerHTML = '<div class="grid">' + this.toursData.map((t, i) => `
+            <div class="card" style="cursor:pointer;" onclick="this.getRootNode().host.showTour(${i})">
+                <div class="card-title">${t.name || 'Tour'}</div>
+                <div class="card-info">📅 ${t.start_date || '-'} → ${t.end_date || '-'}</div>
+                <div class="card-info">👥 ${t.passenger_count || 0} pax</div>
+                <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : '-'}</div>
+            </div>
+        `).join('') + '</div>';
+    }
+
+    showTour(idx) {
+        const tour = this.toursData[idx];
+        if (!tour) return;
         this.shadowRoot.getElementById('node-list').style.display = 'none';
         this.shadowRoot.getElementById('node-detail').style.display = 'block';
-        const weatherPanel = this.shadowRoot.querySelector('tour-weather-panel');
-        weatherPanel.loadTour(tour);
-    }
-
-    // === TASTES CRUD ===
-    renderTastesGrid(data) {
-        if (!data?.length) return '<p style="color:#8899aa;">Nessun ristorante nel database</p>';
-        return data.map((r,i) => `
-            <div class="card" data-id="${r.id}" data-idx="${i}">
-                <div class="card-actions">
-                    <button class="btn-edit" title="Modifica">✏️</button>
-                    <button class="btn-delete" title="Elimina">🗑️</button>
-                </div>
-                <h3>${r.name || 'N/A'}</h3>
-                <p>🌍 ${r.country || 'N/A'} › ${r.region || 'N/A'} › ${r.city || 'N/A'}</p>
-                <p>🍽️ ${r.cuisine || 'N/A'}</p>
-                ${r.address ? `<p>📍 ${r.address}</p>` : ''}
-                ${r.phone ? `<p>📞 ${r.phone}</p>` : ''}
-                ${r.rating_avg ? `<p>⭐ ${parseFloat(r.rating_avg).toFixed(1)}</p>` : ''}
-                ${r.notes ? `<p style="font-size:12px;color:#667788;margin-top:8px;">${r.notes}</p>` : ''}
-            </div>
-        `).join('');
-    }
-
-    filterTastes() {
-        const country = this.shadowRoot.getElementById('filterCountry').value;
-        const region = this.shadowRoot.getElementById('filterRegion').value;
-        const city = this.shadowRoot.getElementById('filterCity').value;
-
-        let filtered = this.tastesData;
-        if (country) filtered = filtered.filter(r => r.country === country);
-        if (region) filtered = filtered.filter(r => r.region === region);
-        if (city) filtered = filtered.filter(r => r.city === city);
-
-        this.shadowRoot.getElementById('tastesGrid').innerHTML = this.renderTastesGrid(filtered);
-        this.setupTasteCardListeners();
-    }
-
-    setupTasteCardListeners() {
-        this.shadowRoot.querySelectorAll('#tastesGrid .btn-edit').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                const card = btn.closest('.card');
-                const idx = parseInt(card.dataset.idx);
-                this.openTasteModal(this.tastesData[idx]);
-            };
-        });
-        this.shadowRoot.querySelectorAll('#tastesGrid .btn-delete').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                const card = btn.closest('.card');
-                const id = card.dataset.id;
-                if (confirm('Eliminare questo ristorante?')) {
-                    this.deleteTaste(id);
-                }
-            };
-        });
-    }
-
-    openTasteModal(taste = null) {
-        this.editingTaste = taste;
-        const modal = this.shadowRoot.getElementById('crudModal');
-        const title = this.shadowRoot.getElementById('modalTitle');
-        const body = this.shadowRoot.getElementById('modalBody');
-
-        title.textContent = taste ? 'Modifica Ristorante' : 'Nuovo Ristorante';
-        body.innerHTML = `
-            <div class="form-group">
-                <label>Nome *</label>
-                <input type="text" id="tasteName" value="${taste?.name || ''}" required>
-            </div>
-            <div class="form-group">
-                <label>Nazione</label>
-                <input type="text" id="tasteCountry" value="${taste?.country || ''}" placeholder="Italia">
-            </div>
-            <div class="form-group">
-                <label>Regione</label>
-                <input type="text" id="tasteRegion" value="${taste?.region || ''}" placeholder="Toscana">
-            </div>
-            <div class="form-group">
-                <label>Città</label>
-                <input type="text" id="tasteCity" value="${taste?.city || ''}" placeholder="Firenze">
-            </div>
-            <div class="form-group">
-                <label>Cucina</label>
-                <input type="text" id="tasteCuisine" value="${taste?.cuisine || ''}" placeholder="Italiana, Pesce, Pizza...">
-            </div>
-            <div class="form-group">
-                <label>Indirizzo</label>
-                <input type="text" id="tasteAddress" value="${taste?.address || ''}">
-            </div>
-            <div class="form-group">
-                <label>Telefono</label>
-                <input type="text" id="tastePhone" value="${taste?.phone || ''}">
-            </div>
-            <div class="form-group">
-                <label>Note</label>
-                <textarea id="tasteNotes">${taste?.notes || ''}</textarea>
-            </div>
-        `;
-
-        modal.classList.add('active');
-
-        // Modal buttons
-        this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveTaste();
-    }
-
-    async saveTaste() {
-        const name = this.shadowRoot.getElementById('tasteName').value.trim();
-        if (!name) return alert('Il nome è obbligatorio');
-
-        const data = {
-            name,
-            country: this.shadowRoot.getElementById('tasteCountry').value.trim() || null,
-            region: this.shadowRoot.getElementById('tasteRegion').value.trim() || null,
-            city: this.shadowRoot.getElementById('tasteCity').value.trim() || null,
-            cuisine: this.shadowRoot.getElementById('tasteCuisine').value.trim() || null,
-            address: this.shadowRoot.getElementById('tasteAddress').value.trim() || null,
-            phone: this.shadowRoot.getElementById('tastePhone').value.trim() || null,
-            notes: this.shadowRoot.getElementById('tasteNotes').value.trim() || null
-        };
-
-        try {
-            if (this.editingTaste) {
-                await window.supabaseClient.from('blueriot_tastes').update(data).eq('id', this.editingTaste.id);
-            } else {
-                await window.supabaseClient.from('blueriot_tastes').insert(data);
-            }
-            this.shadowRoot.getElementById('crudModal').classList.remove('active');
-            this.load('tastes');
-        } catch (err) {
-            alert('Errore: ' + err.message);
+        const panel = this.shadowRoot.querySelector('tour-weather-panel');
+        if (panel && panel.loadTour) {
+            panel.loadTour(tour);
         }
     }
+
+    // MODAL
+    openModal(type, data = null) {
+        this.modalType = type;
+        this.modalData = data;
+        const title = this.shadowRoot.getElementById('modalTitle');
+        const form = this.shadowRoot.getElementById('crudForm');
+
+        title.textContent = data ? 'Modifica' : 'Aggiungi';
+
+        if (type === 'tastes') {
+            form.innerHTML = `
+                <div class="form-group"><label>Nome</label><input name="name" value="${data?.name || ''}"></div>
+                <div class="form-group"><label>Città</label><input name="city" value="${data?.city || ''}"></div>
+                <div class="form-group"><label>Tipo cucina</label><input name="cuisine" value="${data?.cuisine || ''}"></div>
+                <div class="form-group"><label>Telefono</label><input name="phone" value="${data?.phone || ''}"></div>
+                <div class="form-group"><label>Note</label><textarea name="notes">${data?.notes || ''}</textarea></div>
+            `;
+        } else if (type === 'routes') {
+            form.innerHTML = `
+                <div class="form-group"><label>Partenza</label><input name="start_point" value="${data?.start_point || ''}"></div>
+                <div class="form-group"><label>Arrivo</label><input name="end_point" value="${data?.end_point || ''}"></div>
+                <div class="form-group"><label>Mezzo</label><input name="transport_type" value="${data?.transport_type || ''}"></div>
+                <div class="form-group"><label>Durata</label><input name="duration" value="${data?.duration || ''}"></div>
+                <div class="form-group"><label>Prezzo</label><input name="price" value="${data?.price || ''}"></div>
+            `;
+        } else if (type === 'stay') {
+            form.innerHTML = `
+                <div class="form-group"><label>Nome</label><input name="name" value="${data?.name || ''}"></div>
+                <div class="form-group"><label>Località</label><input name="location" value="${data?.location || ''}"></div>
+                <div class="form-group"><label>Tipo</label><input name="type" value="${data?.type || 'Hotel'}"></div>
+                <div class="form-group"><label>Telefono</label><input name="phone" value="${data?.phone || ''}"></div>
+                <div class="form-group"><label>Note</label><textarea name="notes">${data?.notes || ''}</textarea></div>
+            `;
+        }
+
+        this.shadowRoot.getElementById('crudModal').classList.add('active');
+    }
+
+    closeModal() {
+        this.shadowRoot.getElementById('crudModal').classList.remove('active');
+    }
+
+    async saveModal() {
+        const form = this.shadowRoot.getElementById('crudForm');
+        const formData = new FormData(form);
+        const obj = Object.fromEntries(formData);
+
+        const table = this.modalType === 'tastes' ? 'blueriot_tastes' :
+                      this.modalType === 'routes' ? 'blueriot_routes' : 'blueriot_stay';
+
+        try {
+            if (this.modalData?.id) {
+                await window.supabaseClient.from(table).update(obj).eq('id', this.modalData.id);
+            } else {
+                await window.supabaseClient.from(table).insert([obj]);
+            }
+            this.closeModal();
+            this.loadedSections.delete(this.modalType);
+            this.load(this.modalType, true);
+        } catch (e) {
+            alert('Errore: ' + e.message);
+        }
+    }
+
+    // Edit/Delete methods
+    editTaste(i) { this.openModal('tastes', this.tastesData[i]); }
+    editRoute(i) { this.openModal('routes', this.routesData[i]); }
+    editStay(i) { this.openModal('stay', this.stayData[i]); }
 
     async deleteTaste(id) {
-        try {
-            await window.supabaseClient.from('blueriot_tastes').delete().eq('id', id);
-            this.load('tastes');
-        } catch (err) {
-            alert('Errore: ' + err.message);
-        }
+        if (!confirm('Eliminare?')) return;
+        await window.supabaseClient.from('blueriot_tastes').delete().eq('id', id);
+        this.load('tastes', true);
     }
-
-    // === ROUTES CRUD ===
-    renderRoutesGrid(data) {
-        if (!data?.length) return '<p style="color:#8899aa;">Nessuna tratta nel database</p>';
-        return data.map((r,i) => `
-            <div class="card" data-id="${r.id}" data-idx="${i}">
-                <div class="card-actions">
-                    <button class="btn-edit" title="Modifica">✏️</button>
-                    <button class="btn-delete" title="Elimina">🗑️</button>
-                </div>
-                <h3>${r.start_point||'?'} → ${r.end_point||'?'}</h3>
-                <p>🚌 ${r.transport_type||'N/A'}</p>
-                <p>🏢 ${r.operator_name||'N/A'}</p>
-                <p>⏱️ ${r.duration||'N/A'}</p>
-                ${r.price ? `<p>💰 ${r.price}</p>` : ''}
-                ${r.notes ? `<p style="font-size:12px;color:#667788;margin-top:8px;">${r.notes}</p>` : ''}
-            </div>
-        `).join('');
-    }
-
-    filterRoutes() {
-        const type = this.shadowRoot.getElementById('filterRouteType').value;
-        let filtered = this.routesData;
-        if (type) filtered = filtered.filter(r => r.transport_type === type);
-        this.shadowRoot.getElementById('routesGrid').innerHTML = this.renderRoutesGrid(filtered);
-        this.setupRouteCardListeners();
-    }
-
-    setupRouteCardListeners() {
-        this.shadowRoot.querySelectorAll('#routesGrid .btn-edit').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); const idx = parseInt(btn.closest('.card').dataset.idx); this.openRouteModal(this.routesData[idx]); };
-        });
-        this.shadowRoot.querySelectorAll('#routesGrid .btn-delete').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); if(confirm('Eliminare questa tratta?')) this.deleteRoute(btn.closest('.card').dataset.id); };
-        });
-    }
-
-    openRouteModal(route = null) {
-        this.editingRoute = route;
-        const modal = this.shadowRoot.getElementById('crudModal');
-        this.shadowRoot.getElementById('modalTitle').textContent = route ? 'Modifica Tratta' : 'Nuova Tratta';
-        this.shadowRoot.getElementById('modalBody').innerHTML = `
-            <div class="form-group"><label>Partenza *</label><input type="text" id="routeStart" value="${route?.start_point||''}" required></div>
-            <div class="form-group"><label>Arrivo *</label><input type="text" id="routeEnd" value="${route?.end_point||''}" required></div>
-            <div class="form-group"><label>Tipo Trasporto</label>
-                <select id="routeType">
-                    <option value="">Seleziona...</option>
-                    <option value="Bus" ${route?.transport_type==='Bus'?'selected':''}>🚌 Bus</option>
-                    <option value="Train" ${route?.transport_type==='Train'?'selected':''}>🚂 Treno</option>
-                    <option value="Ferry" ${route?.transport_type==='Ferry'?'selected':''}>⛴️ Traghetto</option>
-                    <option value="Taxi" ${route?.transport_type==='Taxi'?'selected':''}>🚕 Taxi</option>
-                    <option value="Flight" ${route?.transport_type==='Flight'?'selected':''}>✈️ Aereo</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Operatore</label><input type="text" id="routeOperator" value="${route?.operator_name||''}"></div>
-            <div class="form-group"><label>Durata</label><input type="text" id="routeDuration" value="${route?.duration||''}" placeholder="2h 30m"></div>
-            <div class="form-group"><label>Prezzo</label><input type="text" id="routePrice" value="${route?.price||''}"></div>
-            <div class="form-group"><label>Note</label><textarea id="routeNotes">${route?.notes||''}</textarea></div>
-        `;
-        modal.classList.add('active');
-        this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveRoute();
-    }
-
-    async saveRoute() {
-        const start = this.shadowRoot.getElementById('routeStart').value.trim();
-        const end = this.shadowRoot.getElementById('routeEnd').value.trim();
-        if (!start || !end) return alert('Partenza e arrivo sono obbligatori');
-        const data = {
-            start_point: start, end_point: end,
-            transport_type: this.shadowRoot.getElementById('routeType').value || null,
-            operator_name: this.shadowRoot.getElementById('routeOperator').value.trim() || null,
-            duration: this.shadowRoot.getElementById('routeDuration').value.trim() || null,
-            price: this.shadowRoot.getElementById('routePrice').value.trim() || null,
-            notes: this.shadowRoot.getElementById('routeNotes').value.trim() || null
-        };
-        try {
-            if (this.editingRoute) await window.supabaseClient.from('blueriot_routes').update(data).eq('id', this.editingRoute.id);
-            else await window.supabaseClient.from('blueriot_routes').insert(data);
-            this.shadowRoot.getElementById('crudModal').classList.remove('active');
-            this.load('routes');
-        } catch (err) { alert('Errore: ' + err.message); }
-    }
-
     async deleteRoute(id) {
-        try { await window.supabaseClient.from('blueriot_routes').delete().eq('id', id); this.load('routes'); }
-        catch (err) { alert('Errore: ' + err.message); }
+        if (!confirm('Eliminare?')) return;
+        await window.supabaseClient.from('blueriot_routes').delete().eq('id', id);
+        this.load('routes', true);
     }
-
-    // === STAY CRUD ===
-    renderStayGrid(data) {
-        if (!data?.length) return '<p style="color:#8899aa;">Nessun hotel nel database</p>';
-        return data.map((h,i) => `
-            <div class="card" data-id="${h.id}" data-idx="${i}">
-                <div class="card-actions">
-                    <button class="btn-edit" title="Modifica">✏️</button>
-                    <button class="btn-delete" title="Elimina">🗑️</button>
-                </div>
-                <h3>${h.name||'N/A'}</h3>
-                <p>🌍 ${h.country||'N/A'} › ${h.region||'N/A'} › ${h.location||'N/A'}</p>
-                <p>🏨 ${h.type||'Hotel'}</p>
-                ${h.address ? `<p>📍 ${h.address}</p>` : ''}
-                ${h.phone ? `<p>📞 ${h.phone}</p>` : ''}
-                ${h.price_range ? `<p>💰 ${h.price_range}</p>` : ''}
-                ${h.notes ? `<p style="font-size:12px;color:#667788;margin-top:8px;">${h.notes}</p>` : ''}
-            </div>
-        `).join('');
-    }
-
-    filterStay() {
-        const country = this.shadowRoot.getElementById('filterStayCountry').value;
-        const region = this.shadowRoot.getElementById('filterStayRegion').value;
-        const city = this.shadowRoot.getElementById('filterStayCity').value;
-        let filtered = this.stayData;
-        if (country) filtered = filtered.filter(h => h.country === country);
-        if (region) filtered = filtered.filter(h => h.region === region);
-        if (city) filtered = filtered.filter(h => h.location === city);
-        this.shadowRoot.getElementById('stayGrid').innerHTML = this.renderStayGrid(filtered);
-        this.setupStayCardListeners();
-    }
-
-    setupStayCardListeners() {
-        this.shadowRoot.querySelectorAll('#stayGrid .btn-edit').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); const idx = parseInt(btn.closest('.card').dataset.idx); this.openStayModal(this.stayData[idx]); };
-        });
-        this.shadowRoot.querySelectorAll('#stayGrid .btn-delete').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); if(confirm('Eliminare questo hotel?')) this.deleteStay(btn.closest('.card').dataset.id); };
-        });
-    }
-
-    openStayModal(stay = null) {
-        this.editingStay = stay;
-        const modal = this.shadowRoot.getElementById('crudModal');
-        this.shadowRoot.getElementById('modalTitle').textContent = stay ? 'Modifica Hotel' : 'Nuovo Hotel';
-        this.shadowRoot.getElementById('modalBody').innerHTML = `
-            <div class="form-group"><label>Nome *</label><input type="text" id="stayName" value="${stay?.name||''}" required></div>
-            <div class="form-group"><label>Nazione</label><input type="text" id="stayCountry" value="${stay?.country||''}" placeholder="Italia"></div>
-            <div class="form-group"><label>Regione</label><input type="text" id="stayRegion" value="${stay?.region||''}" placeholder="Toscana"></div>
-            <div class="form-group"><label>Città</label><input type="text" id="stayCity" value="${stay?.location||''}" placeholder="Firenze"></div>
-            <div class="form-group"><label>Tipo</label>
-                <select id="stayType">
-                    <option value="Hotel" ${stay?.type==='Hotel'?'selected':''}>🏨 Hotel</option>
-                    <option value="B&B" ${stay?.type==='B&B'?'selected':''}>🛏️ B&B</option>
-                    <option value="Agriturismo" ${stay?.type==='Agriturismo'?'selected':''}>🌾 Agriturismo</option>
-                    <option value="Resort" ${stay?.type==='Resort'?'selected':''}>🏖️ Resort</option>
-                    <option value="Ostello" ${stay?.type==='Ostello'?'selected':''}>🎒 Ostello</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Indirizzo</label><input type="text" id="stayAddress" value="${stay?.address||''}"></div>
-            <div class="form-group"><label>Telefono</label><input type="text" id="stayPhone" value="${stay?.phone||''}"></div>
-            <div class="form-group"><label>Fascia Prezzo</label><input type="text" id="stayPrice" value="${stay?.price_range||''}" placeholder="€€€"></div>
-            <div class="form-group"><label>Note</label><textarea id="stayNotes">${stay?.notes||''}</textarea></div>
-        `;
-        modal.classList.add('active');
-        this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveStay();
-    }
-
-    async saveStay() {
-        const name = this.shadowRoot.getElementById('stayName').value.trim();
-        if (!name) return alert('Il nome è obbligatorio');
-        const data = {
-            name,
-            country: this.shadowRoot.getElementById('stayCountry').value.trim() || null,
-            region: this.shadowRoot.getElementById('stayRegion').value.trim() || null,
-            location: this.shadowRoot.getElementById('stayCity').value.trim() || null,
-            type: this.shadowRoot.getElementById('stayType').value || 'Hotel',
-            address: this.shadowRoot.getElementById('stayAddress').value.trim() || null,
-            phone: this.shadowRoot.getElementById('stayPhone').value.trim() || null,
-            price_range: this.shadowRoot.getElementById('stayPrice').value.trim() || null,
-            notes: this.shadowRoot.getElementById('stayNotes').value.trim() || null
-        };
-        try {
-            if (this.editingStay) await window.supabaseClient.from('blueriot_stay').update(data).eq('id', this.editingStay.id);
-            else await window.supabaseClient.from('blueriot_stay').insert(data);
-            this.shadowRoot.getElementById('crudModal').classList.remove('active');
-            this.load('stay');
-        } catch (err) { alert('Errore: ' + err.message); }
-    }
-
     async deleteStay(id) {
-        try { await window.supabaseClient.from('blueriot_stay').delete().eq('id', id); this.load('stay'); }
-        catch (err) { alert('Errore: ' + err.message); }
+        if (!confirm('Eliminare?')) return;
+        await window.supabaseClient.from('blueriot_stay').delete().eq('id', id);
+        this.load('stay', true);
     }
 }
+
 customElements.define('dashboard-frame', DashboardFrame);

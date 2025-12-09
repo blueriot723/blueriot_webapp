@@ -20,55 +20,55 @@ export class TourWeatherPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                /* Note: @import doesn't work reliably in Shadow DOM, styles are inline */
+                /* Terminal-style matching dashboard */
                 * { box-sizing: border-box; margin: 0; padding: 0; }
+                :host {
+                    font-family: 'Courier New', Courier, monospace;
+                    color: #0f0;
+                }
 
                 .panel { padding: 0; }
 
                 .back-btn {
-                    background: rgba(0, 240, 255, 0.1);
-                    border: 1px solid rgba(0, 240, 255, 0.3);
-                    color: #00f0ff;
-                    padding: 10px 20px;
-                    border-radius: 6px;
+                    background: transparent;
+                    border: 1px solid #0f0;
+                    color: #0f0;
+                    padding: 8px 15px;
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: 12px;
+                    font-family: inherit;
                     margin-bottom: 20px;
-                    transition: all 0.2s ease;
                 }
                 .back-btn:hover {
-                    background: rgba(0, 240, 255, 0.2);
-                    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+                    background: rgba(0, 255, 0, 0.2);
                 }
 
                 .tour-header {
-                    background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(255, 0, 255, 0.05) 100%);
-                    border: 1px solid rgba(0, 240, 255, 0.2);
-                    border-radius: 12px;
-                    padding: 24px;
-                    margin-bottom: 24px;
+                    background: rgba(0, 255, 0, 0.05);
+                    border: 1px solid #0f0;
+                    padding: 20px;
+                    margin-bottom: 20px;
                 }
 
                 .tour-title {
-                    font-size: 28px;
-                    color: #00f0ff;
-                    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+                    font-size: 20px;
+                    color: #fff;
                     margin-bottom: 8px;
                 }
 
                 .tour-code {
-                    font-size: 14px;
-                    color: #ff00ff;
+                    font-size: 12px;
+                    color: #0ff;
                     letter-spacing: 2px;
-                    margin-bottom: 16px;
+                    margin-bottom: 12px;
                 }
 
                 .tour-meta {
                     display: flex;
-                    gap: 24px;
+                    gap: 20px;
                     flex-wrap: wrap;
-                    color: var(--text-secondary);
-                    font-size: 14px;
+                    color: #0f0;
+                    font-size: 12px;
                 }
 
                 .tour-meta span {
@@ -78,125 +78,119 @@ export class TourWeatherPanel extends HTMLElement {
                 }
 
                 .weather-section {
-                    margin-top: 24px;
+                    margin-top: 20px;
                 }
 
                 .section-title {
-                    font-size: 18px;
-                    color: #fff;
-                    margin-bottom: 16px;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
+                    font-size: 14px;
+                    color: #0f0;
+                    margin-bottom: 15px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px dashed #0f0;
                 }
 
                 .days-timeline {
                     display: flex;
                     flex-direction: column;
-                    gap: 12px;
+                    gap: 10px;
                 }
 
                 .day-card {
-                    background: rgba(10, 14, 39, 0.6);
-                    border: 1px solid rgba(0, 240, 255, 0.15);
-                    border-radius: 10px;
-                    padding: 16px 20px;
+                    background: rgba(0, 255, 0, 0.02);
+                    border: 1px solid #0f0;
+                    padding: 12px 15px;
                     display: grid;
-                    grid-template-columns: 80px 1fr auto;
-                    gap: 16px;
+                    grid-template-columns: 60px 1fr auto;
+                    gap: 15px;
                     align-items: center;
-                    transition: all 0.2s ease;
                 }
 
                 .day-card:hover {
-                    border-color: rgba(0, 240, 255, 0.3);
-                    background: rgba(10, 14, 39, 0.8);
+                    background: rgba(0, 255, 0, 0.1);
                 }
 
                 .day-number {
-                    font-size: 24px;
+                    font-size: 20px;
                     font-weight: bold;
-                    color: #00f0ff;
+                    color: #0ff;
                     text-align: center;
                 }
 
                 .day-date {
-                    font-size: 11px;
-                    color: var(--text-secondary);
+                    font-size: 10px;
+                    color: #0f0;
                     text-align: center;
                 }
 
                 .day-info h4 {
                     color: #fff;
                     margin-bottom: 4px;
-                    font-size: 16px;
+                    font-size: 14px;
                 }
 
                 .day-info p {
-                    color: var(--text-secondary);
-                    font-size: 13px;
+                    color: #0f0;
+                    font-size: 11px;
                 }
 
                 .day-weather {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    padding: 8px 16px;
-                    background: rgba(0, 0, 0, 0.3);
-                    border-radius: 8px;
-                    min-width: 150px;
+                    gap: 10px;
+                    padding: 8px 12px;
+                    background: rgba(0, 0, 0, 0.5);
+                    border: 1px solid #0f0;
+                    min-width: 140px;
                 }
 
                 .weather-icon {
-                    font-size: 32px;
+                    font-size: 28px;
                 }
 
                 .weather-temp {
-                    font-size: 18px;
+                    font-size: 14px;
                     font-weight: bold;
                     color: #fff;
                 }
 
                 .weather-condition {
-                    font-size: 11px;
-                    color: var(--text-secondary);
+                    font-size: 10px;
+                    color: #0f0;
                 }
 
                 .weather-rain {
                     font-size: 10px;
-                    color: #00bfff;
+                    color: #0ff;
                 }
 
                 .location-input {
-                    background: rgba(0, 0, 0, 0.3);
-                    border: 1px solid rgba(0, 240, 255, 0.3);
-                    border-radius: 4px;
-                    color: #fff;
+                    background: #000;
+                    border: 1px solid #0f0;
+                    color: #0f0;
                     padding: 4px 8px;
-                    font-size: 12px;
-                    width: 120px;
+                    font-size: 11px;
+                    width: 100px;
                     font-family: inherit;
                 }
                 .location-input:focus {
                     outline: none;
-                    border-color: #00f0ff;
-                    box-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+                    background: rgba(0, 255, 0, 0.1);
                 }
                 .location-input::placeholder {
-                    color: rgba(255, 255, 255, 0.4);
+                    color: rgba(0, 255, 0, 0.4);
                 }
                 .location-btn {
-                    background: rgba(0, 240, 255, 0.2);
-                    border: 1px solid rgba(0, 240, 255, 0.3);
-                    color: #00f0ff;
+                    background: transparent;
+                    border: 1px solid #0f0;
+                    color: #0f0;
                     padding: 4px 8px;
-                    border-radius: 4px;
                     cursor: pointer;
-                    font-size: 11px;
+                    font-size: 10px;
+                    font-family: inherit;
                     margin-left: 4px;
                 }
                 .location-btn:hover {
-                    background: rgba(0, 240, 255, 0.3);
+                    background: rgba(0, 255, 0, 0.2);
                 }
                 .day-location {
                     display: flex;
@@ -208,17 +202,17 @@ export class TourWeatherPanel extends HTMLElement {
                 .loading {
                     text-align: center;
                     padding: 40px;
-                    color: var(--text-secondary);
+                    color: #0f0;
                 }
 
                 .loading-spinner {
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid rgba(0, 240, 255, 0.1);
-                    border-top-color: #00f0ff;
+                    width: 30px;
+                    height: 30px;
+                    border: 2px solid rgba(0, 255, 0, 0.2);
+                    border-top-color: #0f0;
                     border-radius: 50%;
                     animation: spin 1s linear infinite;
-                    margin: 0 auto 16px;
+                    margin: 0 auto 15px;
                 }
 
                 @keyframes spin {
@@ -227,56 +221,54 @@ export class TourWeatherPanel extends HTMLElement {
 
                 .empty-state {
                     text-align: center;
-                    padding: 60px 20px;
-                    color: var(--text-secondary);
+                    padding: 40px 20px;
+                    color: #0f0;
                 }
 
                 .empty-state-icon {
-                    font-size: 48px;
-                    margin-bottom: 16px;
+                    font-size: 36px;
+                    margin-bottom: 12px;
                 }
 
                 .forecast-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                    gap: 12px;
-                    margin-top: 24px;
+                    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                    gap: 10px;
+                    margin-top: 20px;
                 }
 
                 .forecast-card {
-                    background: rgba(10, 14, 39, 0.6);
-                    border: 1px solid rgba(0, 240, 255, 0.1);
-                    border-radius: 8px;
-                    padding: 16px;
+                    background: rgba(0, 255, 0, 0.02);
+                    border: 1px solid #0f0;
+                    padding: 12px;
                     text-align: center;
-                    transition: all 0.2s ease;
                 }
 
                 .forecast-card:hover {
-                    border-color: rgba(0, 240, 255, 0.3);
+                    background: rgba(0, 255, 0, 0.1);
                 }
 
                 .forecast-day {
-                    font-size: 12px;
-                    color: var(--text-secondary);
-                    margin-bottom: 8px;
+                    font-size: 10px;
+                    color: #0f0;
+                    margin-bottom: 6px;
                 }
 
                 .forecast-icon {
-                    font-size: 28px;
-                    margin-bottom: 8px;
+                    font-size: 24px;
+                    margin-bottom: 6px;
                 }
 
                 .forecast-temp {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: bold;
                     color: #fff;
                 }
 
                 @media (max-width: 768px) {
                     .day-card {
-                        grid-template-columns: 60px 1fr;
-                        gap: 12px;
+                        grid-template-columns: 50px 1fr;
+                        gap: 10px;
                     }
                     .day-weather {
                         grid-column: span 2;
@@ -284,7 +276,7 @@ export class TourWeatherPanel extends HTMLElement {
                     }
                     .tour-meta {
                         flex-direction: column;
-                        gap: 8px;
+                        gap: 6px;
                     }
                 }
             </style>

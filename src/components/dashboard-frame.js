@@ -1,13 +1,13 @@
 /**
- * Dashboard - BlueRiot Cyberpunk Style (Original)
- * VERSION: 2024-12-09-v7
+ * Dashboard - Simple Dark Design
+ * VERSION: 2024-12-09-v8
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-const VERSION = '2024-12-09-v7';
+const VERSION = '2024-12-09-v8';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
@@ -35,354 +35,181 @@ export class DashboardFrame extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                /* ===== BLUERIOT CYBERPUNK THEME - Original ===== */
-                :root {
-                    --primary-blue: #00F0FF;
-                    --secondary-blue: #0A7AFF;
-                    --dark-bg: #0A0E27;
-                    --card-bg: #13182E;
-                    --text-primary: #FFFFFF;
-                    --text-secondary: #8B9DC3;
-                    --border-color: #1E2749;
-                }
+                /* SIMPLE DARK THEME */
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 :host {
                     display: block;
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    background: #000;
-                    color: var(--text-primary);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    font-size: 14px;
+                    background: #111;
+                    color: #eee;
                     min-height: 100vh;
                 }
 
-                .container {
-                    display: flex;
-                    min-height: 100vh;
-                }
+                .container { display: flex; min-height: 100vh; }
 
                 /* SIDEBAR */
                 .sidebar {
-                    width: 240px;
-                    background: var(--card-bg);
-                    border-right: 1px solid var(--border-color);
-                    padding: 24px 16px;
+                    width: 220px;
+                    background: #1a1a1a;
+                    border-right: 1px solid #333;
+                    padding: 20px 15px;
                     display: flex;
                     flex-direction: column;
                 }
 
                 .logo {
                     text-align: center;
-                    margin-bottom: 32px;
-                    padding-bottom: 24px;
-                    border-bottom: 1px solid var(--border-color);
+                    padding-bottom: 20px;
+                    margin-bottom: 20px;
+                    border-bottom: 1px solid #333;
                 }
-                .logo img {
-                    max-width: 120px;
-                    height: auto;
-                    margin-bottom: 8px;
-                    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
-                }
-                .logo-text {
-                    font-size: 11px;
-                    color: var(--primary-blue);
-                    letter-spacing: 3px;
-                    text-transform: uppercase;
-                }
+                .logo img { max-width: 100px; height: auto; opacity: 0.9; }
 
-                /* NAV */
-                .nav {
-                    list-style: none;
-                    flex: 1;
-                }
+                .nav { list-style: none; flex: 1; }
                 .nav-item {
-                    padding: 14px 16px;
-                    margin-bottom: 4px;
+                    padding: 12px 15px;
+                    margin-bottom: 5px;
                     cursor: pointer;
-                    border-radius: 8px;
-                    transition: all 0.2s;
-                    color: var(--text-secondary);
+                    color: #888;
+                    border-radius: 4px;
                 }
-                .nav-item:hover {
-                    background: var(--dark-bg);
-                    color: var(--text-primary);
-                }
-                .nav-item.active {
-                    background: rgba(0, 240, 255, 0.1);
-                    color: var(--primary-blue);
-                    border-left: 3px solid var(--primary-blue);
-                }
-                .nav-item span {
-                    font-size: 14px;
-                    font-weight: 500;
-                    letter-spacing: 1px;
-                }
+                .nav-item:hover { background: #222; color: #fff; }
+                .nav-item.active { background: #333; color: #fff; }
 
-                .nav-divider {
-                    border-top: 1px solid var(--border-color);
-                    margin: 16px 0;
-                }
+                .nav-divider { border-top: 1px solid #333; margin: 15px 0; }
 
                 .logout-btn {
-                    padding: 12px 16px;
+                    padding: 10px;
                     background: transparent;
-                    border: 1px solid rgba(255, 71, 87, 0.5);
-                    border-radius: 8px;
-                    color: #FF4757;
-                    font-family: inherit;
-                    font-size: 13px;
+                    border: 1px solid #555;
+                    color: #888;
                     cursor: pointer;
-                    margin-top: auto;
-                    transition: all 0.2s;
+                    border-radius: 4px;
                 }
-                .logout-btn:hover {
-                    background: rgba(255, 71, 87, 0.1);
-                    border-color: #FF4757;
-                }
+                .logout-btn:hover { border-color: #888; color: #fff; }
 
                 /* MAIN */
-                .main {
-                    flex: 1;
-                    padding: 32px;
-                    background: var(--dark-bg);
-                    overflow-y: auto;
-                }
+                .main { flex: 1; padding: 25px; overflow-y: auto; }
 
                 .page { display: none; }
                 .page.active { display: block; }
 
-                h1 {
-                    font-size: 28px;
-                    font-weight: 700;
-                    margin-bottom: 24px;
-                    color: var(--text-primary);
-                }
+                h1 { font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #fff; }
 
                 .content-box {
-                    background: var(--card-bg);
-                    border: 1px solid var(--border-color);
-                    border-radius: 12px;
-                    padding: 24px;
-                    margin-bottom: 24px;
+                    background: #1a1a1a;
+                    border: 1px solid #333;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin-bottom: 20px;
                 }
 
                 /* GRID */
                 .grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-                    gap: 20px;
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                    gap: 15px;
                 }
 
                 .card {
-                    background: var(--dark-bg);
-                    border: 1px solid var(--border-color);
-                    border-radius: 12px;
-                    padding: 20px;
-                    transition: all 0.3s;
+                    background: #222;
+                    border: 1px solid #333;
+                    border-radius: 6px;
+                    padding: 15px;
                 }
-                .card:hover {
-                    border-color: var(--primary-blue);
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 24px rgba(0, 240, 255, 0.15);
-                }
-                .card-title {
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: var(--text-primary);
-                    margin-bottom: 12px;
-                }
-                .card-info {
-                    font-size: 14px;
-                    color: var(--text-secondary);
-                    margin: 6px 0;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-                .card-actions {
-                    margin-top: 16px;
-                    padding-top: 16px;
-                    border-top: 1px solid var(--border-color);
-                    display: flex;
-                    gap: 10px;
-                }
+                .card:hover { border-color: #555; }
+                .card-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 10px; }
+                .card-info { font-size: 13px; color: #888; margin: 5px 0; }
+                .card-actions { margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; display: flex; gap: 8px; }
 
                 /* BUTTONS */
                 .btn {
-                    padding: 10px 18px;
-                    border: 1px solid var(--border-color);
-                    border-radius: 8px;
-                    background: var(--card-bg);
-                    color: var(--text-primary);
-                    font-family: inherit;
+                    padding: 8px 14px;
+                    border: 1px solid #444;
+                    border-radius: 4px;
+                    background: #222;
+                    color: #ccc;
                     font-size: 13px;
-                    font-weight: 500;
                     cursor: pointer;
-                    transition: all 0.2s;
                 }
-                .btn:hover {
-                    background: var(--dark-bg);
-                    border-color: var(--primary-blue);
-                }
-                .btn-add {
-                    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-                    border: none;
-                    color: #000;
-                    font-weight: 600;
-                }
-                .btn-add:hover {
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
-                }
-                .btn-danger {
-                    border-color: rgba(255, 71, 87, 0.5);
-                    color: #FF4757;
-                }
-                .btn-danger:hover {
-                    background: rgba(255, 71, 87, 0.1);
-                    border-color: #FF4757;
-                }
+                .btn:hover { background: #333; color: #fff; }
+                .btn-add { background: #2563eb; border-color: #2563eb; color: #fff; }
+                .btn-add:hover { background: #1d4ed8; }
+                .btn-danger { border-color: #dc2626; color: #dc2626; }
+                .btn-danger:hover { background: #dc2626; color: #fff; }
 
                 /* TOOLBAR */
-                .toolbar {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 24px;
-                    flex-wrap: wrap;
-                    gap: 12px;
-                }
-                .toolbar select, .toolbar input {
-                    padding: 10px 14px;
-                    border: 1px solid var(--border-color);
-                    border-radius: 8px;
-                    background: var(--card-bg);
-                    color: var(--text-primary);
-                    font-family: inherit;
-                    font-size: 14px;
-                }
-                .toolbar select:focus, .toolbar input:focus {
-                    outline: none;
-                    border-color: var(--primary-blue);
-                }
+                .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
 
-                /* T00L5 SECTION */
-                .tools-section {
-                    margin-top: 32px;
-                    padding-top: 24px;
-                    border-top: 1px solid var(--border-color);
-                }
-                .tools-section h2 {
-                    color: var(--primary-blue);
-                    font-size: 18px;
-                    margin-bottom: 20px;
-                    letter-spacing: 2px;
-                }
-                .tools-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 20px;
-                }
+                /* TOOLS */
+                .tools-section { margin-top: 25px; padding-top: 20px; border-top: 1px solid #333; }
+                .tools-section h2 { font-size: 16px; color: #888; margin-bottom: 15px; }
+                .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
                 /* MODAL */
                 .modal-overlay {
                     display: none;
                     position: fixed;
                     top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(10, 14, 39, 0.95);
-                    backdrop-filter: blur(10px);
+                    background: rgba(0,0,0,0.8);
                     z-index: 1000;
                     align-items: center;
                     justify-content: center;
                 }
                 .modal-overlay.active { display: flex; }
                 .modal {
-                    background: var(--card-bg);
-                    border: 1px solid var(--border-color);
-                    border-radius: 16px;
-                    padding: 32px;
-                    max-width: 500px;
+                    background: #1a1a1a;
+                    border: 1px solid #333;
+                    border-radius: 8px;
+                    padding: 25px;
+                    max-width: 450px;
                     width: 90%;
-                    max-height: 90vh;
-                    overflow-y: auto;
                 }
-                .modal h2 {
-                    margin-bottom: 24px;
-                    color: var(--text-primary);
-                    font-size: 22px;
-                }
-                .modal-close {
-                    float: right;
-                    background: none;
-                    border: none;
-                    color: var(--text-secondary);
-                    font-size: 28px;
-                    cursor: pointer;
-                    transition: color 0.2s;
-                }
-                .modal-close:hover {
-                    color: #FF4757;
-                }
-                .form-group {
-                    margin-bottom: 20px;
-                }
-                .form-group label {
-                    display: block;
-                    margin-bottom: 8px;
-                    color: var(--text-secondary);
-                    font-size: 14px;
-                    font-weight: 500;
-                }
+                .modal h2 { margin-bottom: 20px; font-size: 18px; }
+                .modal-close { float: right; background: none; border: none; color: #888; font-size: 24px; cursor: pointer; }
+                .form-group { margin-bottom: 15px; }
+                .form-group label { display: block; margin-bottom: 6px; color: #888; font-size: 13px; }
                 .form-group input, .form-group select, .form-group textarea {
                     width: 100%;
-                    padding: 14px 16px;
-                    border: 1px solid var(--border-color);
-                    border-radius: 8px;
-                    background: var(--dark-bg);
-                    color: var(--text-primary);
-                    font-family: inherit;
-                    font-size: 15px;
+                    padding: 10px;
+                    border: 1px solid #333;
+                    border-radius: 4px;
+                    background: #111;
+                    color: #eee;
+                    font-size: 14px;
                 }
-                .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-                    outline: none;
-                    border-color: var(--primary-blue);
-                    box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
-                }
-                .form-group textarea {
-                    min-height: 100px;
-                    resize: vertical;
-                }
+                .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #555; }
+                .form-group textarea { min-height: 80px; resize: vertical; }
 
                 /* MOBILE */
                 .hamburger {
                     display: none;
                     position: fixed;
-                    top: 16px;
-                    left: 16px;
+                    top: 15px; left: 15px;
                     z-index: 200;
-                    background: var(--card-bg);
-                    border: 1px solid var(--border-color);
-                    border-radius: 8px;
-                    color: var(--primary-blue);
-                    width: 44px;
-                    height: 44px;
-                    font-size: 20px;
+                    background: #1a1a1a;
+                    border: 1px solid #333;
+                    color: #fff;
+                    width: 40px; height: 40px;
+                    font-size: 18px;
                     cursor: pointer;
+                    border-radius: 4px;
                 }
 
                 @media (max-width: 768px) {
                     .hamburger { display: flex; align-items: center; justify-content: center; }
                     .sidebar {
                         position: fixed;
-                        left: -260px;
+                        left: -240px;
                         top: 0;
                         height: 100vh;
                         z-index: 150;
                         transition: left 0.3s;
-                        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
                     }
                     .sidebar.open { left: 0; }
-                    .main { padding: 70px 16px 24px; }
+                    .main { padding: 60px 15px 20px; }
                     .tools-grid { grid-template-columns: 1fr; }
-                    .grid { grid-template-columns: 1fr; }
                 }
             </style>
 
@@ -392,57 +219,55 @@ export class DashboardFrame extends HTMLElement {
                 <aside class="sidebar" id="sidebar">
                     <div class="logo">
                         <img src="./blueriot-logo.png" alt="BlueRiot" onerror="this.style.display='none'">
-                        <img src="./matrix.svg" alt="Matrix" style="max-width:100px;margin-top:8px;" onerror="this.style.display='none'">
-                        <div class="logo-text">Syndicate</div>
                     </div>
                     <ul class="nav">
-                        <li class="nav-item" data-v="tastes"><span>TASTES</span></li>
-                        <li class="nav-item" data-v="routes"><span>ROUTES</span></li>
-                        <li class="nav-item" data-v="stay"><span>STAY</span></li>
+                        <li class="nav-item" data-v="tastes">Tastes</li>
+                        <li class="nav-item" data-v="routes">Routes</li>
+                        <li class="nav-item" data-v="stay">Stay</li>
                         <div class="nav-divider"></div>
-                        <li class="nav-item" data-v="node"><span>NODE</span></li>
+                        <li class="nav-item" data-v="node">Node</li>
                     </ul>
-                    <button class="logout-btn" id="logoutBtn">LOGOUT</button>
+                    <button class="logout-btn" id="logoutBtn">Logout</button>
                 </aside>
 
                 <main class="main">
                     <div id="home" class="page active">
                         <h1>Dashboard</h1>
                         <div class="content-box">
-                            <p style="color:var(--text-secondary);">Seleziona una sezione dal menu per iniziare.</p>
+                            <p style="color:#888;">Seleziona una sezione dal menu.</p>
                         </div>
                     </div>
 
                     <div id="tastes" class="page">
                         <h1>Tastes</h1>
                         <div class="toolbar">
-                            <div id="tastes-filters"></div>
+                            <div></div>
                             <button class="btn btn-add" id="addTaste">+ Aggiungi</button>
                         </div>
                         <div class="content-box" id="tastes-c">
-                            <p style="color:var(--text-secondary);">Caricamento...</p>
+                            <p style="color:#888;">Caricamento...</p>
                         </div>
                     </div>
 
                     <div id="routes" class="page">
                         <h1>Routes</h1>
                         <div class="toolbar">
-                            <div id="routes-filters"></div>
+                            <div></div>
                             <button class="btn btn-add" id="addRoute">+ Aggiungi</button>
                         </div>
                         <div class="content-box" id="routes-c">
-                            <p style="color:var(--text-secondary);">Caricamento...</p>
+                            <p style="color:#888;">Caricamento...</p>
                         </div>
                     </div>
 
                     <div id="stay" class="page">
                         <h1>Stay</h1>
                         <div class="toolbar">
-                            <div id="stay-filters"></div>
+                            <div></div>
                             <button class="btn btn-add" id="addStay">+ Aggiungi</button>
                         </div>
                         <div class="content-box" id="stay-c">
-                            <p style="color:var(--text-secondary);">Caricamento...</p>
+                            <p style="color:#888;">Caricamento...</p>
                         </div>
                     </div>
 
@@ -450,20 +275,20 @@ export class DashboardFrame extends HTMLElement {
                         <div id="node-list">
                             <h1>Node - Tours</h1>
                             <div class="content-box" id="node-c">
-                                <p style="color:var(--text-secondary);">Caricamento tour...</p>
+                                <p style="color:#888;">Caricamento...</p>
                             </div>
                         </div>
                         <div id="node-detail" style="display:none;">
                             <tour-weather-panel></tour-weather-panel>
                             <div class="tools-section">
-                                <h2>TOOLS</h2>
+                                <h2>Tools</h2>
                                 <div class="tools-grid">
                                     <div class="content-box">
-                                        <h3 style="color:var(--primary-blue);margin-bottom:12px;font-size:15px;">eTickets</h3>
+                                        <h3 style="margin-bottom:10px;">eTickets</h3>
                                         <eticket-panel></eticket-panel>
                                     </div>
                                     <div class="content-box">
-                                        <h3 style="color:var(--primary-blue);margin-bottom:12px;font-size:15px;">PDF OCR</h3>
+                                        <h3 style="margin-bottom:10px;">PDF OCR</h3>
                                         <pdf-ocr-panel></pdf-ocr-panel>
                                     </div>
                                 </div>
@@ -473,13 +298,12 @@ export class DashboardFrame extends HTMLElement {
                 </main>
             </div>
 
-            <!-- Modal CRUD -->
             <div class="modal-overlay" id="crudModal">
                 <div class="modal">
                     <button class="modal-close" id="modalClose">×</button>
                     <h2 id="modalTitle">Aggiungi</h2>
                     <form id="crudForm"></form>
-                    <div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end;">
+                    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
                         <button type="button" class="btn" id="modalCancel">Annulla</button>
                         <button type="submit" class="btn btn-add" id="modalSave">Salva</button>
                     </div>
@@ -489,12 +313,10 @@ export class DashboardFrame extends HTMLElement {
     }
 
     setupListeners() {
-        // Hamburger
         this.shadowRoot.getElementById('hamburger').onclick = () => {
             this.shadowRoot.getElementById('sidebar').classList.toggle('open');
         };
 
-        // Nav items
         this.shadowRoot.querySelectorAll('.nav-item[data-v]').forEach(item => {
             item.onclick = () => {
                 const v = item.dataset.v;
@@ -507,23 +329,19 @@ export class DashboardFrame extends HTMLElement {
             };
         });
 
-        // Logout
         this.shadowRoot.getElementById('logoutBtn').onclick = async () => {
             await window.supabaseClient.auth.signOut();
             window.location.reload();
         };
 
-        // Add buttons
         this.shadowRoot.getElementById('addTaste').onclick = () => this.openModal('tastes');
         this.shadowRoot.getElementById('addRoute').onclick = () => this.openModal('routes');
         this.shadowRoot.getElementById('addStay').onclick = () => this.openModal('stay');
 
-        // Modal
         this.shadowRoot.getElementById('modalClose').onclick = () => this.closeModal();
         this.shadowRoot.getElementById('modalCancel').onclick = () => this.closeModal();
         this.shadowRoot.getElementById('modalSave').onclick = () => this.saveModal();
 
-        // Tour weather panel back
         const tourPanel = this.shadowRoot.querySelector('tour-weather-panel');
         if (tourPanel) {
             tourPanel.addEventListener('back', () => {
@@ -536,45 +354,32 @@ export class DashboardFrame extends HTMLElement {
     async load(v, force = false) {
         const c = this.shadowRoot.getElementById(v + '-c');
         if (!c) return;
-
         if (this.loadedSections.has(v) && !force) return;
 
         try {
             if (v === 'tastes') {
-                const { data, error } = await window.supabaseClient
-                    .from('blueriot_tastes')
-                    .select('*')
-                    .order('name');
+                const { data, error } = await window.supabaseClient.from('blueriot_tastes').select('*').order('name');
                 if (error) throw error;
                 this.tastesData = data || [];
                 this.renderTastes(c);
                 this.loadedSections.add(v);
             }
             else if (v === 'routes') {
-                const { data, error } = await window.supabaseClient
-                    .from('blueriot_routes')
-                    .select('*')
-                    .order('start_point');
+                const { data, error } = await window.supabaseClient.from('blueriot_routes').select('*').order('start_point');
                 if (error) throw error;
                 this.routesData = data || [];
                 this.renderRoutes(c);
                 this.loadedSections.add(v);
             }
             else if (v === 'stay') {
-                const { data, error } = await window.supabaseClient
-                    .from('blueriot_stay')
-                    .select('*')
-                    .order('name');
+                const { data, error } = await window.supabaseClient.from('blueriot_stay').select('*').order('name');
                 if (error) throw error;
                 this.stayData = data || [];
                 this.renderStay(c);
                 this.loadedSections.add(v);
             }
             else if (v === 'node') {
-                const { data, error } = await window.supabaseClient
-                    .from('tours')
-                    .select('*')
-                    .order('start_date', { ascending: false });
+                const { data, error } = await window.supabaseClient.from('tours').select('*').order('start_date', { ascending: false });
                 if (error) throw error;
                 this.toursData = data || [];
                 this.renderTours(c);
@@ -582,21 +387,17 @@ export class DashboardFrame extends HTMLElement {
             }
         } catch (e) {
             console.error('Load error:', e);
-            c.innerHTML = `<p style="color:#FF4757;">Errore: ${e.message}</p>`;
+            c.innerHTML = `<p style="color:#f66;">Errore: ${e.message}</p>`;
         }
     }
 
     renderTastes(c) {
-        if (this.tastesData.length === 0) {
-            c.innerHTML = '<p style="color:var(--text-secondary);">Nessun ristorante. Clicca + Aggiungi per crearne uno.</p>';
-            return;
-        }
+        if (!this.tastesData.length) { c.innerHTML = '<p style="color:#888;">Nessun ristorante.</p>'; return; }
         c.innerHTML = '<div class="grid">' + this.tastesData.map((r, i) => `
             <div class="card">
                 <div class="card-title">${r.name || 'N/A'}</div>
-                <div class="card-info">📍 ${r.city || r.location || '-'}</div>
-                <div class="card-info">🍽️ ${r.cuisine || r.type || '-'}</div>
-                <div class="card-info">📞 ${r.phone || '-'}</div>
+                <div class="card-info">📍 ${r.city || '-'}</div>
+                <div class="card-info">🍽️ ${r.cuisine || '-'}</div>
                 <div class="card-actions">
                     <button class="btn" onclick="this.getRootNode().host.editTaste(${i})">Modifica</button>
                     <button class="btn btn-danger" onclick="this.getRootNode().host.deleteTaste('${r.id}')">Elimina</button>
@@ -606,16 +407,12 @@ export class DashboardFrame extends HTMLElement {
     }
 
     renderRoutes(c) {
-        if (this.routesData.length === 0) {
-            c.innerHTML = '<p style="color:var(--text-secondary);">Nessuna tratta. Clicca + Aggiungi per crearne una.</p>';
-            return;
-        }
+        if (!this.routesData.length) { c.innerHTML = '<p style="color:#888;">Nessuna tratta.</p>'; return; }
         c.innerHTML = '<div class="grid">' + this.routesData.map((r, i) => `
             <div class="card">
                 <div class="card-title">${r.start_point || '?'} → ${r.end_point || '?'}</div>
                 <div class="card-info">🚗 ${r.transport_type || '-'}</div>
                 <div class="card-info">⏱️ ${r.duration || '-'}</div>
-                <div class="card-info">💰 ${r.price || '-'}</div>
                 <div class="card-actions">
                     <button class="btn" onclick="this.getRootNode().host.editRoute(${i})">Modifica</button>
                     <button class="btn btn-danger" onclick="this.getRootNode().host.deleteRoute('${r.id}')">Elimina</button>
@@ -625,16 +422,12 @@ export class DashboardFrame extends HTMLElement {
     }
 
     renderStay(c) {
-        if (this.stayData.length === 0) {
-            c.innerHTML = '<p style="color:var(--text-secondary);">Nessun hotel. Clicca + Aggiungi per crearne uno.</p>';
-            return;
-        }
+        if (!this.stayData.length) { c.innerHTML = '<p style="color:#888;">Nessun hotel.</p>'; return; }
         c.innerHTML = '<div class="grid">' + this.stayData.map((r, i) => `
             <div class="card">
                 <div class="card-title">${r.name || 'N/A'}</div>
-                <div class="card-info">📍 ${r.location || r.city || '-'}</div>
+                <div class="card-info">📍 ${r.location || '-'}</div>
                 <div class="card-info">🏨 ${r.type || 'Hotel'}</div>
-                <div class="card-info">📞 ${r.phone || '-'}</div>
                 <div class="card-actions">
                     <button class="btn" onclick="this.getRootNode().host.editStay(${i})">Modifica</button>
                     <button class="btn btn-danger" onclick="this.getRootNode().host.deleteStay('${r.id}')">Elimina</button>
@@ -644,16 +437,13 @@ export class DashboardFrame extends HTMLElement {
     }
 
     renderTours(c) {
-        if (this.toursData.length === 0) {
-            c.innerHTML = '<p style="color:var(--text-secondary);">Nessun tour disponibile.</p>';
-            return;
-        }
+        if (!this.toursData.length) { c.innerHTML = '<p style="color:#888;">Nessun tour.</p>'; return; }
         c.innerHTML = '<div class="grid">' + this.toursData.map((t, i) => `
             <div class="card" style="cursor:pointer;" onclick="this.getRootNode().host.showTour(${i})">
                 <div class="card-title">${t.name || 'Tour'}</div>
                 <div class="card-info">📅 ${t.start_date || '-'} → ${t.end_date || '-'}</div>
-                <div class="card-info">👥 ${t.passenger_count || 0} passeggeri</div>
-                <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : '-'}</div>
+                <div class="card-info">👥 ${t.passenger_count || 0} pax</div>
+                <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : 'Nessuna città'}</div>
             </div>
         `).join('') + '</div>';
     }
@@ -664,25 +454,20 @@ export class DashboardFrame extends HTMLElement {
         this.shadowRoot.getElementById('node-list').style.display = 'none';
         this.shadowRoot.getElementById('node-detail').style.display = 'block';
         const panel = this.shadowRoot.querySelector('tour-weather-panel');
-        if (panel && panel.loadTour) {
-            panel.loadTour(tour);
-        }
+        if (panel?.loadTour) panel.loadTour(tour);
     }
 
-    // MODAL
     openModal(type, data = null) {
         this.modalType = type;
         this.modalData = data;
-        const title = this.shadowRoot.getElementById('modalTitle');
         const form = this.shadowRoot.getElementById('crudForm');
-
-        title.textContent = data ? 'Modifica' : 'Aggiungi';
+        this.shadowRoot.getElementById('modalTitle').textContent = data ? 'Modifica' : 'Aggiungi';
 
         if (type === 'tastes') {
             form.innerHTML = `
                 <div class="form-group"><label>Nome</label><input name="name" value="${data?.name || ''}"></div>
                 <div class="form-group"><label>Città</label><input name="city" value="${data?.city || ''}"></div>
-                <div class="form-group"><label>Tipo cucina</label><input name="cuisine" value="${data?.cuisine || ''}"></div>
+                <div class="form-group"><label>Cucina</label><input name="cuisine" value="${data?.cuisine || ''}"></div>
                 <div class="form-group"><label>Telefono</label><input name="phone" value="${data?.phone || ''}"></div>
                 <div class="form-group"><label>Note</label><textarea name="notes">${data?.notes || ''}</textarea></div>
             `;
@@ -703,21 +488,15 @@ export class DashboardFrame extends HTMLElement {
                 <div class="form-group"><label>Note</label><textarea name="notes">${data?.notes || ''}</textarea></div>
             `;
         }
-
         this.shadowRoot.getElementById('crudModal').classList.add('active');
     }
 
-    closeModal() {
-        this.shadowRoot.getElementById('crudModal').classList.remove('active');
-    }
+    closeModal() { this.shadowRoot.getElementById('crudModal').classList.remove('active'); }
 
     async saveModal() {
         const form = this.shadowRoot.getElementById('crudForm');
-        const formData = new FormData(form);
-        const obj = Object.fromEntries(formData);
-
-        const table = this.modalType === 'tastes' ? 'blueriot_tastes' :
-                      this.modalType === 'routes' ? 'blueriot_routes' : 'blueriot_stay';
+        const obj = Object.fromEntries(new FormData(form));
+        const table = this.modalType === 'tastes' ? 'blueriot_tastes' : this.modalType === 'routes' ? 'blueriot_routes' : 'blueriot_stay';
 
         try {
             if (this.modalData?.id) {
@@ -728,34 +507,16 @@ export class DashboardFrame extends HTMLElement {
             this.closeModal();
             this.loadedSections.delete(this.modalType);
             this.load(this.modalType, true);
-        } catch (e) {
-            alert('Errore: ' + e.message);
-        }
+        } catch (e) { alert('Errore: ' + e.message); }
     }
 
-    // Edit/Delete methods
     editTaste(i) { this.openModal('tastes', this.tastesData[i]); }
     editRoute(i) { this.openModal('routes', this.routesData[i]); }
     editStay(i) { this.openModal('stay', this.stayData[i]); }
 
-    async deleteTaste(id) {
-        if (!confirm('Eliminare?')) return;
-        await window.supabaseClient.from('blueriot_tastes').delete().eq('id', id);
-        this.loadedSections.delete('tastes');
-        this.load('tastes', true);
-    }
-    async deleteRoute(id) {
-        if (!confirm('Eliminare?')) return;
-        await window.supabaseClient.from('blueriot_routes').delete().eq('id', id);
-        this.loadedSections.delete('routes');
-        this.load('routes', true);
-    }
-    async deleteStay(id) {
-        if (!confirm('Eliminare?')) return;
-        await window.supabaseClient.from('blueriot_stay').delete().eq('id', id);
-        this.loadedSections.delete('stay');
-        this.load('stay', true);
-    }
+    async deleteTaste(id) { if (confirm('Eliminare?')) { await window.supabaseClient.from('blueriot_tastes').delete().eq('id', id); this.loadedSections.delete('tastes'); this.load('tastes', true); } }
+    async deleteRoute(id) { if (confirm('Eliminare?')) { await window.supabaseClient.from('blueriot_routes').delete().eq('id', id); this.loadedSections.delete('routes'); this.load('routes', true); } }
+    async deleteStay(id) { if (confirm('Eliminare?')) { await window.supabaseClient.from('blueriot_stay').delete().eq('id', id); this.loadedSections.delete('stay'); this.load('stay', true); } }
 }
 
 customElements.define('dashboard-frame', DashboardFrame);

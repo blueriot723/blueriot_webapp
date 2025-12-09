@@ -108,6 +108,29 @@ export class DashboardFrame extends HTMLElement {
                 .nav-item.active::before { content: '←'; position: absolute; right: 0; bottom: 0; color: var(--neon-fuchsia); font-size: 18px; text-shadow: 0 0 10px var(--neon-fuchsia); }
                 .nav-section { color: #445566; font-size: 10px; letter-spacing: 2px; margin: 30px 0 15px; text-transform: uppercase; }
 
+                /* === LOGOUT BUTTON === */
+                .logout-btn {
+                    position: absolute;
+                    bottom: 30px;
+                    left: 20px;
+                    right: 20px;
+                    padding: 12px;
+                    background: rgba(255,0,100,0.1);
+                    border: 1px solid rgba(255,0,100,0.3);
+                    color: #ff0064;
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 2px;
+                    cursor: pointer;
+                    border-radius: 6px;
+                    transition: all 0.3s;
+                }
+                .logout-btn:hover {
+                    background: rgba(255,0,100,0.2);
+                    box-shadow: 0 0 15px rgba(255,0,100,0.4);
+                }
+
                 /* === MAIN CONTENT === */
                 .main { margin-left: 240px; flex: 1; padding: 30px; background: var(--bg-black); min-height: 100vh; }
 
@@ -280,6 +303,7 @@ export class DashboardFrame extends HTMLElement {
                         <li class="nav-item" data-v="etickets"><span>eTICKETS</span></li>
                         <li class="nav-item" data-v="pdfocr"><span>PDF OCR</span></li>
                     </ul>
+                    <button class="logout-btn" id="logoutBtn">LOGOUT</button>
                 </aside>
                 <main class="main">
                     <div class="work">
@@ -374,6 +398,12 @@ export class DashboardFrame extends HTMLElement {
                 // Close sidebar on tablet/mobile after selection
                 if(window.innerWidth <= 1024) this.closeSidebar();
             };
+        });
+
+        // Logout button
+        this.shadowRoot.getElementById('logoutBtn').addEventListener('click', async () => {
+            await window.supabaseClient.auth.signOut();
+            window.location.reload();
         });
 
         // Listen for back event from tour-weather-panel (with error handling)

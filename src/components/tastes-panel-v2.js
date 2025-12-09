@@ -25,11 +25,13 @@ export class TastesPanelV2 extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = \`
             <style>
-                @import url('../styles/base.css');
-                @import url('../styles/layout.css');
-                @import url('../styles/components.css');
-
-                :host { display: block; }
+                /* CSS variables must be defined inline for Shadow DOM */
+                :host {
+                    display: block;
+                    --spacing-xs: 4px; --spacing-sm: 8px; --spacing-md: 16px; --spacing-lg: 24px; --spacing-xl: 32px; --spacing-2xl: 48px;
+                    --bg-card: #0D1117; --text-muted: #525866; --radius-lg: 12px;
+                    --transition-normal: 300ms ease;
+                }
                 
                 .header-actions {
                     display: flex;

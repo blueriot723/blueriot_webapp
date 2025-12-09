@@ -1,13 +1,13 @@
 /**
- * Dashboard - Simple Clean Design
- * VERSION: 2024-12-09-v6
+ * Dashboard - BlueRiot Cyberpunk Style (Original)
+ * VERSION: 2024-12-09-v7
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-const VERSION = '2024-12-09-v6';
+const VERSION = '2024-12-09-v7';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
@@ -35,12 +35,22 @@ export class DashboardFrame extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
+                /* ===== BLUERIOT CYBERPUNK THEME - Original ===== */
+                :root {
+                    --primary-blue: #00F0FF;
+                    --secondary-blue: #0A7AFF;
+                    --dark-bg: #0A0E27;
+                    --card-bg: #13182E;
+                    --text-primary: #FFFFFF;
+                    --text-secondary: #8B9DC3;
+                    --border-color: #1E2749;
+                }
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 :host {
                     display: block;
-                    font-family: 'Courier New', Courier, monospace;
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                     background: #000;
-                    color: #0f0;
+                    color: var(--text-primary);
                     min-height: 100vh;
                 }
 
@@ -51,24 +61,31 @@ export class DashboardFrame extends HTMLElement {
 
                 /* SIDEBAR */
                 .sidebar {
-                    width: 200px;
-                    background: #000;
-                    border-right: 1px solid #0f0;
-                    padding: 20px;
+                    width: 240px;
+                    background: var(--card-bg);
+                    border-right: 1px solid var(--border-color);
+                    padding: 24px 16px;
                     display: flex;
                     flex-direction: column;
                 }
 
                 .logo {
                     text-align: center;
-                    margin-bottom: 30px;
-                    padding-bottom: 20px;
-                    border-bottom: 1px solid #0f0;
+                    margin-bottom: 32px;
+                    padding-bottom: 24px;
+                    border-bottom: 1px solid var(--border-color);
                 }
                 .logo img {
                     max-width: 120px;
                     height: auto;
-                    margin-bottom: 10px;
+                    margin-bottom: 8px;
+                    filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
+                }
+                .logo-text {
+                    font-size: 11px;
+                    color: var(--primary-blue);
+                    letter-spacing: 3px;
+                    text-transform: uppercase;
                 }
 
                 /* NAV */
@@ -77,49 +94,55 @@ export class DashboardFrame extends HTMLElement {
                     flex: 1;
                 }
                 .nav-item {
-                    padding: 12px 10px;
-                    margin-bottom: 8px;
+                    padding: 14px 16px;
+                    margin-bottom: 4px;
                     cursor: pointer;
-                    border: 1px solid transparent;
+                    border-radius: 8px;
                     transition: all 0.2s;
+                    color: var(--text-secondary);
                 }
                 .nav-item:hover {
-                    border-color: #0f0;
-                    background: rgba(0,255,0,0.1);
+                    background: var(--dark-bg);
+                    color: var(--text-primary);
                 }
                 .nav-item.active {
-                    border-color: #0f0;
-                    background: rgba(0,255,0,0.2);
-                    color: #fff;
+                    background: rgba(0, 240, 255, 0.1);
+                    color: var(--primary-blue);
+                    border-left: 3px solid var(--primary-blue);
                 }
                 .nav-item span {
                     font-size: 14px;
+                    font-weight: 500;
                     letter-spacing: 1px;
                 }
 
                 .nav-divider {
-                    border-top: 1px dashed #0f0;
-                    margin: 15px 0;
-                    opacity: 0.5;
+                    border-top: 1px solid var(--border-color);
+                    margin: 16px 0;
                 }
 
                 .logout-btn {
-                    padding: 10px;
+                    padding: 12px 16px;
                     background: transparent;
-                    border: 1px solid #f00;
-                    color: #f00;
+                    border: 1px solid rgba(255, 71, 87, 0.5);
+                    border-radius: 8px;
+                    color: #FF4757;
                     font-family: inherit;
+                    font-size: 13px;
                     cursor: pointer;
                     margin-top: auto;
+                    transition: all 0.2s;
                 }
                 .logout-btn:hover {
-                    background: rgba(255,0,0,0.2);
+                    background: rgba(255, 71, 87, 0.1);
+                    border-color: #FF4757;
                 }
 
                 /* MAIN */
                 .main {
                     flex: 1;
-                    padding: 30px;
+                    padding: 32px;
+                    background: var(--dark-bg);
                     overflow-y: auto;
                 }
 
@@ -127,74 +150,95 @@ export class DashboardFrame extends HTMLElement {
                 .page.active { display: block; }
 
                 h1 {
-                    font-size: 24px;
-                    margin-bottom: 20px;
-                    padding-bottom: 10px;
-                    border-bottom: 1px solid #0f0;
-                    color: #0f0;
+                    font-size: 28px;
+                    font-weight: 700;
+                    margin-bottom: 24px;
+                    color: var(--text-primary);
                 }
 
                 .content-box {
-                    border: 1px solid #0f0;
-                    padding: 20px;
-                    margin-bottom: 20px;
-                    background: rgba(0,255,0,0.02);
+                    background: var(--card-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px;
+                    padding: 24px;
+                    margin-bottom: 24px;
                 }
 
                 /* GRID */
                 .grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-                    gap: 15px;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                    gap: 20px;
                 }
 
                 .card {
-                    border: 1px solid #0f0;
-                    padding: 15px;
-                    background: rgba(0,255,0,0.05);
+                    background: var(--dark-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px;
+                    padding: 20px;
+                    transition: all 0.3s;
+                }
+                .card:hover {
+                    border-color: var(--primary-blue);
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0, 240, 255, 0.15);
                 }
                 .card-title {
-                    font-size: 16px;
-                    color: #fff;
-                    margin-bottom: 10px;
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin-bottom: 12px;
                 }
                 .card-info {
-                    font-size: 12px;
-                    color: #0f0;
-                    margin: 5px 0;
+                    font-size: 14px;
+                    color: var(--text-secondary);
+                    margin: 6px 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                 }
                 .card-actions {
-                    margin-top: 10px;
+                    margin-top: 16px;
+                    padding-top: 16px;
+                    border-top: 1px solid var(--border-color);
                     display: flex;
                     gap: 10px;
                 }
 
                 /* BUTTONS */
                 .btn {
-                    padding: 8px 15px;
-                    border: 1px solid #0f0;
-                    background: transparent;
-                    color: #0f0;
+                    padding: 10px 18px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 8px;
+                    background: var(--card-bg);
+                    color: var(--text-primary);
                     font-family: inherit;
-                    font-size: 12px;
+                    font-size: 13px;
+                    font-weight: 500;
                     cursor: pointer;
+                    transition: all 0.2s;
                 }
                 .btn:hover {
-                    background: rgba(0,255,0,0.2);
+                    background: var(--dark-bg);
+                    border-color: var(--primary-blue);
                 }
                 .btn-add {
-                    border-color: #0ff;
-                    color: #0ff;
+                    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+                    border: none;
+                    color: #000;
+                    font-weight: 600;
                 }
                 .btn-add:hover {
-                    background: rgba(0,255,255,0.2);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 16px rgba(0, 240, 255, 0.4);
                 }
                 .btn-danger {
-                    border-color: #f00;
-                    color: #f00;
+                    border-color: rgba(255, 71, 87, 0.5);
+                    color: #FF4757;
                 }
                 .btn-danger:hover {
-                    background: rgba(255,0,0,0.2);
+                    background: rgba(255, 71, 87, 0.1);
+                    border-color: #FF4757;
                 }
 
                 /* TOOLBAR */
@@ -202,28 +246,35 @@ export class DashboardFrame extends HTMLElement {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 24px;
                     flex-wrap: wrap;
-                    gap: 10px;
+                    gap: 12px;
                 }
                 .toolbar select, .toolbar input {
-                    padding: 8px;
-                    border: 1px solid #0f0;
-                    background: #000;
-                    color: #0f0;
+                    padding: 10px 14px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 8px;
+                    background: var(--card-bg);
+                    color: var(--text-primary);
                     font-family: inherit;
+                    font-size: 14px;
+                }
+                .toolbar select:focus, .toolbar input:focus {
+                    outline: none;
+                    border-color: var(--primary-blue);
                 }
 
                 /* T00L5 SECTION */
                 .tools-section {
-                    margin-top: 30px;
-                    padding-top: 20px;
-                    border-top: 1px dashed #0f0;
+                    margin-top: 32px;
+                    padding-top: 24px;
+                    border-top: 1px solid var(--border-color);
                 }
                 .tools-section h2 {
-                    color: #0ff;
-                    font-size: 16px;
-                    margin-bottom: 15px;
+                    color: var(--primary-blue);
+                    font-size: 18px;
+                    margin-bottom: 20px;
+                    letter-spacing: 2px;
                 }
                 .tools-grid {
                     display: grid;
@@ -236,77 +287,102 @@ export class DashboardFrame extends HTMLElement {
                     display: none;
                     position: fixed;
                     top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0,0,0,0.9);
+                    background: rgba(10, 14, 39, 0.95);
+                    backdrop-filter: blur(10px);
                     z-index: 1000;
                     align-items: center;
                     justify-content: center;
                 }
                 .modal-overlay.active { display: flex; }
                 .modal {
-                    background: #000;
-                    border: 2px solid #0f0;
-                    padding: 30px;
+                    background: var(--card-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 16px;
+                    padding: 32px;
                     max-width: 500px;
                     width: 90%;
+                    max-height: 90vh;
+                    overflow-y: auto;
                 }
                 .modal h2 {
-                    margin-bottom: 20px;
-                    color: #0f0;
+                    margin-bottom: 24px;
+                    color: var(--text-primary);
+                    font-size: 22px;
                 }
                 .modal-close {
                     float: right;
                     background: none;
                     border: none;
-                    color: #f00;
-                    font-size: 24px;
+                    color: var(--text-secondary);
+                    font-size: 28px;
                     cursor: pointer;
+                    transition: color 0.2s;
+                }
+                .modal-close:hover {
+                    color: #FF4757;
                 }
                 .form-group {
-                    margin-bottom: 15px;
+                    margin-bottom: 20px;
                 }
                 .form-group label {
                     display: block;
-                    margin-bottom: 5px;
-                    color: #0f0;
+                    margin-bottom: 8px;
+                    color: var(--text-secondary);
+                    font-size: 14px;
+                    font-weight: 500;
                 }
                 .form-group input, .form-group select, .form-group textarea {
                     width: 100%;
-                    padding: 10px;
-                    border: 1px solid #0f0;
-                    background: #000;
-                    color: #0f0;
+                    padding: 14px 16px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 8px;
+                    background: var(--dark-bg);
+                    color: var(--text-primary);
                     font-family: inherit;
+                    font-size: 15px;
+                }
+                .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+                    outline: none;
+                    border-color: var(--primary-blue);
+                    box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
+                }
+                .form-group textarea {
+                    min-height: 100px;
+                    resize: vertical;
                 }
 
                 /* MOBILE */
                 .hamburger {
                     display: none;
                     position: fixed;
-                    top: 10px;
-                    left: 10px;
+                    top: 16px;
+                    left: 16px;
                     z-index: 200;
-                    background: #000;
-                    border: 1px solid #0f0;
-                    color: #0f0;
-                    width: 40px;
-                    height: 40px;
+                    background: var(--card-bg);
+                    border: 1px solid var(--border-color);
+                    border-radius: 8px;
+                    color: var(--primary-blue);
+                    width: 44px;
+                    height: 44px;
                     font-size: 20px;
                     cursor: pointer;
                 }
 
                 @media (max-width: 768px) {
-                    .hamburger { display: block; }
+                    .hamburger { display: flex; align-items: center; justify-content: center; }
                     .sidebar {
                         position: fixed;
-                        left: -220px;
+                        left: -260px;
                         top: 0;
                         height: 100vh;
                         z-index: 150;
                         transition: left 0.3s;
+                        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
                     }
                     .sidebar.open { left: 0; }
-                    .main { padding: 60px 15px 15px; }
+                    .main { padding: 70px 16px 24px; }
                     .tools-grid { grid-template-columns: 1fr; }
+                    .grid { grid-template-columns: 1fr; }
                 }
             </style>
 
@@ -316,78 +392,78 @@ export class DashboardFrame extends HTMLElement {
                 <aside class="sidebar" id="sidebar">
                     <div class="logo">
                         <img src="./blueriot-logo.png" alt="BlueRiot" onerror="this.style.display='none'">
-                        <img src="./matrix.svg" alt="Matrix" style="max-width:100px;" onerror="this.style.display='none'">
+                        <img src="./matrix.svg" alt="Matrix" style="max-width:100px;margin-top:8px;" onerror="this.style.display='none'">
+                        <div class="logo-text">Syndicate</div>
                     </div>
                     <ul class="nav">
-                        <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
-                        <li class="nav-item" data-v="routes"><span>R0UT35</span></li>
-                        <li class="nav-item" data-v="stay"><span>SΤΔΥ</span></li>
+                        <li class="nav-item" data-v="tastes"><span>TASTES</span></li>
+                        <li class="nav-item" data-v="routes"><span>ROUTES</span></li>
+                        <li class="nav-item" data-v="stay"><span>STAY</span></li>
                         <div class="nav-divider"></div>
-                        <li class="nav-item" data-v="node"><span>NODΞ</span></li>
+                        <li class="nav-item" data-v="node"><span>NODE</span></li>
                     </ul>
-                    <button class="logout-btn" id="logoutBtn">[ LOGOUT ]</button>
+                    <button class="logout-btn" id="logoutBtn">LOGOUT</button>
                 </aside>
 
                 <main class="main">
                     <div id="home" class="page active">
-                        <h1>BLUERIOT MATRIX</h1>
+                        <h1>Dashboard</h1>
                         <div class="content-box">
-                            <p>> Seleziona una sezione dal menu</p>
-                            <p>> Sistema pronto</p>
+                            <p style="color:var(--text-secondary);">Seleziona una sezione dal menu per iniziare.</p>
                         </div>
                     </div>
 
                     <div id="tastes" class="page">
-                        <h1>ΤΔSΤΞ5</h1>
+                        <h1>Tastes</h1>
                         <div class="toolbar">
                             <div id="tastes-filters"></div>
-                            <button class="btn btn-add" id="addTaste">+ AGGIUNGI</button>
+                            <button class="btn btn-add" id="addTaste">+ Aggiungi</button>
                         </div>
                         <div class="content-box" id="tastes-c">
-                            <p>> Caricamento...</p>
+                            <p style="color:var(--text-secondary);">Caricamento...</p>
                         </div>
                     </div>
 
                     <div id="routes" class="page">
-                        <h1>R0UT35</h1>
+                        <h1>Routes</h1>
                         <div class="toolbar">
                             <div id="routes-filters"></div>
-                            <button class="btn btn-add" id="addRoute">+ AGGIUNGI</button>
+                            <button class="btn btn-add" id="addRoute">+ Aggiungi</button>
                         </div>
                         <div class="content-box" id="routes-c">
-                            <p>> Caricamento...</p>
+                            <p style="color:var(--text-secondary);">Caricamento...</p>
                         </div>
                     </div>
 
                     <div id="stay" class="page">
-                        <h1>SΤΔΥ</h1>
+                        <h1>Stay</h1>
                         <div class="toolbar">
                             <div id="stay-filters"></div>
-                            <button class="btn btn-add" id="addStay">+ AGGIUNGI</button>
+                            <button class="btn btn-add" id="addStay">+ Aggiungi</button>
                         </div>
                         <div class="content-box" id="stay-c">
-                            <p>> Caricamento...</p>
+                            <p style="color:var(--text-secondary);">Caricamento...</p>
                         </div>
                     </div>
 
                     <div id="node" class="page">
                         <div id="node-list">
-                            <h1>NODΞ - Tour</h1>
+                            <h1>Node - Tours</h1>
                             <div class="content-box" id="node-c">
-                                <p>> Caricamento tour...</p>
+                                <p style="color:var(--text-secondary);">Caricamento tour...</p>
                             </div>
                         </div>
                         <div id="node-detail" style="display:none;">
                             <tour-weather-panel></tour-weather-panel>
                             <div class="tools-section">
-                                <h2>T00L5</h2>
+                                <h2>TOOLS</h2>
                                 <div class="tools-grid">
                                     <div class="content-box">
-                                        <h3 style="color:#0ff;margin-bottom:10px;">eTICKETS</h3>
+                                        <h3 style="color:var(--primary-blue);margin-bottom:12px;font-size:15px;">eTickets</h3>
                                         <eticket-panel></eticket-panel>
                                     </div>
                                     <div class="content-box">
-                                        <h3 style="color:#0ff;margin-bottom:10px;">PDF OCR</h3>
+                                        <h3 style="color:var(--primary-blue);margin-bottom:12px;font-size:15px;">PDF OCR</h3>
                                         <pdf-ocr-panel></pdf-ocr-panel>
                                     </div>
                                 </div>
@@ -403,7 +479,7 @@ export class DashboardFrame extends HTMLElement {
                     <button class="modal-close" id="modalClose">×</button>
                     <h2 id="modalTitle">Aggiungi</h2>
                     <form id="crudForm"></form>
-                    <div style="margin-top:20px;text-align:right;">
+                    <div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end;">
                         <button type="button" class="btn" id="modalCancel">Annulla</button>
                         <button type="submit" class="btn btn-add" id="modalSave">Salva</button>
                     </div>
@@ -427,7 +503,6 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 this.shadowRoot.getElementById(v).classList.add('active');
                 this.load(v);
-                // Close sidebar on mobile
                 this.shadowRoot.getElementById('sidebar').classList.remove('open');
             };
         });
@@ -507,13 +582,13 @@ export class DashboardFrame extends HTMLElement {
             }
         } catch (e) {
             console.error('Load error:', e);
-            c.innerHTML = `<p style="color:#f00;">> Errore: ${e.message}</p>`;
+            c.innerHTML = `<p style="color:#FF4757;">Errore: ${e.message}</p>`;
         }
     }
 
     renderTastes(c) {
         if (this.tastesData.length === 0) {
-            c.innerHTML = '<p>> Nessun ristorante. Clicca + AGGIUNGI</p>';
+            c.innerHTML = '<p style="color:var(--text-secondary);">Nessun ristorante. Clicca + Aggiungi per crearne uno.</p>';
             return;
         }
         c.innerHTML = '<div class="grid">' + this.tastesData.map((r, i) => `
@@ -532,7 +607,7 @@ export class DashboardFrame extends HTMLElement {
 
     renderRoutes(c) {
         if (this.routesData.length === 0) {
-            c.innerHTML = '<p>> Nessuna tratta. Clicca + AGGIUNGI</p>';
+            c.innerHTML = '<p style="color:var(--text-secondary);">Nessuna tratta. Clicca + Aggiungi per crearne una.</p>';
             return;
         }
         c.innerHTML = '<div class="grid">' + this.routesData.map((r, i) => `
@@ -551,7 +626,7 @@ export class DashboardFrame extends HTMLElement {
 
     renderStay(c) {
         if (this.stayData.length === 0) {
-            c.innerHTML = '<p>> Nessun hotel. Clicca + AGGIUNGI</p>';
+            c.innerHTML = '<p style="color:var(--text-secondary);">Nessun hotel. Clicca + Aggiungi per crearne uno.</p>';
             return;
         }
         c.innerHTML = '<div class="grid">' + this.stayData.map((r, i) => `
@@ -570,14 +645,14 @@ export class DashboardFrame extends HTMLElement {
 
     renderTours(c) {
         if (this.toursData.length === 0) {
-            c.innerHTML = '<p>> Nessun tour. Crea un tour in Supabase.</p>';
+            c.innerHTML = '<p style="color:var(--text-secondary);">Nessun tour disponibile.</p>';
             return;
         }
         c.innerHTML = '<div class="grid">' + this.toursData.map((t, i) => `
             <div class="card" style="cursor:pointer;" onclick="this.getRootNode().host.showTour(${i})">
                 <div class="card-title">${t.name || 'Tour'}</div>
                 <div class="card-info">📅 ${t.start_date || '-'} → ${t.end_date || '-'}</div>
-                <div class="card-info">👥 ${t.passenger_count || 0} pax</div>
+                <div class="card-info">👥 ${t.passenger_count || 0} passeggeri</div>
                 <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : '-'}</div>
             </div>
         `).join('') + '</div>';
@@ -666,16 +741,19 @@ export class DashboardFrame extends HTMLElement {
     async deleteTaste(id) {
         if (!confirm('Eliminare?')) return;
         await window.supabaseClient.from('blueriot_tastes').delete().eq('id', id);
+        this.loadedSections.delete('tastes');
         this.load('tastes', true);
     }
     async deleteRoute(id) {
         if (!confirm('Eliminare?')) return;
         await window.supabaseClient.from('blueriot_routes').delete().eq('id', id);
+        this.loadedSections.delete('routes');
         this.load('routes', true);
     }
     async deleteStay(id) {
         if (!confirm('Eliminare?')) return;
         await window.supabaseClient.from('blueriot_stay').delete().eq('id', id);
+        this.loadedSections.delete('stay');
         this.load('stay', true);
     }
 }

@@ -1,13 +1,13 @@
 /**
  * Dashboard - Main application frame with navigation
- * VERSION: 2024-12-09-v3
+ * VERSION: 2024-12-09-v5
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-const VERSION = '2024-12-09-v3';
+const VERSION = '2024-12-09-v5';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
@@ -56,57 +56,64 @@ export class DashboardFrame extends HTMLElement {
                     z-index: 100;
                 }
                 .logo-box {
-                    border: 1px solid rgba(255,255,255,0.3);
-                    border-radius: 8px;
-                    padding: 15px;
                     text-align: center;
-                    margin-bottom: 20px;
-                    position: relative;
-                    background: rgba(20,20,30,0.5);
+                    margin-bottom: 30px;
+                    padding: 20px 15px;
                 }
-                .logo-text { margin-bottom: 10px; }
-                .logo-blue { font-size: 16px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; text-transform: uppercase; }
-                .logo-white { font-size: 14px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 3px; text-transform: uppercase; }
                 .blueriot-logo {
                     width: 100%;
-                    max-width: 160px;
+                    max-width: 180px;
                     height: auto;
-                    margin: 10px auto;
+                    margin: 0 auto 15px;
                     display: block;
-                    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-                    /* Ensure image displays even if broken */
-                    min-height: 60px;
-                    background: rgba(255,255,255,0.05);
-                    border-radius: 4px;
+                    filter: drop-shadow(0 0 20px rgba(255,255,255,0.6)) drop-shadow(0 0 40px rgba(255,255,255,0.3));
                 }
                 .matrix-logo {
                     width: 100%;
-                    max-width: 140px;
+                    max-width: 160px;
                     height: auto;
-                    margin: 10px auto 0;
+                    margin: 0 auto;
                     display: block;
-                    filter: drop-shadow(0 0 12px rgba(0,240,255,0.8));
-                    /* Ensure SVG displays */
-                    min-height: 40px;
-                }
-                /* White glow line under logos */
-                .logo-glow {
-                    height: 2px;
-                    background: white;
-                    margin: 15px 20%;
-                    border-radius: 2px;
-                    box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px rgba(255,255,255,0.8);
+                    /* Neon tube effect */
+                    filter: drop-shadow(0 0 8px rgba(56,207,255,0.9)) drop-shadow(0 0 20px rgba(56,207,255,0.6)) drop-shadow(0 0 40px rgba(255,79,207,0.4));
                 }
 
                 /* === NAV ITEMS === */
-                .nav { list-style: none; padding: 0; }
-                .nav-item { margin-bottom: 28px; position: relative; cursor: pointer; padding-bottom: 12px; }
-                .nav-item span { font-size: 16px; font-weight: 700; color: var(--text-gray); letter-spacing: 1px; transition: color 0.3s; display: block; }
-                .nav-item:hover span { color: white; }
-                .nav-item.active span { color: white; }
-                .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 50px; height: 2px; background: var(--neon-fuchsia); box-shadow: 0 0 10px var(--neon-fuchsia); }
-                .nav-item.active::before { content: '←'; position: absolute; right: 0; bottom: 0; color: var(--neon-fuchsia); font-size: 18px; text-shadow: 0 0 10px var(--neon-fuchsia); }
-                .nav-section { color: #445566; font-size: 10px; letter-spacing: 2px; margin: 30px 0 15px; text-transform: uppercase; }
+                .nav { list-style: none; padding: 0; margin-top: 40px; }
+                .nav-item {
+                    margin-bottom: 24px;
+                    position: relative;
+                    cursor: pointer;
+                    padding: 8px 0;
+                }
+                .nav-item span {
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: #38CFFF;
+                    letter-spacing: 2px;
+                    transition: all 0.3s;
+                    display: block;
+                }
+                .nav-item:hover span {
+                    color: #FF4FCF;
+                    text-shadow: 0 0 10px rgba(255,79,207,0.5);
+                }
+                .nav-item.active span {
+                    color: #FF4FCF;
+                    text-shadow: 0 0 15px rgba(255,79,207,0.8), 0 0 30px rgba(255,79,207,0.4);
+                }
+                /* Angled underline for active item */
+                .nav-item.active::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 60%;
+                    height: 2px;
+                    background: #FF4FCF;
+                    box-shadow: 0 0 10px #FF4FCF, 0 0 20px #FF4FCF;
+                    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+                }
 
                 /* === LOGOUT BUTTON === */
                 .logout-btn {
@@ -286,22 +293,14 @@ export class DashboardFrame extends HTMLElement {
             <div class="container">
                 <aside class="sidebar" id="sidebar">
                     <div class="logo-box">
-                        <div class="logo-text">
-                            <div class="logo-blue">BLUERIOT</div>
-                            <div class="logo-white">SYNDICATE</div>
-                        </div>
                         <img src="./blueriot-logo.png" alt="BlueRiot" class="blueriot-logo" onerror="this.style.display='none'">
                         <img src="./matrix.svg" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
                     </div>
-                    <div class="logo-glow"></div>
                     <ul class="nav">
-                        <li class="nav-item" data-v="tastes"><span>TASTES</span></li>
-                        <li class="nav-item" data-v="routes"><span>ROUTES</span></li>
-                        <li class="nav-item" data-v="stay"><span>STAY</span></li>
-                        <li class="nav-item" data-v="node"><span>NODE</span></li>
-                        <li class="nav-section">T00L5</li>
-                        <li class="nav-item" data-v="etickets"><span>eTICKETS</span></li>
-                        <li class="nav-item" data-v="pdfocr"><span>PDF OCR</span></li>
+                        <li class="nav-item" data-v="tastes"><span>ΤΔSΤΞ5</span></li>
+                        <li class="nav-item" data-v="routes"><span>R0UT35</span></li>
+                        <li class="nav-item" data-v="stay"><span>SΤΔΥ</span></li>
+                        <li class="nav-item" data-v="node"><span>NODΞ</span></li>
                     </ul>
                     <button class="logout-btn" id="logoutBtn">LOGOUT</button>
                 </aside>
@@ -313,26 +312,34 @@ export class DashboardFrame extends HTMLElement {
                             <p style="color:#6b7280;font-size:14px;">Seleziona una sezione dal menu</p>
                         </div>
                         <div id="tastes" class="page">
-                            <h1>TASTES</h1>
+                            <h1>ΤΔSΤΞ5</h1>
                             <div class="content-box" id="tastes-c"><p style="color:#6b7280;">Caricamento...</p></div>
                         </div>
                         <div id="routes" class="page">
-                            <h1>ROUTES</h1>
+                            <h1>R0UT35</h1>
                             <div class="content-box" id="routes-c"><p style="color:#6b7280;">Caricamento...</p></div>
                         </div>
                         <div id="stay" class="page">
-                            <h1>STAY</h1>
+                            <h1>SΤΔΥ</h1>
                             <div class="content-box" id="stay-c"><p style="color:#6b7280;">Caricamento...</p></div>
                         </div>
                         <div id="node" class="page">
                             <div id="node-list">
-                                <h1>NODE</h1>
+                                <h1>NODΞ</h1>
                                 <div class="content-box" id="node-c"><p style="color:#6b7280;">Caricamento...</p></div>
                             </div>
-                            <div id="node-detail" style="display:none;"><tour-weather-panel></tour-weather-panel></div>
+                            <div id="node-detail" style="display:none;">
+                                <tour-weather-panel></tour-weather-panel>
+                                <!-- T00L5 Section - only visible inside a tour -->
+                                <div id="tools-section" style="margin-top:30px;">
+                                    <h2 style="color:#38CFFF;font-size:14px;letter-spacing:3px;margin-bottom:20px;border-bottom:1px solid rgba(56,207,255,0.3);padding-bottom:10px;">T00L5</h2>
+                                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                                        <div class="content-box"><h3 style="color:#FF4FCF;margin-bottom:15px;">eTICKETS</h3><eticket-panel></eticket-panel></div>
+                                        <div class="content-box"><h3 style="color:#FF4FCF;margin-bottom:15px;">PDF OCR</h3><pdf-ocr-panel></pdf-ocr-panel></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="etickets" class="page"><h1>eTICKETS</h1><eticket-panel></eticket-panel></div>
-                        <div id="pdfocr" class="page"><h1>PDF OCR</h1><pdf-ocr-panel></pdf-ocr-panel></div>
                     </div>
                 </main>
             </div>

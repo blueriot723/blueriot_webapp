@@ -20,7 +20,7 @@ export class TourWeatherPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('../styles/base.css');
+                /* Note: @import doesn't work reliably in Shadow DOM, styles are inline */
                 * { box-sizing: border-box; margin: 0; padding: 0; }
 
                 .panel { padding: 0; }

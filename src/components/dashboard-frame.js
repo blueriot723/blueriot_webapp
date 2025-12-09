@@ -1,13 +1,14 @@
 /**
  * Dashboard - Main application frame with navigation
- * VERSION: 2024-12-08-v2
+ * VERSION: 2024-12-09-v3
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-console.log('📦 dashboard-frame.js loaded');
+const VERSION = '2024-12-09-v3';
+console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
     constructor() {
@@ -73,6 +74,10 @@ export class DashboardFrame extends HTMLElement {
                     margin: 10px auto;
                     display: block;
                     filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+                    /* Ensure image displays even if broken */
+                    min-height: 60px;
+                    background: rgba(255,255,255,0.05);
+                    border-radius: 4px;
                 }
                 .matrix-logo {
                     width: 100%;
@@ -81,6 +86,8 @@ export class DashboardFrame extends HTMLElement {
                     margin: 10px auto 0;
                     display: block;
                     filter: drop-shadow(0 0 12px rgba(0,240,255,0.8));
+                    /* Ensure SVG displays */
+                    min-height: 40px;
                 }
                 /* White glow line under logos */
                 .logo-glow {
@@ -260,8 +267,8 @@ export class DashboardFrame extends HTMLElement {
                             <div class="logo-blue">BLUERIOT</div>
                             <div class="logo-white">SYNDICATE</div>
                         </div>
-                        <img src="blueriot-logo.png" alt="BlueRiot" class="blueriot-logo">
-                        <img src="matrix.svg" alt="Matrix" class="matrix-logo">
+                        <img src="./blueriot-logo.png" alt="BlueRiot" class="blueriot-logo" onerror="this.style.display='none'">
+                        <img src="./matrix.svg" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
                     </div>
                     <div class="logo-glow"></div>
                     <ul class="nav">
@@ -364,8 +371,8 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 this.shadowRoot.getElementById(v).classList.add('active');
                 this.load(v);
-                // Close sidebar on mobile after selection
-                if(window.innerWidth <= 768) this.closeSidebar();
+                // Close sidebar on tablet/mobile after selection
+                if(window.innerWidth <= 1024) this.closeSidebar();
             };
         });
 
@@ -389,14 +396,20 @@ export class DashboardFrame extends HTMLElement {
             });
         }
     }
-    async load(v) {
+    async load(v, forceRefresh = false) {
         const c = this.shadowRoot.getElementById(v + '-c');
         if(!c) return; // etickets and pdfocr don't have -c containers, they use web components
 
-        // Skip loading if already loaded (prevents reload on page switch)
-        if (this.loadedSections.has(v)) {
+        // Skip loading if already loaded (prevents reload on page switch), unless force refresh
+        if (this.loadedSections.has(v) && !forceRefresh) {
             console.log(`📦 ${v} already loaded, skipping fetch`);
             return;
+        }
+
+        // Clear from cache if forcing refresh
+        if (forceRefresh) {
+            this.loadedSections.delete(v);
+            console.log(`🔄 Force refreshing ${v}`);
         }
 
         try {

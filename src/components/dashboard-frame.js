@@ -1,13 +1,13 @@
 /**
  * Dashboard - Main application frame with navigation
- * VERSION: 2024-12-09-v3
+ * VERSION: 2024-12-09-v4 - Neon Design Layout
  */
 import { auth } from '../utils/auth.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-const VERSION = '2024-12-09-v3';
+const VERSION = '2024-12-09-v4';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
@@ -41,98 +41,300 @@ export class DashboardFrame extends HTMLElement {
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
                 * { box-sizing: border-box; margin: 0; padding: 0; }
-                :host { --neon-cyan: #00f0ff; --neon-fuchsia: #ff00ff; --text-gray: #6b7280; --bg-black: #000000; }
+                :host {
+                    --neon-cyan: #00e5ff;
+                    --neon-fuchsia: #ff00ff;
+                    --neon-pink: #ff4fd8;
+                    --text-gray: #6b7280;
+                    --bg-black: #0a0a0a;
+                    --bg-darker: #050505;
+                }
                 .container { display: flex; min-height: 100vh; background: var(--bg-black); font-family: 'Orbitron', sans-serif; }
 
                 /* === SIDEBAR === */
                 .sidebar {
-                    width: 240px;
-                    background: var(--bg-black);
+                    width: 260px;
+                    background: var(--bg-darker);
                     padding: 30px 20px;
-                    border-right: 1px solid rgba(255,255,255,0.1);
+                    border-right: none;
                     position: fixed;
                     height: 100vh;
                     overflow-y: auto;
                     z-index: 100;
                 }
                 .logo-box {
-                    border: 1px solid rgba(255,255,255,0.3);
-                    border-radius: 8px;
-                    padding: 15px;
+                    border: 1px solid rgba(255,255,255,0.25);
+                    border-radius: 6px;
+                    padding: 20px 15px;
                     text-align: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 25px;
                     position: relative;
-                    background: rgba(20,20,30,0.5);
+                    background: rgba(15,15,20,0.8);
                 }
                 .logo-text { margin-bottom: 10px; }
-                .logo-blue { font-size: 16px; font-weight: 700; color: #6b8fb8; letter-spacing: 2px; text-transform: uppercase; }
-                .logo-white { font-size: 14px; font-weight: 700; color: white; letter-spacing: 3px; margin-top: 3px; text-transform: uppercase; }
+                .logo-blue { font-size: 15px; font-weight: 700; color: #7ba3c9; letter-spacing: 3px; text-transform: uppercase; }
+                .logo-white { font-size: 13px; font-weight: 700; color: white; letter-spacing: 4px; margin-top: 4px; text-transform: uppercase; }
                 .blueriot-logo {
                     width: 100%;
-                    max-width: 160px;
+                    max-width: 150px;
                     height: auto;
-                    margin: 10px auto;
+                    margin: 12px auto;
                     display: block;
-                    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-                    /* Ensure image displays even if broken */
+                    filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
                     min-height: 60px;
-                    background: rgba(255,255,255,0.05);
+                    background: rgba(255,255,255,0.03);
                     border-radius: 4px;
                 }
                 .matrix-logo {
                     width: 100%;
-                    max-width: 140px;
+                    max-width: 130px;
                     height: auto;
-                    margin: 10px auto 0;
+                    margin: 12px auto 0;
                     display: block;
-                    filter: drop-shadow(0 0 12px rgba(0,240,255,0.8));
-                    /* Ensure SVG displays */
+                    filter: drop-shadow(0 0 10px rgba(0,229,255,0.7));
                     min-height: 40px;
                 }
-                /* White glow line under logos */
+                /* Glow line under logos */
                 .logo-glow {
                     height: 2px;
-                    background: white;
-                    margin: 15px 20%;
+                    background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 30%, var(--neon-cyan) 70%, transparent 100%);
+                    margin: 20px 10%;
                     border-radius: 2px;
-                    box-shadow: 0 0 10px white, 0 0 20px white, 0 0 30px rgba(255,255,255,0.8);
+                    box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan);
                 }
 
-                /* === NAV ITEMS === */
-                .nav { list-style: none; padding: 0; }
-                .nav-item { margin-bottom: 28px; position: relative; cursor: pointer; padding-bottom: 12px; }
-                .nav-item span { font-size: 16px; font-weight: 700; color: var(--text-gray); letter-spacing: 1px; transition: color 0.3s; display: block; }
-                .nav-item:hover span { color: white; }
-                .nav-item.active span { color: white; }
-                .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 50px; height: 2px; background: var(--neon-fuchsia); box-shadow: 0 0 10px var(--neon-fuchsia); }
-                .nav-item.active::before { content: '←'; position: absolute; right: 0; bottom: 0; color: var(--neon-fuchsia); font-size: 18px; text-shadow: 0 0 10px var(--neon-fuchsia); }
-                .nav-section { color: #445566; font-size: 10px; letter-spacing: 2px; margin: 30px 0 15px; text-transform: uppercase; }
+                /* === NAV ITEMS - Stile immagine === */
+                .nav { list-style: none; padding: 0; margin-top: 10px; }
+                .nav-item {
+                    margin-bottom: 12px;
+                    position: relative;
+                    cursor: pointer;
+                    padding: 10px 0 10px 5px;
+                    transition: all 0.3s ease;
+                }
+                .nav-item span {
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: var(--text-gray);
+                    letter-spacing: 2px;
+                    transition: all 0.3s ease;
+                    display: block;
+                    text-transform: uppercase;
+                }
+                .nav-item:hover span { color: #a0a0a0; }
+                .nav-item.active span {
+                    color: var(--neon-pink);
+                    text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+                }
+                /* Sottolineatura fuchsia con freccia - stile immagine */
+                .nav-item.active::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 2px;
+                    left: 0;
+                    width: 70%;
+                    height: 2px;
+                    background: var(--neon-pink);
+                    box-shadow: 0 0 8px var(--neon-pink), 0 0 16px var(--neon-pink);
+                }
+                .nav-item.active::before {
+                    content: '';
+                    position: absolute;
+                    bottom: -2px;
+                    left: calc(70% - 8px);
+                    width: 12px;
+                    height: 12px;
+                    border-right: 2px solid var(--neon-pink);
+                    border-bottom: 2px solid var(--neon-pink);
+                    transform: rotate(-45deg);
+                    box-shadow: 2px 2px 6px var(--neon-pink);
+                }
+                .nav-section {
+                    color: #445566;
+                    font-size: 10px;
+                    letter-spacing: 3px;
+                    margin: 35px 0 15px;
+                    text-transform: uppercase;
+                    padding-left: 5px;
+                }
 
                 /* === MAIN CONTENT === */
-                .main { margin-left: 240px; flex: 1; padding: 30px; background: var(--bg-black); min-height: 100vh; }
+                .main { margin-left: 260px; flex: 1; padding: 40px; background: var(--bg-black); min-height: 100vh; }
 
-                /* === WORK WINDOW with 45° corners === */
+                /* === NEON FRAME - Stile immagine con angoli elaborati === */
                 .work {
-                    position: relative; background: var(--bg-black); min-height: calc(100vh - 60px); padding: 40px;
-                    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+                    position: relative;
+                    background: var(--bg-darker);
+                    min-height: calc(100vh - 80px);
+                    padding: 50px 40px;
+                    margin: 0;
                 }
+
+                /* Bordo superiore con angolo tagliato */
                 .work::before {
-                    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
-                    border: 2px solid var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 15px rgba(0,240,255,0.1);
-                    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 40px;
+                    right: 0;
+                    height: 2px;
+                    background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-cyan) calc(100% - 80px), transparent calc(100% - 80px));
+                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+                }
+
+                /* Linea diagonale angolo superiore destro */
+                .work::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    width: 80px;
+                    height: 50px;
+                    border-right: 2px solid var(--neon-cyan);
+                    border-top: none;
+                    background: linear-gradient(135deg, transparent 49%, var(--neon-cyan) 49%, var(--neon-cyan) 51%, transparent 51%);
+                    box-shadow: 2px 0 10px var(--neon-cyan);
+                }
+
+                /* Frame container per gli altri lati */
+                .neon-frame-sides {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    pointer-events: none;
+                    z-index: 1;
+                }
+
+                /* Linea sinistra */
+                .frame-left {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 2px;
+                    height: calc(100% - 50px);
+                    background: var(--neon-cyan);
+                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+                }
+
+                /* Angolo inferiore sinistro con estensione */
+                .frame-bottom-left {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 50px;
+                    height: 50px;
+                }
+                .frame-bottom-left::before {
+                    content: '';
+                    position: absolute;
+                    bottom: 50px;
+                    left: 0;
+                    width: 2px;
+                    height: 30px;
+                    background: var(--neon-cyan);
+                    box-shadow: 0 0 10px var(--neon-cyan);
+                }
+                .frame-bottom-left::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 80px;
+                    height: 2px;
+                    background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 20px, var(--neon-cyan) 100%);
+                    box-shadow: 0 0 10px var(--neon-cyan);
+                }
+
+                /* Bordo inferiore */
+                .frame-bottom {
+                    position: absolute;
+                    bottom: 0;
+                    left: 50px;
+                    right: 60px;
+                    height: 2px;
+                    background: var(--neon-cyan);
+                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+                }
+
+                /* Angolo inferiore destro con curva */
+                .frame-bottom-right {
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    width: 60px;
+                    height: 60px;
+                }
+                .frame-bottom-right::before {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    right: 30px;
+                    width: 40px;
+                    height: 2px;
+                    background: var(--neon-cyan);
+                    box-shadow: 0 0 10px var(--neon-cyan);
+                    transform-origin: right center;
+                    transform: rotate(-30deg);
+                }
+                .frame-bottom-right::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 20px;
+                    right: 0;
+                    width: 2px;
+                    height: calc(100% - 70px);
+                    background: var(--neon-cyan);
+                    box-shadow: 0 0 10px var(--neon-cyan);
+                }
+
+                /* Linea destra */
+                .frame-right {
+                    position: absolute;
+                    top: 50px;
+                    right: 0;
+                    width: 2px;
+                    height: calc(100% - 130px);
+                    background: var(--neon-cyan);
+                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
                 }
 
                 .page { display: none; }
                 .page.active { display: block; }
-                h1 { font-size: 42px; font-weight: 900; color: white; letter-spacing: 4px; margin-bottom: 30px; }
+                h1 {
+                    font-size: 38px;
+                    font-weight: 900;
+                    color: white;
+                    letter-spacing: 6px;
+                    margin-bottom: 30px;
+                    text-transform: uppercase;
+                }
 
-                /* === CONTENT BOX === */
-                .content-box { background: rgba(10,14,39,0.3); border: 1px solid rgba(0,240,255,0.2); border-radius: 8px; padding: 25px; min-height: 300px; }
-                .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 16px; }
-                .card { background: rgba(10,14,39,0.6); border: 1px solid rgba(0,240,255,0.2); border-radius: 8px; padding: 20px; transition: all 0.3s ease; position: relative; }
-                .card:hover { border-color: rgba(0,240,255,0.4); box-shadow: 0 0 20px rgba(0,240,255,0.1); }
-                .card h3 { color: #00f0ff; margin-bottom: 8px; }
-                .card p { color: var(--text-secondary); font-size: 14px; margin: 4px 0; }
+                /* === CONTENT BOX - Stile immagine con bordo sottile === */
+                .content-box {
+                    background: rgba(8,12,25,0.4);
+                    border: 1px solid rgba(255,255,255,0.15);
+                    border-radius: 4px;
+                    padding: 30px;
+                    min-height: 300px;
+                    position: relative;
+                }
+                .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 20px; }
+                .card {
+                    background: rgba(12,16,30,0.7);
+                    border: 1px solid rgba(0,229,255,0.15);
+                    border-radius: 6px;
+                    padding: 22px;
+                    transition: all 0.3s ease;
+                    position: relative;
+                }
+                .card:hover {
+                    border-color: rgba(0,229,255,0.35);
+                    box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05);
+                }
+                .card h3 { color: var(--neon-cyan); margin-bottom: 10px; font-size: 16px; letter-spacing: 1px; }
+                .card p { color: #8899aa; font-size: 13px; margin: 5px 0; }
                 .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
                 .card:hover .card-actions { opacity: 1; }
                 .card-actions button { width: 28px; height: 28px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
@@ -218,44 +420,59 @@ export class DashboardFrame extends HTMLElement {
                         height: 100vh;
                         transform: translateX(-100%);
                         transition: transform 0.3s ease;
-                        box-shadow: 4px 0 30px rgba(0,0,0,0.8);
+                        box-shadow: 4px 0 30px rgba(0,0,0,0.9);
                         z-index: 150;
                     }
                     .sidebar.open { transform: translateX(0); }
-                    .main { margin-left: 0; padding: 20px; padding-top: 80px; }
-                    .work { min-height: calc(100vh - 120px); }
-                    h1 { font-size: 28px; }
-                    .logo-box { padding: 12px; }
+                    .main { margin-left: 0; padding: 25px; padding-top: 85px; }
+                    .work { min-height: calc(100vh - 130px); padding: 35px 25px; }
+                    h1 { font-size: 26px; letter-spacing: 4px; }
+                    .logo-box { padding: 15px; }
                     .blueriot-logo { max-width: 120px; }
                     .matrix-logo { max-width: 100px; }
-                    .nav-item { margin-bottom: 20px; }
+                    .nav-item { margin-bottom: 10px; padding: 8px 0 8px 5px; }
                     .nav-item span { font-size: 14px; }
+                    /* Nasconde elementi frame complessi su tablet */
+                    .neon-frame-sides { display: none; }
+                    .work::before, .work::after {
+                        box-shadow: 0 0 8px var(--neon-cyan);
+                    }
                 }
 
                 /* === RESPONSIVE - MOBILE === */
                 @media (max-width: 768px) {
                     .main { padding: 15px; padding-top: 75px; }
-                    .work { padding: 20px; min-height: calc(100vh - 110px); }
-                    h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 20px; }
+                    .work { padding: 25px 18px; min-height: calc(100vh - 110px); }
+                    h1 { font-size: 20px; letter-spacing: 3px; margin-bottom: 20px; }
                     .grid { grid-template-columns: 1fr; }
                     .toolbar { flex-direction: column; align-items: stretch; }
                     .toolbar-filters { flex-direction: column; }
                     .toolbar-filters select { width: 100%; }
                     .btn-add { width: 100%; justify-content: center; }
-                    .content-box { padding: 15px; }
-                    .card { padding: 15px; }
+                    .content-box { padding: 18px; }
+                    .card { padding: 18px; }
                     .modal { width: 95%; margin: 10px; }
+                    /* Frame semplificato su mobile */
+                    .work::before {
+                        left: 20px;
+                        background: var(--neon-cyan);
+                    }
+                    .work::after {
+                        width: 40px;
+                        height: 30px;
+                    }
                 }
 
                 /* === RESPONSIVE - SMALL MOBILE === */
                 @media (max-width: 480px) {
-                    h1 { font-size: 18px; }
-                    .work { padding: 12px; }
+                    h1 { font-size: 16px; letter-spacing: 2px; }
+                    .work { padding: 18px 12px; }
                     .hamburger { width: 44px; height: 44px; font-size: 22px; }
-                    .logo-box { padding: 10px; }
+                    .logo-box { padding: 12px; }
                     .blueriot-logo { max-width: 100px; }
                     .matrix-logo { max-width: 80px; }
-                    .nav-item span { font-size: 13px; }
+                    .nav-item span { font-size: 13px; letter-spacing: 1px; }
+                    .content-box { padding: 14px; }
                 }
             </style>
             <button class="hamburger" id="hamburger">☰</button>
@@ -283,10 +500,18 @@ export class DashboardFrame extends HTMLElement {
                 </aside>
                 <main class="main">
                     <div class="work">
-                        <div id="home" class="page active" style="text-align:center;padding:80px 20px;">
-                            <div style="font-size:72px;margin-bottom:20px;opacity:0.6;">⬡</div>
+                        <!-- Neon Frame Elements -->
+                        <div class="neon-frame-sides">
+                            <div class="frame-left"></div>
+                            <div class="frame-right"></div>
+                            <div class="frame-bottom"></div>
+                            <div class="frame-bottom-left"></div>
+                            <div class="frame-bottom-right"></div>
+                        </div>
+                        <div id="home" class="page active" style="text-align:center;padding:60px 20px;">
+                            <div style="font-size:64px;margin-bottom:20px;opacity:0.5;color:var(--neon-cyan);">⬡</div>
                             <h1>MATRIX</h1>
-                            <p style="color:#6b7280;font-size:14px;">Seleziona una sezione dal menu</p>
+                            <p style="color:#6b7280;font-size:13px;letter-spacing:1px;">Seleziona una sezione dal menu</p>
                         </div>
                         <div id="tastes" class="page">
                             <h1>TASTES</h1>

@@ -1,5 +1,6 @@
 /**
- * Tour Weather Panel - Shows tour details with weather forecast
+ * Tour Weather Panel - Shows tour details with weather forecast, activities and suggested restaurants
+ * VERSION: 2024-12-10-v1
  */
 import { getWeatherForecast, getWeatherSummary, formatTemp } from '../utils/weather.js';
 
@@ -10,6 +11,7 @@ export class TourWeatherPanel extends HTMLElement {
         this.tour = null;
         this.tourDays = [];
         this.weatherData = new Map();
+        this.tastesData = []; // Ristoranti dal database
         this.render();
     }
 
@@ -273,6 +275,116 @@ export class TourWeatherPanel extends HTMLElement {
                     color: #fff;
                 }
 
+                /* === SUGGESTED RESTAURANTS === */
+                .day-suggestions {
+                    margin-top: 12px;
+                    padding-top: 12px;
+                    border-top: 1px solid rgba(0, 240, 255, 0.1);
+                }
+
+                .suggestions-title {
+                    font-size: 11px;
+                    color: #ff00ff;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                .restaurant-chips {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                }
+
+                .restaurant-chip {
+                    background: rgba(255, 0, 255, 0.1);
+                    border: 1px solid rgba(255, 0, 255, 0.3);
+                    border-radius: 16px;
+                    padding: 4px 10px;
+                    font-size: 11px;
+                    color: #ff00ff;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .restaurant-chip:hover {
+                    background: rgba(255, 0, 255, 0.2);
+                    box-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
+                }
+
+                .restaurant-chip .cuisine {
+                    color: #8899aa;
+                    margin-left: 4px;
+                }
+
+                /* === ACTIVITIES SECTION === */
+                .day-activities {
+                    margin-top: 8px;
+                }
+
+                .activities-input {
+                    width: 100%;
+                    background: rgba(0, 0, 0, 0.3);
+                    border: 1px solid rgba(0, 240, 255, 0.2);
+                    border-radius: 4px;
+                    color: #fff;
+                    padding: 6px 10px;
+                    font-size: 12px;
+                    font-family: inherit;
+                    resize: none;
+                    min-height: 40px;
+                }
+
+                .activities-input:focus {
+                    outline: none;
+                    border-color: #00f0ff;
+                    box-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+                }
+
+                .activities-input::placeholder {
+                    color: rgba(255, 255, 255, 0.3);
+                }
+
+                .no-suggestions {
+                    font-size: 11px;
+                    color: #6b7280;
+                    font-style: italic;
+                }
+
+                /* === EXPANDED DAY CARD === */
+                .day-card.expanded {
+                    grid-template-columns: 80px 1fr;
+                }
+
+                .day-card.expanded .day-content {
+                    grid-column: span 1;
+                }
+
+                .day-details {
+                    grid-column: 1 / -1;
+                    padding-top: 12px;
+                    margin-top: 12px;
+                    border-top: 1px solid rgba(0, 240, 255, 0.1);
+                }
+
+                .toggle-details {
+                    background: none;
+                    border: none;
+                    color: #00f0ff;
+                    font-size: 11px;
+                    cursor: pointer;
+                    padding: 4px 8px;
+                    margin-top: 8px;
+                    transition: all 0.2s;
+                }
+
+                .toggle-details:hover {
+                    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+                }
+
                 @media (max-width: 768px) {
                     .day-card {
                         grid-template-columns: 60px 1fr;
@@ -285,6 +397,9 @@ export class TourWeatherPanel extends HTMLElement {
                     .tour-meta {
                         flex-direction: column;
                         gap: 8px;
+                    }
+                    .restaurant-chips {
+                        flex-direction: column;
                     }
                 }
             </style>
@@ -314,20 +429,27 @@ export class TourWeatherPanel extends HTMLElement {
         content.innerHTML = `
             <div class="loading">
                 <div class="loading-spinner"></div>
-                <p>Caricamento dati tour e meteo...</p>
+                <p>Caricamento dati tour, meteo e ristoranti...</p>
             </div>
         `;
 
         try {
-            // Load tour days
-            const { data: days, error } = await window.supabaseClient
-                .from('tour_days')
-                .select('*')
-                .eq('tour_id', tour.id)
-                .order('day_number', { ascending: true });
+            // Load tour days and restaurants in parallel
+            const [daysResult, tastesResult] = await Promise.all([
+                window.supabaseClient
+                    .from('tour_days')
+                    .select('*')
+                    .eq('tour_id', tour.id)
+                    .order('day_number', { ascending: true }),
+                window.supabaseClient
+                    .from('blueriot_tastes')
+                    .select('*')
+                    .order('name')
+            ]);
 
-            if (error) throw error;
-            this.tourDays = days || [];
+            if (daysResult.error) throw daysResult.error;
+            this.tourDays = daysResult.data || [];
+            this.tastesData = tastesResult.data || [];
 
             // Get unique cities from tour
             const cities = new Set();
@@ -361,6 +483,25 @@ export class TourWeatherPanel extends HTMLElement {
                 </div>
             `;
         }
+    }
+
+    // Get suggested restaurants for a city
+    getSuggestedRestaurants(city) {
+        if (!city || !this.tastesData.length) return [];
+
+        const cityLower = city.toLowerCase().trim();
+
+        // Match by city, region, or country
+        return this.tastesData.filter(r => {
+            const rCity = (r.city || '').toLowerCase();
+            const rRegion = (r.region || '').toLowerCase();
+            const rCountry = (r.country || '').toLowerCase();
+
+            return rCity.includes(cityLower) ||
+                   cityLower.includes(rCity) ||
+                   rRegion.includes(cityLower) ||
+                   cityLower.includes(rRegion);
+        }).slice(0, 5); // Max 5 suggestions
     }
 
     renderTourDetail() {
@@ -414,7 +555,7 @@ export class TourWeatherPanel extends HTMLElement {
             });
         });
 
-        // Save on Enter key
+        // Save location on Enter key
         this.shadowRoot.querySelectorAll('.location-input').forEach(input => {
             input.addEventListener('keypress', async (e) => {
                 if (e.key === 'Enter') {
@@ -428,6 +569,113 @@ export class TourWeatherPanel extends HTMLElement {
                 }
             });
         });
+
+        // Save activities on blur (when leaving the textarea)
+        this.shadowRoot.querySelectorAll('.activities-input').forEach(textarea => {
+            textarea.addEventListener('blur', async (e) => {
+                const dayId = e.target.dataset.dayId;
+                const dayNum = parseInt(e.target.dataset.dayNum);
+                const activities = e.target.value?.trim();
+
+                await this.updateDayActivities(dayId, dayNum, activities);
+            });
+        });
+
+        // Restaurant chip click - show details
+        this.shadowRoot.querySelectorAll('.restaurant-chip').forEach(chip => {
+            chip.addEventListener('click', (e) => {
+                const restaurantId = e.target.closest('.restaurant-chip').dataset.restaurantId;
+                const restaurant = this.tastesData.find(r => r.id == restaurantId);
+                if (restaurant) {
+                    this.showRestaurantDetails(restaurant);
+                }
+            });
+        });
+    }
+
+    async updateDayActivities(dayId, dayNum, activities) {
+        try {
+            // Update in database if we have an ID
+            if (dayId) {
+                const { error } = await window.supabaseClient
+                    .from('tour_days')
+                    .update({ activities: activities, description: activities })
+                    .eq('id', dayId);
+
+                if (error) {
+                    console.warn('Could not save activities (field may not exist):', error);
+                }
+            }
+
+            // Update local data
+            const dayIndex = this.tourDays.findIndex(d => d.day_number === dayNum);
+            if (dayIndex >= 0) {
+                this.tourDays[dayIndex].activities = activities;
+            }
+        } catch (error) {
+            console.error('Update activities error:', error);
+        }
+    }
+
+    showRestaurantDetails(restaurant) {
+        // Create a simple popup/tooltip with restaurant info
+        const existing = this.shadowRoot.querySelector('.restaurant-popup');
+        if (existing) existing.remove();
+
+        const popup = document.createElement('div');
+        popup.className = 'restaurant-popup';
+        popup.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #0a0e27;
+            border: 1px solid rgba(255, 0, 255, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 1000;
+            max-width: 350px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+        `;
+
+        popup.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <h3 style="color: #ff00ff; margin: 0; font-size: 18px;">${restaurant.name}</h3>
+                <button class="close-popup" style="background: none; border: none; color: #8899aa; font-size: 20px; cursor: pointer;">×</button>
+            </div>
+            <div style="color: #8899aa; font-size: 13px;">
+                ${restaurant.cuisine ? `<p style="margin: 6px 0;">🍽️ <strong>Cucina:</strong> ${restaurant.cuisine}</p>` : ''}
+                ${restaurant.address ? `<p style="margin: 6px 0;">📍 <strong>Indirizzo:</strong> ${restaurant.address}</p>` : ''}
+                ${restaurant.phone ? `<p style="margin: 6px 0;">📞 <strong>Telefono:</strong> <a href="tel:${restaurant.phone}" style="color: #00f0ff;">${restaurant.phone}</a></p>` : ''}
+                ${restaurant.city ? `<p style="margin: 6px 0;">🏙️ ${restaurant.city}${restaurant.region ? ', ' + restaurant.region : ''}${restaurant.country ? ', ' + restaurant.country : ''}</p>` : ''}
+                ${restaurant.notes ? `<p style="margin: 10px 0; font-style: italic; color: #6b7280;">${restaurant.notes}</p>` : ''}
+            </div>
+        `;
+
+        // Add backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'popup-backdrop';
+        backdrop.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+        `;
+
+        this.shadowRoot.appendChild(backdrop);
+        this.shadowRoot.appendChild(popup);
+
+        // Close handlers
+        const closePopup = () => {
+            popup.remove();
+            backdrop.remove();
+        };
+
+        popup.querySelector('.close-popup').addEventListener('click', closePopup);
+        backdrop.addEventListener('click', closePopup);
     }
 
     async updateDayLocation(dayId, dayNum, city) {
@@ -497,9 +745,10 @@ export class TourWeatherPanel extends HTMLElement {
                     const date = day.calendar_date;
                     const weather = this.weatherData.get(date);
                     const dateObj = new Date(date);
+                    const suggestedRestaurants = this.getSuggestedRestaurants(day.city);
 
                     return `
-                        <div class="day-card">
+                        <div class="day-card" data-day-num="${day.day_number}">
                             <div>
                                 <div class="day-number">${day.day_number || '?'}</div>
                                 <div class="day-date">${dayFormatter.format(dateObj)}</div>
@@ -515,7 +764,33 @@ export class TourWeatherPanel extends HTMLElement {
                                            placeholder="Luogo...">
                                     <button class="location-btn" data-day-id="${day.id || ''}" data-day-num="${day.day_number}">↻</button>
                                 </div>
-                                <p style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${day.description || ''}</p>
+
+                                <!-- Activities -->
+                                <div class="day-activities">
+                                    <textarea class="activities-input"
+                                              data-day-id="${day.id || ''}"
+                                              data-day-num="${day.day_number}"
+                                              placeholder="Attività del giorno: visite, escursioni, eventi...">${day.activities || day.description || ''}</textarea>
+                                </div>
+
+                                <!-- Suggested Restaurants -->
+                                <div class="day-suggestions">
+                                    <div class="suggestions-title">🍽️ Ristoranti suggeriti</div>
+                                    ${suggestedRestaurants.length > 0 ? `
+                                        <div class="restaurant-chips">
+                                            ${suggestedRestaurants.map(r => `
+                                                <span class="restaurant-chip" data-restaurant-id="${r.id}" title="${r.address || ''}\n${r.phone || ''}">
+                                                    ${r.name}
+                                                    ${r.cuisine ? `<span class="cuisine">(${r.cuisine})</span>` : ''}
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    ` : `
+                                        <span class="no-suggestions">
+                                            ${day.city ? `Nessun ristorante in "${day.city}" - aggiungine uno in TASTES` : 'Inserisci una località per vedere i suggerimenti'}
+                                        </span>
+                                    `}
+                                </div>
                             </div>
                             <div class="day-weather">
                                 ${weather ? `

@@ -1,5 +1,6 @@
 /**
- * Tour Weather Panel - Simple Dark Style
+ * Tour Weather Panel - BlueRiot Cyberpunk Style
+ * VERSION: 2024-12-10-v9
  */
 import { getWeatherForecast, getWeatherSummary, formatTemp } from '../utils/weather.js';
 
@@ -20,6 +21,8 @@ export class TourWeatherPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
+                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
                 * { box-sizing: border-box; margin: 0; padding: 0; }
                 :host {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -28,46 +31,76 @@ export class TourWeatherPanel extends HTMLElement {
                 }
 
                 .back-btn {
-                    background: #222;
-                    border: 1px solid #444;
-                    color: #ccc;
-                    padding: 8px 14px;
+                    background: #111;
+                    border: 1px solid #333;
+                    color: #888;
+                    padding: 10px 16px;
                     border-radius: 4px;
                     cursor: pointer;
-                    font-size: 13px;
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 11px;
+                    letter-spacing: 1px;
                     margin-bottom: 20px;
+                    transition: all 0.2s ease;
                 }
-                .back-btn:hover { background: #333; color: #fff; }
+                .back-btn:hover { background: #1a1a1a; color: #00F0FF; border-color: #00F0FF; }
 
                 .tour-header {
-                    background: #1a1a1a;
-                    border: 1px solid #333;
+                    background: #111111;
+                    border: 1px solid #222;
                     border-radius: 6px;
                     padding: 20px;
                     margin-bottom: 20px;
                 }
-                .tour-title { font-size: 20px; font-weight: 600; color: #fff; margin-bottom: 8px; }
-                .tour-code { font-size: 12px; color: #888; margin-bottom: 12px; }
+                .tour-title {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #00F0FF;
+                    margin-bottom: 8px;
+                    letter-spacing: 2px;
+                }
+                .tour-code {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 11px;
+                    color: #666;
+                    margin-bottom: 12px;
+                    letter-spacing: 1px;
+                }
                 .tour-meta { display: flex; gap: 20px; flex-wrap: wrap; color: #888; font-size: 13px; }
 
-                .section-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 15px; }
+                .section-title {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #00F0FF;
+                    margin-bottom: 15px;
+                    letter-spacing: 1px;
+                }
 
                 .days-timeline { display: flex; flex-direction: column; gap: 10px; }
 
                 .day-card {
-                    background: #1a1a1a;
-                    border: 1px solid #333;
+                    background: #111111;
+                    border: 1px solid #222;
                     border-radius: 6px;
                     padding: 15px;
                     display: grid;
                     grid-template-columns: 60px 1fr auto;
                     gap: 15px;
                     align-items: center;
+                    transition: all 0.2s ease;
                 }
-                .day-card:hover { border-color: #555; }
+                .day-card:hover { border-color: #00F0FF; box-shadow: 0 0 10px rgba(0,240,255,0.1); }
 
-                .day-number { font-size: 20px; font-weight: 600; color: #fff; text-align: center; }
-                .day-date { font-size: 11px; color: #888; text-align: center; }
+                .day-number {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #00F0FF;
+                    text-align: center;
+                }
+                .day-date { font-size: 11px; color: #666; text-align: center; }
 
                 .day-info h4 { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
                 .day-info p { font-size: 12px; color: #888; }
@@ -77,28 +110,34 @@ export class TourWeatherPanel extends HTMLElement {
                     align-items: center;
                     gap: 10px;
                     padding: 10px;
-                    background: #222;
-                    border: 1px solid #333;
+                    background: #0A0A0A;
+                    border: 1px solid #222;
                     border-radius: 4px;
                     min-width: 130px;
                 }
                 .weather-icon { font-size: 26px; }
-                .weather-temp { font-size: 14px; font-weight: 600; color: #fff; }
+                .weather-temp {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #fff;
+                }
                 .weather-condition { font-size: 11px; color: #888; }
-                .weather-rain { font-size: 10px; color: #6bf; }
+                .weather-rain { font-size: 10px; color: #00F0FF; }
 
                 .location-input {
-                    background: #111;
+                    background: #0A0A0A;
                     border: 1px solid #333;
                     border-radius: 4px;
                     color: #eee;
                     padding: 5px 8px;
                     font-size: 12px;
                     width: 100px;
+                    transition: border-color 0.2s ease;
                 }
-                .location-input:focus { outline: none; border-color: #555; }
+                .location-input:focus { outline: none; border-color: #00F0FF; }
                 .location-btn {
-                    background: #222;
+                    background: #111;
                     border: 1px solid #333;
                     color: #888;
                     padding: 5px 8px;
@@ -106,22 +145,23 @@ export class TourWeatherPanel extends HTMLElement {
                     cursor: pointer;
                     font-size: 11px;
                     margin-left: 5px;
+                    transition: all 0.2s ease;
                 }
-                .location-btn:hover { background: #333; color: #fff; }
+                .location-btn:hover { background: #1a1a1a; color: #00F0FF; border-color: #00F0FF; }
                 .day-location { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
 
-                .loading { text-align: center; padding: 40px; color: #888; }
+                .loading { text-align: center; padding: 40px; color: #666; }
                 .loading-spinner {
                     width: 30px; height: 30px;
-                    border: 3px solid #333;
-                    border-top-color: #888;
+                    border: 3px solid #222;
+                    border-top-color: #00F0FF;
                     border-radius: 50%;
                     animation: spin 1s linear infinite;
                     margin: 0 auto 15px;
                 }
                 @keyframes spin { to { transform: rotate(360deg); } }
 
-                .empty-state { text-align: center; padding: 40px; color: #888; }
+                .empty-state { text-align: center; padding: 40px; color: #666; }
                 .empty-state-icon { font-size: 36px; margin-bottom: 12px; }
 
                 .forecast-grid {
@@ -131,16 +171,22 @@ export class TourWeatherPanel extends HTMLElement {
                     margin-top: 20px;
                 }
                 .forecast-card {
-                    background: #1a1a1a;
-                    border: 1px solid #333;
+                    background: #111111;
+                    border: 1px solid #222;
                     border-radius: 6px;
                     padding: 15px;
                     text-align: center;
+                    transition: all 0.2s ease;
                 }
-                .forecast-card:hover { border-color: #555; }
-                .forecast-day { font-size: 11px; color: #888; margin-bottom: 6px; }
+                .forecast-card:hover { border-color: #00F0FF; }
+                .forecast-day { font-size: 11px; color: #666; margin-bottom: 6px; }
                 .forecast-icon { font-size: 24px; margin-bottom: 6px; }
-                .forecast-temp { font-size: 13px; font-weight: 600; color: #fff; }
+                .forecast-temp {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #fff;
+                }
 
                 @media (max-width: 768px) {
                     .day-card { grid-template-columns: 50px 1fr; gap: 10px; }
@@ -150,7 +196,7 @@ export class TourWeatherPanel extends HTMLElement {
             </style>
 
             <div>
-                <button class="back-btn" id="backBtn">← Torna alla lista</button>
+                <button class="back-btn" id="backBtn">← TORNA ALLA LISTA</button>
                 <div id="content">
                     <div class="empty-state">
                         <div class="empty-state-icon">🌤️</div>
@@ -220,7 +266,7 @@ export class TourWeatherPanel extends HTMLElement {
                     <span>🏙️ ${this.tour.cities?.join(', ') || 'Nessuna città'}</span>
                 </div>
             </div>
-            <h3 class="section-title">🌤️ Previsioni Meteo</h3>
+            <h3 class="section-title">🌤️ PREVISIONI METEO</h3>
             ${daysToShow.length > 0 ? this.renderDaysTimeline(daysToShow) : this.renderForecastGrid()}
         `;
 

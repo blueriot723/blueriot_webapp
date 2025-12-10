@@ -1,13 +1,14 @@
 /**
  * Dashboard - Main application frame with navigation
- * VERSION: 2024-12-09-v4 - Neon Design Layout
+ * VERSION: 2024-12-10-v2 - OSM Autocomplete + Neon Design
  */
 import { auth } from '../utils/auth.js';
+import { createShadowAutocomplete } from '../utils/geocoding.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-const VERSION = '2024-12-10-v1';
+const VERSION = '2024-12-10-v2';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
@@ -832,16 +833,19 @@ export class DashboardFrame extends HTMLElement {
                 <input type="text" id="tasteName" value="${taste?.name || ''}" required>
             </div>
             <div class="form-group">
-                <label>Nazione</label>
-                <input type="text" id="tasteCountry" value="${taste?.country || ''}" placeholder="Italia">
+                <label>Località (inizia a digitare...)</label>
+                <div class="osm-autocomplete-wrapper">
+                    <input type="text" id="tasteCity" value="${taste?.city || ''}" placeholder="Cerca città, paese, rifugio..." autocomplete="off">
+                </div>
+                <small style="color:#6b7280;font-size:11px;margin-top:4px;display:block;">Compila automaticamente nazione e regione</small>
             </div>
             <div class="form-group">
                 <label>Regione</label>
                 <input type="text" id="tasteRegion" value="${taste?.region || ''}" placeholder="Toscana">
             </div>
             <div class="form-group">
-                <label>Città</label>
-                <input type="text" id="tasteCity" value="${taste?.city || ''}" placeholder="Firenze">
+                <label>Nazione</label>
+                <input type="text" id="tasteCountry" value="${taste?.country || ''}" placeholder="Italia">
             </div>
             <div class="form-group">
                 <label>Cucina</label>
@@ -862,6 +866,20 @@ export class DashboardFrame extends HTMLElement {
         `;
 
         modal.classList.add('active');
+
+        // Setup autocomplete on city field
+        const cityInput = this.shadowRoot.getElementById('tasteCity');
+        if (cityInput) {
+            createShadowAutocomplete(this.shadowRoot, cityInput, {}, (result) => {
+                // Auto-fill country and region
+                if (result.country) {
+                    this.shadowRoot.getElementById('tasteCountry').value = result.country;
+                }
+                if (result.region) {
+                    this.shadowRoot.getElementById('tasteRegion').value = result.region;
+                }
+            });
+        }
 
         // Modal buttons
         this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
@@ -947,8 +965,18 @@ export class DashboardFrame extends HTMLElement {
         const modal = this.shadowRoot.getElementById('crudModal');
         this.shadowRoot.getElementById('modalTitle').textContent = route ? 'Modifica Tratta' : 'Nuova Tratta';
         this.shadowRoot.getElementById('modalBody').innerHTML = `
-            <div class="form-group"><label>Partenza *</label><input type="text" id="routeStart" value="${route?.start_point||''}" required></div>
-            <div class="form-group"><label>Arrivo *</label><input type="text" id="routeEnd" value="${route?.end_point||''}" required></div>
+            <div class="form-group">
+                <label>Partenza * (inizia a digitare...)</label>
+                <div class="osm-autocomplete-wrapper">
+                    <input type="text" id="routeStart" value="${route?.start_point||''}" placeholder="Cerca località..." autocomplete="off" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Arrivo * (inizia a digitare...)</label>
+                <div class="osm-autocomplete-wrapper">
+                    <input type="text" id="routeEnd" value="${route?.end_point||''}" placeholder="Cerca località..." autocomplete="off" required>
+                </div>
+            </div>
             <div class="form-group"><label>Tipo Trasporto</label>
                 <select id="routeType">
                     <option value="">Seleziona...</option>
@@ -965,6 +993,13 @@ export class DashboardFrame extends HTMLElement {
             <div class="form-group"><label>Note</label><textarea id="routeNotes">${route?.notes||''}</textarea></div>
         `;
         modal.classList.add('active');
+
+        // Setup autocomplete on start and end fields
+        const startInput = this.shadowRoot.getElementById('routeStart');
+        const endInput = this.shadowRoot.getElementById('routeEnd');
+        if (startInput) createShadowAutocomplete(this.shadowRoot, startInput);
+        if (endInput) createShadowAutocomplete(this.shadowRoot, endInput);
+
         this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
         this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
         this.shadowRoot.getElementById('modalSave').onclick = () => this.saveRoute();
@@ -1042,9 +1077,15 @@ export class DashboardFrame extends HTMLElement {
         this.shadowRoot.getElementById('modalTitle').textContent = stay ? 'Modifica Hotel' : 'Nuovo Hotel';
         this.shadowRoot.getElementById('modalBody').innerHTML = `
             <div class="form-group"><label>Nome *</label><input type="text" id="stayName" value="${stay?.name||''}" required></div>
-            <div class="form-group"><label>Nazione</label><input type="text" id="stayCountry" value="${stay?.country||''}" placeholder="Italia"></div>
+            <div class="form-group">
+                <label>Località (inizia a digitare...)</label>
+                <div class="osm-autocomplete-wrapper">
+                    <input type="text" id="stayCity" value="${stay?.location||''}" placeholder="Cerca città, paese..." autocomplete="off">
+                </div>
+                <small style="color:#6b7280;font-size:11px;margin-top:4px;display:block;">Compila automaticamente nazione e regione</small>
+            </div>
             <div class="form-group"><label>Regione</label><input type="text" id="stayRegion" value="${stay?.region||''}" placeholder="Toscana"></div>
-            <div class="form-group"><label>Città</label><input type="text" id="stayCity" value="${stay?.location||''}" placeholder="Firenze"></div>
+            <div class="form-group"><label>Nazione</label><input type="text" id="stayCountry" value="${stay?.country||''}" placeholder="Italia"></div>
             <div class="form-group"><label>Tipo</label>
                 <select id="stayType">
                     <option value="Hotel" ${stay?.type==='Hotel'?'selected':''}>🏨 Hotel</option>
@@ -1060,6 +1101,21 @@ export class DashboardFrame extends HTMLElement {
             <div class="form-group"><label>Note</label><textarea id="stayNotes">${stay?.notes||''}</textarea></div>
         `;
         modal.classList.add('active');
+
+        // Setup autocomplete on city field
+        const cityInput = this.shadowRoot.getElementById('stayCity');
+        if (cityInput) {
+            createShadowAutocomplete(this.shadowRoot, cityInput, {}, (result) => {
+                // Auto-fill country and region
+                if (result.country) {
+                    this.shadowRoot.getElementById('stayCountry').value = result.country;
+                }
+                if (result.region) {
+                    this.shadowRoot.getElementById('stayRegion').value = result.region;
+                }
+            });
+        }
+
         this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
         this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
         this.shadowRoot.getElementById('modalSave').onclick = () => this.saveStay();

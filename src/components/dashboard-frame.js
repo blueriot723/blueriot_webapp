@@ -7,7 +7,7 @@ import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 
-const VERSION = '2024-12-09-v4';
+const VERSION = '2024-12-10-v1';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 export class DashboardFrame extends HTMLElement {
@@ -80,10 +80,7 @@ export class DashboardFrame extends HTMLElement {
                     height: auto;
                     margin: 12px auto;
                     display: block;
-                    filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
                     min-height: 60px;
-                    background: rgba(255,255,255,0.03);
-                    border-radius: 4px;
                 }
                 .matrix-logo {
                     width: 100%;
@@ -91,7 +88,6 @@ export class DashboardFrame extends HTMLElement {
                     height: auto;
                     margin: 12px auto 0;
                     display: block;
-                    filter: drop-shadow(0 0 10px rgba(0,229,255,0.7));
                     min-height: 40px;
                 }
                 /* Glow line under logos */
@@ -485,7 +481,7 @@ export class DashboardFrame extends HTMLElement {
                             <div class="logo-white">SYNDICATE</div>
                         </div>
                         <img src="./blueriot-logo.png" alt="BlueRiot" class="blueriot-logo" onerror="this.style.display='none'">
-                        <img src="./matrix.svg" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
+                        <img src="./matrix.png" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
                     </div>
                     <div class="logo-glow"></div>
                     <ul class="nav">

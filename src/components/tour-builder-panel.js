@@ -94,7 +94,7 @@ export class TourBuilderPanel extends HTMLElement {
                 .palette-title {
                     font-size: 14px;
                     font-weight: 700;
-                    color: var(--neon-cyan);
+                    color: var(--cyan);
                     text-transform: uppercase;
                     letter-spacing: 2px;
                     margin-bottom: 16px;
@@ -140,8 +140,8 @@ export class TourBuilderPanel extends HTMLElement {
                     text-transform: uppercase;
                 }
 
-                .palette-section-header.tastes .palette-section-title { color: var(--neon-fuchsia); }
-                .palette-section-header.stay .palette-section-title { color: var(--neon-cyan); }
+                .palette-section-header.tastes .palette-section-title { color: var(--pink); }
+                .palette-section-header.stay .palette-section-title { color: var(--cyan); }
 
                 .palette-section-count {
                     font-size: 11px;
@@ -171,7 +171,7 @@ export class TourBuilderPanel extends HTMLElement {
                 }
                 .palette-search:focus {
                     outline: none;
-                    border-color: var(--neon-cyan);
+                    border-color: var(--cyan);
                 }
                 .palette-search::placeholder { color: #555; }
 
@@ -197,11 +197,11 @@ export class TourBuilderPanel extends HTMLElement {
                 }
 
                 .block.taste-block {
-                    border-left: 3px solid var(--neon-fuchsia);
+                    border-left: 3px solid var(--pink);
                 }
 
                 .block.stay-block {
-                    border-left: 3px solid var(--neon-cyan);
+                    border-left: 3px solid var(--cyan);
                 }
 
                 .block-name {
@@ -232,14 +232,14 @@ export class TourBuilderPanel extends HTMLElement {
 
                 .tour-title {
                     font-size: 24px;
-                    color: var(--neon-cyan);
+                    color: var(--cyan);
                     text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
                     margin-bottom: 4px;
                 }
 
                 .tour-code {
                     font-size: 12px;
-                    color: var(--neon-fuchsia);
+                    color: var(--pink);
                     letter-spacing: 2px;
                     margin-bottom: 12px;
                 }
@@ -263,7 +263,7 @@ export class TourBuilderPanel extends HTMLElement {
 
                 .days-title {
                     font-size: 14px;
-                    color: var(--neon-cyan);
+                    color: var(--cyan);
                     text-transform: uppercase;
                     letter-spacing: 2px;
                     margin-bottom: 16px;
@@ -275,7 +275,7 @@ export class TourBuilderPanel extends HTMLElement {
                 .days-title button {
                     background: rgba(0, 240, 255, 0.1);
                     border: 1px solid rgba(0, 240, 255, 0.3);
-                    color: var(--neon-cyan);
+                    color: var(--cyan);
                     padding: 4px 12px;
                     border-radius: 4px;
                     font-size: 11px;
@@ -317,7 +317,7 @@ export class TourBuilderPanel extends HTMLElement {
                 .day-number {
                     font-size: 28px;
                     font-weight: bold;
-                    color: var(--neon-cyan);
+                    color: var(--cyan);
                     width: 50px;
                     text-align: center;
                 }
@@ -341,14 +341,14 @@ export class TourBuilderPanel extends HTMLElement {
                     background: transparent;
                     border: none;
                     border-bottom: 1px dashed rgba(0, 240, 255, 0.3);
-                    color: var(--neon-cyan);
+                    color: var(--cyan);
                     font-size: 11px;
                     padding: 2px 4px;
                     width: 120px;
                 }
                 .day-city input:focus {
                     outline: none;
-                    border-color: var(--neon-cyan);
+                    border-color: var(--cyan);
                 }
 
                 .day-weather {
@@ -405,11 +405,11 @@ export class TourBuilderPanel extends HTMLElement {
                 }
 
                 .dropped-block.taste {
-                    border-left: 3px solid var(--neon-fuchsia);
+                    border-left: 3px solid var(--pink);
                 }
 
                 .dropped-block.stay {
-                    border-left: 3px solid var(--neon-cyan);
+                    border-left: 3px solid var(--cyan);
                 }
 
                 .dropped-block .block-name {
@@ -443,7 +443,7 @@ export class TourBuilderPanel extends HTMLElement {
                     width: 40px;
                     height: 40px;
                     border: 3px solid rgba(0, 240, 255, 0.1);
-                    border-top-color: var(--neon-cyan);
+                    border-top-color: var(--cyan);
                     border-radius: 50%;
                     animation: spin 1s linear infinite;
                     margin: 0 auto 16px;

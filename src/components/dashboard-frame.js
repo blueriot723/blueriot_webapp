@@ -1,598 +1,563 @@
 /**
- * Dashboard - Main application frame with navigation
- * VERSION: 2024-12-10-v2 - OSM Autocomplete + Neon Design
+ * Dashboard - BlueRiot Cyberpunk Style
+ * VERSION: 2024-12-10-v9
+ * Brand Identity: Greek Letters + Orbitron Font
  */
 import { auth } from '../utils/auth.js';
-import { createShadowAutocomplete } from '../utils/geocoding.js';
+import { getCityInfo, searchCities, getPhonePrefix, getGoogleMapsLink, getWhat3WordsLink } from '../utils/cities-db.js';
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 import './tour-builder-panel.js';
 
-const VERSION = '2024-12-11-v1';
-console.log(`📦 dashboard-frame.js loaded (${VERSION}) - Tour Builder integration`);
+const VERSION = '2024-12-10-v9';
+console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
+
+// Restaurant types
+const RESTAURANT_TYPES = [
+    'Ristorante Tradizionale',
+    'Trattoria',
+    'Osteria',
+    'Pizzeria',
+    'Enoteca',
+    'Agriturismo',
+    'Fine Dining',
+    'Bistrot',
+    'Taverna',
+    'Street Food',
+    'Bar/Caffè',
+    'Gelateria',
+    'Pasticceria'
+];
+
+// Price ranges
+const PRICE_RANGES = [
+    { value: '€', label: '€ (Budget)' },
+    { value: '€€', label: '€€ (Medio)' },
+    { value: '€€€', label: '€€€ (Alto)' },
+    { value: '€€€€', label: '€€€€ (Lusso)' }
+];
 
 export class DashboardFrame extends HTMLElement {
     constructor() {
         super();
-        console.log('🏗️ DashboardFrame constructor called');
         this.attachShadow({ mode: 'open' });
         this.currentView = 'home';
-        this.user = null;
-        this.currentTL = null;
-        this.toursData = [];
-        // Cache to prevent reloading data on page switch
         this.loadedSections = new Set();
+        this.tastesData = [];
+        this.routesData = [];
+        this.stayData = [];
+        this.toursData = [];
+        this.citySearchResults = [];
         this.render();
-        console.log('🎨 DashboardFrame render() completed');
     }
-    async connectedCallback() {
-        console.log('🔌 DashboardFrame connectedCallback');
+
+    connectedCallback() {
         try {
-            this.user = await auth.getCurrentUser();
-            this.currentTL = auth.getTL();
-        } catch (e) {
-            console.warn('Auth not ready yet:', e);
+            this.setupListeners();
+            console.log('✅ Dashboard ready');
+        } catch(e) {
+            console.error('Dashboard error:', e);
         }
-        // Always setup listeners even if auth fails
-        this.setupListeners();
-        console.log('✅ Dashboard listeners initialized');
     }
+
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
-                * { box-sizing: border-box; margin: 0; padding: 0; }
+                /* ORBITRON FONT */
+                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+
+                /* BLUERIOT CYBERPUNK THEME */
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 :host {
-                    --neon-cyan: #00e5ff;
-                    --neon-fuchsia: #ff00ff;
-                    --neon-pink: #ff4fd8;
-                    --text-gray: #6b7280;
-                    --bg-black: #0a0a0a;
-                    --bg-darker: #050505;
+                    display: block;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    font-size: 14px;
+                    background: #0A0A0A;
+                    color: #eee;
+                    min-height: 100vh;
                 }
-                .container { display: flex; min-height: 100vh; background: var(--bg-black); font-family: 'Orbitron', sans-serif; }
 
-                /* === SIDEBAR === */
+                .container { display: flex; min-height: 100vh; }
+
+                /* SIDEBAR - PURE BLACK */
                 .sidebar {
-                    width: 260px;
-                    background: var(--bg-darker);
-                    padding: 30px 20px;
-                    border-right: none;
-                    position: fixed;
-                    height: 100vh;
-                    overflow-y: auto;
-                    z-index: 100;
-                }
-                .logo-box {
-                    border: 1px solid rgba(255,255,255,0.25);
-                    border-radius: 6px;
+                    width: 220px;
+                    background: #000000;
+                    border-right: 1px solid #222;
                     padding: 20px 15px;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .logo {
                     text-align: center;
-                    margin-bottom: 25px;
-                    position: relative;
-                    background: rgba(15,15,20,0.8);
+                    padding-bottom: 20px;
+                    margin-bottom: 20px;
+                    border-bottom: 1px solid #222;
                 }
-                .logo-text { margin-bottom: 10px; }
-                .logo-blue { font-size: 15px; font-weight: 700; color: #7ba3c9; letter-spacing: 3px; text-transform: uppercase; }
-                .logo-white { font-size: 13px; font-weight: 700; color: white; letter-spacing: 4px; margin-top: 4px; text-transform: uppercase; }
-                .blueriot-logo {
-                    width: 100%;
-                    max-width: 150px;
-                    height: auto;
-                    margin: 12px auto;
-                    display: block;
-                    min-height: 60px;
-                }
-                .matrix-logo {
-                    width: 100%;
-                    max-width: 130px;
-                    height: auto;
-                    margin: 12px auto 0;
-                    display: block;
-                    min-height: 40px;
-                }
-                /* Glow line under logos */
-                .logo-glow {
-                    height: 2px;
-                    background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 30%, var(--neon-cyan) 70%, transparent 100%);
-                    margin: 20px 10%;
-                    border-radius: 2px;
-                    box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan);
-                }
-
-                /* === NAV ITEMS - Stile immagine === */
-                .nav { list-style: none; padding: 0; margin-top: 10px; }
-                .nav-item {
-                    margin-bottom: 12px;
-                    position: relative;
-                    cursor: pointer;
-                    padding: 10px 0 10px 5px;
-                    transition: all 0.3s ease;
-                }
-                .nav-item span {
-                    font-size: 15px;
+                .logo img { max-width: 100px; height: auto; opacity: 0.9; }
+                .logo-text {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 18px;
                     font-weight: 700;
-                    color: var(--text-gray);
+                    color: #00F0FF;
                     letter-spacing: 2px;
-                    transition: all 0.3s ease;
-                    display: block;
-                    text-transform: uppercase;
                 }
-                .nav-item:hover span { color: #a0a0a0; }
-                .nav-item.active span {
-                    color: var(--neon-pink);
-                    text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+
+                .nav { list-style: none; flex: 1; }
+                .nav-item {
+                    padding: 14px 15px;
+                    margin-bottom: 5px;
+                    cursor: pointer;
+                    color: #666;
+                    border-radius: 4px;
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 12px;
+                    font-weight: 500;
+                    letter-spacing: 1px;
+                    transition: all 0.2s ease;
                 }
-                /* Sottolineatura fuchsia con freccia - stile immagine */
-                .nav-item.active::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 2px;
-                    left: 0;
-                    width: 70%;
-                    height: 2px;
-                    background: var(--neon-pink);
-                    box-shadow: 0 0 8px var(--neon-pink), 0 0 16px var(--neon-pink);
+                .nav-item:hover {
+                    background: #111;
+                    color: #00F0FF;
+                    border-left: 2px solid #00F0FF;
                 }
-                .nav-item.active::before {
-                    content: '';
-                    position: absolute;
-                    bottom: -2px;
-                    left: calc(70% - 8px);
-                    width: 12px;
-                    height: 12px;
-                    border-right: 2px solid var(--neon-pink);
-                    border-bottom: 2px solid var(--neon-pink);
-                    transform: rotate(-45deg);
-                    box-shadow: 2px 2px 6px var(--neon-pink);
+                .nav-item.active {
+                    background: #0A0A0A;
+                    color: #00F0FF;
+                    border-left: 2px solid #00F0FF;
                 }
-                .nav-section {
-                    color: #445566;
+
+                .nav-divider { border-top: 1px solid #222; margin: 15px 0; }
+
+                .logout-btn {
+                    padding: 10px;
+                    background: transparent;
+                    border: 1px solid #333;
+                    color: #666;
+                    cursor: pointer;
+                    border-radius: 4px;
+                    font-family: 'Orbitron', sans-serif;
                     font-size: 10px;
-                    letter-spacing: 3px;
-                    margin: 35px 0 15px;
-                    text-transform: uppercase;
-                    padding-left: 5px;
+                    letter-spacing: 1px;
+                    transition: all 0.2s ease;
                 }
+                .logout-btn:hover { border-color: #00F0FF; color: #00F0FF; }
 
-                /* === MAIN CONTENT === */
-                .main { margin-left: 260px; flex: 1; padding: 40px; background: var(--bg-black); min-height: 100vh; }
-
-                /* === NEON FRAME - Stile immagine con angoli elaborati === */
-                .work {
-                    position: relative;
-                    background: var(--bg-darker);
-                    min-height: calc(100vh - 80px);
-                    padding: 50px 40px;
-                    margin: 0;
-                }
-
-                /* Bordo superiore con angolo tagliato */
-                .work::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 40px;
-                    right: 0;
-                    height: 2px;
-                    background: linear-gradient(90deg, var(--neon-cyan) 0%, var(--neon-cyan) calc(100% - 80px), transparent calc(100% - 80px));
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-                }
-
-                /* Linea diagonale angolo superiore destro */
-                .work::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 80px;
-                    height: 50px;
-                    border-right: 2px solid var(--neon-cyan);
-                    border-top: none;
-                    background: linear-gradient(135deg, transparent 49%, var(--neon-cyan) 49%, var(--neon-cyan) 51%, transparent 51%);
-                    box-shadow: 2px 0 10px var(--neon-cyan);
-                }
-
-                /* Frame container per gli altri lati */
-                .neon-frame-sides {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    pointer-events: none;
-                    z-index: 1;
-                }
-
-                /* Linea sinistra */
-                .frame-left {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 2px;
-                    height: calc(100% - 50px);
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-                }
-
-                /* Angolo inferiore sinistro con estensione */
-                .frame-bottom-left {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 50px;
-                    height: 50px;
-                }
-                .frame-bottom-left::before {
-                    content: '';
-                    position: absolute;
-                    bottom: 50px;
-                    left: 0;
-                    width: 2px;
-                    height: 30px;
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                }
-                .frame-bottom-left::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 80px;
-                    height: 2px;
-                    background: linear-gradient(90deg, transparent 0%, var(--neon-cyan) 20px, var(--neon-cyan) 100%);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                }
-
-                /* Bordo inferiore */
-                .frame-bottom {
-                    position: absolute;
-                    bottom: 0;
-                    left: 50px;
-                    right: 60px;
-                    height: 2px;
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-                }
-
-                /* Angolo inferiore destro con curva */
-                .frame-bottom-right {
-                    position: absolute;
-                    bottom: 0;
-                    right: 0;
-                    width: 60px;
-                    height: 60px;
-                }
-                .frame-bottom-right::before {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    right: 30px;
-                    width: 40px;
-                    height: 2px;
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                    transform-origin: right center;
-                    transform: rotate(-30deg);
-                }
-                .frame-bottom-right::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 20px;
-                    right: 0;
-                    width: 2px;
-                    height: calc(100% - 70px);
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan);
-                }
-
-                /* Linea destra */
-                .frame-right {
-                    position: absolute;
-                    top: 50px;
-                    right: 0;
-                    width: 2px;
-                    height: calc(100% - 130px);
-                    background: var(--neon-cyan);
-                    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
-                }
+                /* MAIN CONTENT */
+                .main { flex: 1; padding: 25px; overflow-y: auto; background: #0A0A0A; }
 
                 .page { display: none; }
                 .page.active { display: block; }
+
                 h1 {
-                    font-size: 38px;
-                    font-weight: 900;
-                    color: white;
-                    letter-spacing: 6px;
-                    margin-bottom: 30px;
-                    text-transform: uppercase;
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 22px;
+                    font-weight: 600;
+                    margin-bottom: 20px;
+                    color: #00F0FF;
+                    letter-spacing: 2px;
                 }
 
-                /* === CONTENT BOX - Stile immagine con bordo sottile === */
                 .content-box {
-                    background: rgba(8,12,25,0.4);
-                    border: 1px solid rgba(255,255,255,0.15);
-                    border-radius: 4px;
-                    padding: 30px;
-                    min-height: 300px;
-                    position: relative;
-                }
-                .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 20px; }
-                .card {
-                    background: rgba(12,16,30,0.7);
-                    border: 1px solid rgba(0,229,255,0.15);
+                    background: #111111;
+                    border: 1px solid #222;
                     border-radius: 6px;
-                    padding: 22px;
-                    transition: all 0.3s ease;
-                    position: relative;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                }
+
+                /* GRID */
+                .grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                    gap: 15px;
+                }
+
+                .card {
+                    background: #0F0F0F;
+                    border: 1px solid #222;
+                    border-radius: 6px;
+                    padding: 18px;
+                    transition: all 0.2s ease;
                 }
                 .card:hover {
-                    border-color: rgba(0,229,255,0.35);
-                    box-shadow: 0 0 20px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05);
+                    border-color: #00F0FF;
+                    box-shadow: 0 0 15px rgba(0,240,255,0.1);
                 }
-                .card h3 { color: var(--neon-cyan); margin-bottom: 10px; font-size: 16px; letter-spacing: 1px; }
-                .card p { color: #8899aa; font-size: 13px; margin: 5px 0; }
-                .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; }
-                .card:hover .card-actions { opacity: 1; }
-                .card-actions button { width: 28px; height: 28px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-                .btn-edit { background: rgba(0,240,255,0.2); color: #00f0ff; }
-                .btn-edit:hover { background: rgba(0,240,255,0.4); }
-                .btn-delete { background: rgba(255,0,100,0.2); color: #ff0064; }
-                .btn-delete:hover { background: rgba(255,0,100,0.4); }
-                .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-                .modal-overlay.active { display: flex; }
-                .modal { background: #0a0e27; border: 1px solid rgba(0,240,255,0.3); border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-                .modal-header { padding: 20px; border-bottom: 1px solid rgba(0,240,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-                .modal-header h2 { color: #00f0ff; margin: 0; font-size: 20px; }
-                .modal-close { background: none; border: none; color: #8899aa; font-size: 24px; cursor: pointer; }
-                .modal-close:hover { color: #ff0064; }
-                .modal-body { padding: 20px; }
-                .form-group { margin-bottom: 16px; }
-                .form-group label { display: block; color: #8899aa; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; }
-                .form-group input, .form-group select, .form-group textarea { width: 100%; background: rgba(10,14,39,0.8); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; padding: 12px; color: white; font-size: 14px; }
-                .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #00f0ff; box-shadow: 0 0 8px rgba(0,240,255,0.3); }
-                .form-group textarea { min-height: 80px; resize: vertical; }
-                .modal-footer { padding: 20px; border-top: 1px solid rgba(0,240,255,0.1); display: flex; justify-content: flex-end; gap: 12px; }
-                .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-                .btn-primary { background: linear-gradient(135deg, #00f0ff, #0080ff); color: white; }
-                .btn-primary:hover { box-shadow: 0 0 16px rgba(0,240,255,0.5); }
-                .btn-secondary { background: rgba(255,255,255,0.1); color: #8899aa; }
-                .btn-secondary:hover { background: rgba(255,255,255,0.2); }
-                .btn-danger { background: rgba(255,0,100,0.2); color: #ff0064; }
-                .btn-danger:hover { background: rgba(255,0,100,0.4); }
-                .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-                .toolbar-filters { display: flex; gap: 12px; flex-wrap: wrap; }
-                .toolbar-filters select { background: rgba(10,14,39,0.8); border: 1px solid rgba(0,240,255,0.2); border-radius: 6px; padding: 8px 12px; color: white; font-size: 13px; }
-                .btn-add { background: linear-gradient(135deg, #00f0ff, #0080ff); color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-                .btn-add:hover { box-shadow: 0 0 16px rgba(0,240,255,0.5); }
-                /* === MOBILE OVERLAY === */
-                .mobile-overlay {
+                .card-title {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #fff;
+                    margin-bottom: 10px;
+                    letter-spacing: 1px;
+                }
+                .card-info { font-size: 13px; color: #888; margin: 6px 0; }
+                .card-info a { color: #00F0FF; text-decoration: none; }
+                .card-info a:hover { text-decoration: underline; }
+                .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+                .card-tag {
+                    background: #1a1a1a;
+                    border: 1px solid #333;
+                    padding: 3px 8px;
+                    border-radius: 3px;
+                    font-size: 11px;
+                    color: #888;
+                }
+                .card-tag.tl-free { background: #0a2a0a; border-color: #0f0; color: #0f0; }
+                .card-tag.commission { background: #2a2a0a; border-color: #ff0; color: #ff0; }
+                .card-tag.discount { background: #2a0a2a; border-color: #f0f; color: #f0f; }
+                .card-actions {
+                    margin-top: 15px;
+                    padding-top: 12px;
+                    border-top: 1px solid #222;
+                    display: flex;
+                    gap: 8px;
+                }
+
+                /* BUTTONS */
+                .btn {
+                    padding: 8px 14px;
+                    border: 1px solid #333;
+                    border-radius: 4px;
+                    background: #111;
+                    color: #888;
+                    font-size: 12px;
+                    cursor: pointer;
+                    font-family: 'Orbitron', sans-serif;
+                    letter-spacing: 0.5px;
+                    transition: all 0.2s ease;
+                }
+                .btn:hover { background: #1a1a1a; color: #fff; border-color: #444; }
+                .btn-add {
+                    background: #00F0FF;
+                    border-color: #00F0FF;
+                    color: #000;
+                    font-weight: 600;
+                }
+                .btn-add:hover { background: #00d4e0; }
+                .btn-danger { border-color: #ff3333; color: #ff3333; }
+                .btn-danger:hover { background: #ff3333; color: #fff; }
+
+                /* TOOLBAR */
+                .toolbar {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                }
+
+                /* TOOLS SECTION */
+                .tools-section { margin-top: 25px; padding-top: 20px; border-top: 1px solid #222; }
+                .tools-section h2 {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 14px;
+                    color: #666;
+                    margin-bottom: 15px;
+                    letter-spacing: 1px;
+                }
+                .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+                /* MODAL */
+                .modal-overlay {
                     display: none;
                     position: fixed;
                     top: 0; left: 0; right: 0; bottom: 0;
-                    background: rgba(0,0,0,0.7);
-                    z-index: 99;
-                    opacity: 0;
-                    transition: opacity 0.3s ease;
+                    background: rgba(0,0,0,0.9);
+                    z-index: 1000;
+                    align-items: flex-start;
+                    justify-content: center;
+                    overflow-y: auto;
+                    padding: 40px 20px;
                 }
-                .mobile-overlay.active {
-                    display: block;
-                    opacity: 1;
+                .modal-overlay.active { display: flex; }
+                .modal {
+                    background: #0F0F0F;
+                    border: 1px solid #222;
+                    border-radius: 8px;
+                    padding: 25px;
+                    max-width: 700px;
+                    width: 100%;
+                    margin: auto;
                 }
+                .modal h2 {
+                    font-family: 'Orbitron', sans-serif;
+                    margin-bottom: 20px;
+                    font-size: 18px;
+                    color: #00F0FF;
+                    letter-spacing: 1px;
+                }
+                .modal-close {
+                    float: right;
+                    background: none;
+                    border: none;
+                    color: #666;
+                    font-size: 24px;
+                    cursor: pointer;
+                }
+                .modal-close:hover { color: #ff3333; }
 
-                /* === HAMBURGER BUTTON (hidden by default on desktop) === */
+                /* FORM STYLES */
+                .form-section {
+                    background: #111;
+                    border: 1px solid #222;
+                    border-radius: 6px;
+                    padding: 18px;
+                    margin-bottom: 15px;
+                }
+                .form-section-title {
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 11px;
+                    color: #00F0FF;
+                    letter-spacing: 1px;
+                    margin-bottom: 15px;
+                    text-transform: uppercase;
+                }
+                .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+                .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+                .form-row.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+                .form-group { margin-bottom: 0; }
+                .form-group.full { grid-column: span 2; }
+                .form-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    color: #666;
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                .form-group input, .form-group select, .form-group textarea {
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1px solid #333;
+                    border-radius: 4px;
+                    background: #0A0A0A;
+                    color: #eee;
+                    font-size: 14px;
+                    transition: border-color 0.2s ease;
+                }
+                .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+                    outline: none;
+                    border-color: #00F0FF;
+                }
+                .form-group input::placeholder { color: #444; }
+                .form-group textarea { min-height: 80px; resize: vertical; }
+                .form-group select { cursor: pointer; }
+                .form-group select option { background: #111; }
+
+                /* AUTO-DETECT INFO */
+                .auto-detect-info {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 8px;
+                    padding: 8px 10px;
+                    background: #0a1a1a;
+                    border: 1px solid #00F0FF33;
+                    border-radius: 4px;
+                    font-size: 12px;
+                }
+                .auto-detect-info span { color: #888; }
+                .auto-detect-info .value { color: #00F0FF; font-weight: 500; }
+
+                /* CITY AUTOCOMPLETE */
+                .city-autocomplete {
+                    position: relative;
+                }
+                .city-suggestions {
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    right: 0;
+                    background: #111;
+                    border: 1px solid #333;
+                    border-top: none;
+                    border-radius: 0 0 4px 4px;
+                    max-height: 200px;
+                    overflow-y: auto;
+                    z-index: 100;
+                    display: none;
+                }
+                .city-suggestions.active { display: block; }
+                .city-suggestion {
+                    padding: 10px 12px;
+                    cursor: pointer;
+                    border-bottom: 1px solid #222;
+                    display: flex;
+                    justify-content: space-between;
+                }
+                .city-suggestion:hover { background: #1a1a1a; }
+                .city-suggestion .name { color: #fff; }
+                .city-suggestion .region { color: #666; font-size: 12px; }
+
+                /* CHECKBOX GROUP */
+                .checkbox-group {
+                    display: flex;
+                    gap: 20px;
+                    flex-wrap: wrap;
+                }
+                .checkbox-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    cursor: pointer;
+                }
+                .checkbox-item input[type="checkbox"] {
+                    width: 18px;
+                    height: 18px;
+                    accent-color: #00F0FF;
+                }
+                .checkbox-item label { color: #888; font-size: 13px; cursor: pointer; }
+
+                /* MOBILE */
                 .hamburger {
                     display: none;
-                    align-items: center;
-                    justify-content: center;
                     position: fixed;
-                    top: 15px;
-                    left: 15px;
+                    top: 15px; left: 15px;
                     z-index: 200;
-                    width: 50px;
-                    height: 50px;
-                    background: var(--bg-black);
-                    border: 2px solid var(--neon-cyan);
-                    border-radius: 8px;
-                    color: var(--neon-cyan);
-                    font-size: 26px;
+                    background: #000;
+                    border: 1px solid #222;
+                    color: #00F0FF;
+                    width: 40px; height: 40px;
+                    font-size: 18px;
                     cursor: pointer;
-                    box-shadow: 0 0 15px rgba(0,240,255,0.4);
-                    -webkit-tap-highlight-color: transparent;
-                    touch-action: manipulation;
-                }
-                .hamburger:active {
-                    transform: scale(0.9);
-                    background: rgba(0,240,255,0.2);
+                    border-radius: 4px;
                 }
 
-                /* === RESPONSIVE - TABLET & iPAD (use hamburger menu) === */
-                @media (max-width: 1024px) {
-                    .hamburger { display: flex !important; }
+                @media (max-width: 768px) {
+                    .hamburger { display: flex; align-items: center; justify-content: center; }
                     .sidebar {
                         position: fixed;
-                        left: 0;
+                        left: -240px;
                         top: 0;
-                        width: 280px;
                         height: 100vh;
-                        transform: translateX(-100%);
-                        transition: transform 0.3s ease;
-                        box-shadow: 4px 0 30px rgba(0,0,0,0.9);
                         z-index: 150;
+                        transition: left 0.3s;
                     }
-                    .sidebar.open { transform: translateX(0); }
-                    .main { margin-left: 0; padding: 25px; padding-top: 85px; }
-                    .work { min-height: calc(100vh - 130px); padding: 35px 25px; }
-                    h1 { font-size: 26px; letter-spacing: 4px; }
-                    .logo-box { padding: 15px; }
-                    .blueriot-logo { max-width: 120px; }
-                    .matrix-logo { max-width: 100px; }
-                    .nav-item { margin-bottom: 10px; padding: 8px 0 8px 5px; }
-                    .nav-item span { font-size: 14px; }
-                    /* Nasconde elementi frame complessi su tablet */
-                    .neon-frame-sides { display: none; }
-                    .work::before, .work::after {
-                        box-shadow: 0 0 8px var(--neon-cyan);
-                    }
-                }
-
-                /* === RESPONSIVE - MOBILE === */
-                @media (max-width: 768px) {
-                    .main { padding: 15px; padding-top: 75px; }
-                    .work { padding: 25px 18px; min-height: calc(100vh - 110px); }
-                    h1 { font-size: 20px; letter-spacing: 3px; margin-bottom: 20px; }
-                    .grid { grid-template-columns: 1fr; }
-                    .toolbar { flex-direction: column; align-items: stretch; }
-                    .toolbar-filters { flex-direction: column; }
-                    .toolbar-filters select { width: 100%; }
-                    .btn-add { width: 100%; justify-content: center; }
-                    .content-box { padding: 18px; }
-                    .card { padding: 18px; }
-                    .modal { width: 95%; margin: 10px; }
-                    /* Frame semplificato su mobile */
-                    .work::before {
-                        left: 20px;
-                        background: var(--neon-cyan);
-                    }
-                    .work::after {
-                        width: 40px;
-                        height: 30px;
-                    }
-                }
-
-                /* === RESPONSIVE - SMALL MOBILE === */
-                @media (max-width: 480px) {
-                    h1 { font-size: 16px; letter-spacing: 2px; }
-                    .work { padding: 18px 12px; }
-                    .hamburger { width: 44px; height: 44px; font-size: 22px; }
-                    .logo-box { padding: 12px; }
-                    .blueriot-logo { max-width: 100px; }
-                    .matrix-logo { max-width: 80px; }
-                    .nav-item span { font-size: 13px; letter-spacing: 1px; }
-                    .content-box { padding: 14px; }
+                    .sidebar.open { left: 0; }
+                    .main { padding: 60px 15px 20px; }
+                    .tools-grid { grid-template-columns: 1fr; }
+                    .form-row { grid-template-columns: 1fr; }
+                    .form-row.three, .form-row.four { grid-template-columns: 1fr; }
+                    .form-group.full { grid-column: span 1; }
                 }
             </style>
+
             <button class="hamburger" id="hamburger">☰</button>
-            <div class="mobile-overlay" id="mobileOverlay"></div>
+
             <div class="container">
                 <aside class="sidebar" id="sidebar">
-                    <div class="logo-box">
-                        <div class="logo-text">
-                            <div class="logo-blue">BLUERIOT</div>
-                            <div class="logo-white">SYNDICATE</div>
-                        </div>
-                        <img src="./blueriot-logo.png" alt="BlueRiot" class="blueriot-logo" onerror="this.style.display='none'">
-                        <img src="./matrix.png" alt="Matrix" class="matrix-logo" onerror="this.style.display='none'">
+                    <div class="logo">
+                        <img src="./blueriot-logo.png" alt="BlueRiot" onerror="this.style.display='none'">
+                        <div class="logo-text">BLUERIOT</div>
                     </div>
-                    <div class="logo-glow"></div>
                     <ul class="nav">
-                        <li class="nav-item" data-v="tastes"><span>TASTES</span></li>
-                        <li class="nav-item" data-v="routes"><span>ROUTES</span></li>
-                        <li class="nav-item" data-v="stay"><span>STAY</span></li>
-                        <li class="nav-item" data-v="node"><span>NODE</span></li>
-                        <li class="nav-section">T00L5</li>
-                        <li class="nav-item" data-v="etickets"><span>eTICKETS</span></li>
-                        <li class="nav-item" data-v="pdfocr"><span>PDF OCR</span></li>
+                        <li class="nav-item" data-v="tastes">ΤΔSΤΞ5</li>
+                        <li class="nav-item" data-v="routes">R0UT35</li>
+                        <li class="nav-item" data-v="stay">SΤΔΥ</li>
+                        <div class="nav-divider"></div>
+                        <li class="nav-item" data-v="node">NODΞ</li>
+                        <li class="nav-item" data-v="tools">T00L5</li>
                     </ul>
+                    <button class="logout-btn" id="logoutBtn">LOGOUT</button>
                 </aside>
+
                 <main class="main">
-                    <div class="work">
-                        <!-- Neon Frame Elements -->
-                        <div class="neon-frame-sides">
-                            <div class="frame-left"></div>
-                            <div class="frame-right"></div>
-                            <div class="frame-bottom"></div>
-                            <div class="frame-bottom-left"></div>
-                            <div class="frame-bottom-right"></div>
+                    <div id="home" class="page active">
+                        <h1>DASHBOARD</h1>
+                        <div class="content-box">
+                            <p style="color:#666;">Seleziona una sezione dal menu.</p>
                         </div>
-                        <div id="home" class="page active" style="text-align:center;padding:60px 20px;">
-                            <div style="font-size:64px;margin-bottom:20px;opacity:0.5;color:var(--neon-cyan);">⬡</div>
-                            <h1>MATRIX</h1>
-                            <p style="color:#6b7280;font-size:13px;letter-spacing:1px;">Seleziona una sezione dal menu</p>
+                    </div>
+
+                    <div id="tastes" class="page">
+                        <h1>ΤΔSΤΞ5</h1>
+                        <div class="toolbar">
+                            <div></div>
+                            <button class="btn btn-add" id="addTaste">+ AGGIUNGI</button>
                         </div>
-                        <div id="tastes" class="page">
-                            <h1>TASTES</h1>
-                            <div class="content-box" id="tastes-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                        <div class="content-box" id="tastes-c">
+                            <p style="color:#666;">Caricamento...</p>
                         </div>
-                        <div id="routes" class="page">
-                            <h1>ROUTES</h1>
-                            <div class="content-box" id="routes-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                    </div>
+
+                    <div id="routes" class="page">
+                        <h1>R0UT35</h1>
+                        <div class="toolbar">
+                            <div></div>
+                            <button class="btn btn-add" id="addRoute">+ AGGIUNGI</button>
                         </div>
-                        <div id="stay" class="page">
-                            <h1>STAY</h1>
-                            <div class="content-box" id="stay-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                        <div class="content-box" id="routes-c">
+                            <p style="color:#666;">Caricamento...</p>
                         </div>
-                        <div id="node" class="page">
-                            <div id="node-list">
-                                <h1>NODE</h1>
-                                <div class="content-box" id="node-c"><p style="color:#6b7280;">Caricamento...</p></div>
+                    </div>
+
+                    <div id="stay" class="page">
+                        <h1>SΤΔΥ</h1>
+                        <div class="toolbar">
+                            <div></div>
+                            <button class="btn btn-add" id="addStay">+ AGGIUNGI</button>
+                        </div>
+                        <div class="content-box" id="stay-c">
+                            <p style="color:#666;">Caricamento...</p>
+                        </div>
+                    </div>
+
+                    <div id="node" class="page">
+                        <div id="node-list">
+                            <h1>NODΞ - TOURS</h1>
+                            <div class="content-box" id="node-c">
+                                <p style="color:#666;">Caricamento...</p>
                             </div>
-                            <div id="node-detail" style="display:none;">
-                                <div class="node-view-tabs" style="display:flex;gap:8px;margin-bottom:16px;">
-                                    <button class="view-tab active" data-view="weather" style="background:rgba(0,240,255,0.2);border:1px solid rgba(0,240,255,0.4);color:#00f0ff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:1px;">🌤️ Meteo</button>
-                                    <button class="view-tab" data-view="builder" style="background:rgba(255,0,255,0.1);border:1px solid rgba(255,0,255,0.3);color:#ff00ff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:1px;">🏗️ Builder</button>
-                                </div>
-                                <div id="weather-view"><tour-weather-panel></tour-weather-panel></div>
-                                <div id="builder-view" style="display:none;"><tour-builder-panel></tour-builder-panel></div>
+                        </div>
+                        <div id="node-detail" style="display:none;">
+                            <div class="node-view-tabs" style="display:flex;gap:8px;margin-bottom:16px;">
+                                <button class="view-tab active" data-view="weather" style="background:#111;border:1px solid #00F0FF;color:#00F0FF;padding:10px 20px;border-radius:4px;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:1px;">🌤️ METEO</button>
+                                <button class="view-tab" data-view="builder" style="background:#111;border:1px solid #333;color:#888;padding:10px 20px;border-radius:4px;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:1px;">🏗️ BUILDER</button>
+                            </div>
+                            <div id="weather-view"><tour-weather-panel></tour-weather-panel></div>
+                            <div id="builder-view" style="display:none;"><tour-builder-panel></tour-builder-panel></div>
+                        </div>
+                    </div>
+
+                    <div id="tools" class="page">
+                        <h1>T00L5</h1>
+                        <div class="tools-grid">
+                            <div class="content-box">
+                                <h3 style="margin-bottom:10px;color:#888;">eTickets Generator</h3>
+                                <eticket-panel></eticket-panel>
+                            </div>
+                            <div class="content-box">
+                                <h3 style="margin-bottom:10px;color:#888;">PDF OCR Extractor</h3>
+                                <pdf-ocr-panel></pdf-ocr-panel>
                             </div>
                         </div>
-                        <div id="etickets" class="page"><h1>eTICKETS</h1><eticket-panel></eticket-panel></div>
-                        <div id="pdfocr" class="page"><h1>PDF OCR</h1><pdf-ocr-panel></pdf-ocr-panel></div>
                     </div>
                 </main>
             </div>
 
-            <!-- Modal per CRUD -->
             <div class="modal-overlay" id="crudModal">
                 <div class="modal">
-                    <div class="modal-header">
-                        <h2 id="modalTitle">Aggiungi</h2>
-                        <button class="modal-close" id="modalClose">×</button>
-                    </div>
-                    <div class="modal-body" id="modalBody"></div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" id="modalCancel">Annulla</button>
-                        <button class="btn btn-primary" id="modalSave">Salva</button>
+                    <button class="modal-close" id="modalClose">×</button>
+                    <h2 id="modalTitle">AGGIUNGI</h2>
+                    <form id="crudForm"></form>
+                    <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+                        <button type="button" class="btn" id="modalCancel">ANNULLA</button>
+                        <button type="submit" class="btn btn-add" id="modalSave">SALVA</button>
                     </div>
                 </div>
             </div>
         `;
     }
-    toggleSidebar() {
-        const sidebar = this.shadowRoot.getElementById('sidebar');
-        const overlay = this.shadowRoot.getElementById('mobileOverlay');
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-    }
-    closeSidebar() {
-        this.shadowRoot.getElementById('sidebar').classList.remove('open');
-        this.shadowRoot.getElementById('mobileOverlay').classList.remove('active');
-    }
+
     setupListeners() {
-        const hamburger = this.shadowRoot.getElementById('hamburger');
-        const overlay = this.shadowRoot.getElementById('mobileOverlay');
+        this.shadowRoot.getElementById('hamburger').onclick = () => {
+            this.shadowRoot.getElementById('sidebar').classList.toggle('open');
+        };
 
-        // Hamburger - both click and touch
-        hamburger.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleSidebar();
-        });
-        hamburger.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleSidebar();
-        }, { passive: false });
-
-        // Mobile overlay - close sidebar when clicked/touched
-        overlay.addEventListener('click', () => this.closeSidebar());
-        overlay.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            this.closeSidebar();
-        }, { passive: false });
-
-        // Nav items
         this.shadowRoot.querySelectorAll('.nav-item[data-v]').forEach(item => {
             item.onclick = () => {
                 const v = item.dataset.v;
@@ -601,12 +566,24 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 this.shadowRoot.getElementById(v).classList.add('active');
                 this.load(v);
-                // Close sidebar on tablet/mobile after selection
-                if(window.innerWidth <= 1024) this.closeSidebar();
+                this.shadowRoot.getElementById('sidebar').classList.remove('open');
             };
         });
 
-        // Listen for back event from tour-weather-panel and tour-builder-panel
+        this.shadowRoot.getElementById('logoutBtn').onclick = async () => {
+            await window.supabaseClient.auth.signOut();
+            window.location.reload();
+        };
+
+        this.shadowRoot.getElementById('addTaste').onclick = () => this.openModal('tastes');
+        this.shadowRoot.getElementById('addRoute').onclick = () => this.openModal('routes');
+        this.shadowRoot.getElementById('addStay').onclick = () => this.openModal('stay');
+
+        this.shadowRoot.getElementById('modalClose').onclick = () => this.closeModal();
+        this.shadowRoot.getElementById('modalCancel').onclick = () => this.closeModal();
+        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveModal();
+
+        // Back handlers for tour panels
         const setupBackHandler = (panel) => {
             if (panel) {
                 panel.addEventListener('back', () => {
@@ -622,7 +599,7 @@ export class DashboardFrame extends HTMLElement {
         setupBackHandler(tourPanel);
         setupBackHandler(builderPanel);
 
-        // Retry after custom elements are defined
+        // Retry after custom elements defined
         if (!tourPanel) {
             customElements.whenDefined('tour-weather-panel').then(() => {
                 setupBackHandler(this.shadowRoot.querySelector('tour-weather-panel'));
@@ -651,12 +628,14 @@ export class DashboardFrame extends HTMLElement {
         tabs.forEach(t => {
             if (t.dataset.view === view) {
                 t.classList.add('active');
-                t.style.background = view === 'weather' ? 'rgba(0,240,255,0.2)' : 'rgba(255,0,255,0.2)';
-                t.style.borderColor = view === 'weather' ? 'rgba(0,240,255,0.4)' : 'rgba(255,0,255,0.4)';
+                t.style.background = '#111';
+                t.style.borderColor = '#00F0FF';
+                t.style.color = '#00F0FF';
             } else {
                 t.classList.remove('active');
-                t.style.background = t.dataset.view === 'weather' ? 'rgba(0,240,255,0.1)' : 'rgba(255,0,255,0.1)';
-                t.style.borderColor = t.dataset.view === 'weather' ? 'rgba(0,240,255,0.3)' : 'rgba(255,0,255,0.3)';
+                t.style.background = '#111';
+                t.style.borderColor = '#333';
+                t.style.color = '#888';
             }
         });
 
@@ -676,147 +655,123 @@ export class DashboardFrame extends HTMLElement {
             }
         }
     }
-    async load(v, forceRefresh = false) {
+
+    async load(v, force = false) {
         const c = this.shadowRoot.getElementById(v + '-c');
-        if(!c) return; // etickets and pdfocr don't have -c containers, they use web components
-
-        // Skip loading if already loaded (prevents reload on page switch), unless force refresh
-        if (this.loadedSections.has(v) && !forceRefresh) {
-            console.log(`📦 ${v} already loaded, skipping fetch`);
-            return;
-        }
-
-        // Clear from cache if forcing refresh
-        if (forceRefresh) {
-            this.loadedSections.delete(v);
-            console.log(`🔄 Force refreshing ${v}`);
-        }
+        if (!c) return;
+        if (this.loadedSections.has(v) && !force) return;
 
         try {
-            console.log(`🔄 Loading ${v} data...`);
-            if(v==='tastes') {
-                const {data,error} = await window.supabaseClient.from('blueriot_tastes').select('*').order('country,region,city,name');
-                if(error) throw error;
+            if (v === 'tastes') {
+                const { data, error } = await window.supabaseClient.from('blueriot_tastes').select('*').order('name');
+                if (error) throw error;
                 this.tastesData = data || [];
-
-                // Build filters
-                const countries = [...new Set(data?.map(r=>r.country).filter(Boolean))].sort();
-                const regions = [...new Set(data?.map(r=>r.region).filter(Boolean))].sort();
-                const cities = [...new Set(data?.map(r=>r.city).filter(Boolean))].sort();
-
-                c.innerHTML = `
-                    <div class="toolbar">
-                        <div class="toolbar-filters">
-                            <select id="filterCountry"><option value="">🌍 Tutte le nazioni</option>${countries.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                            <select id="filterRegion"><option value="">📍 Tutte le regioni</option>${regions.map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
-                            <select id="filterCity"><option value="">🏙️ Tutte le città</option>${cities.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                        </div>
-                        <button class="btn-add" id="addTaste">+ Aggiungi</button>
-                    </div>
-                    <div id="tastesGrid" class="grid">${this.renderTastesGrid(data)}</div>
-                `;
-
-                // Filter listeners
-                ['filterCountry','filterRegion','filterCity'].forEach(id => {
-                    this.shadowRoot.getElementById(id).onchange = () => this.filterTastes();
-                });
-
-                // Add button
-                this.shadowRoot.getElementById('addTaste').onclick = () => this.openTasteModal();
-
-                // Edit/Delete listeners
-                this.setupTasteCardListeners();
-                this.loadedSections.add('tastes');
-
-            } else if(v==='routes') {
-                const {data,error} = await window.supabaseClient.from('blueriot_routes').select('*').order('start_point,end_point');
-                if(error) throw error;
-                this.routesData = data || [];
-
-                const types = [...new Set(data?.map(r=>r.transport_type).filter(Boolean))].sort();
-                c.innerHTML = `
-                    <div class="toolbar">
-                        <div class="toolbar-filters">
-                            <select id="filterRouteType"><option value="">🚌 Tutti i tipi</option>${types.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
-                        </div>
-                        <button class="btn-add" id="addRoute">+ Aggiungi</button>
-                    </div>
-                    <div id="routesGrid" class="grid">${this.renderRoutesGrid(data)}</div>
-                `;
-                this.shadowRoot.getElementById('filterRouteType').onchange = () => this.filterRoutes();
-                this.shadowRoot.getElementById('addRoute').onclick = () => this.openRouteModal();
-                this.setupRouteCardListeners();
-                this.loadedSections.add('routes');
-
-            } else if(v==='stay') {
-                const {data,error} = await window.supabaseClient.from('blueriot_stay').select('*').order('country,region,location,name');
-                if(error) throw error;
-                this.stayData = data || [];
-
-                const countries = [...new Set(data?.map(h=>h.country).filter(Boolean))].sort();
-                const regions = [...new Set(data?.map(h=>h.region).filter(Boolean))].sort();
-                const cities = [...new Set(data?.map(h=>h.location).filter(Boolean))].sort();
-
-                c.innerHTML = `
-                    <div class="toolbar">
-                        <div class="toolbar-filters">
-                            <select id="filterStayCountry"><option value="">🌍 Tutte le nazioni</option>${countries.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                            <select id="filterStayRegion"><option value="">📍 Tutte le regioni</option>${regions.map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
-                            <select id="filterStayCity"><option value="">🏙️ Tutte le città</option>${cities.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-                        </div>
-                        <button class="btn-add" id="addStay">+ Aggiungi</button>
-                    </div>
-                    <div id="stayGrid" class="grid">${this.renderStayGrid(data)}</div>
-                `;
-                ['filterStayCountry','filterStayRegion','filterStayCity'].forEach(id => {
-                    this.shadowRoot.getElementById(id).onchange = () => this.filterStay();
-                });
-                this.shadowRoot.getElementById('addStay').onclick = () => this.openStayModal();
-                this.setupStayCardListeners();
-                this.loadedSections.add('stay');
-
-            } else if(v==='node') {
-                // Reset to list view
-                this.shadowRoot.getElementById('node-list').style.display = 'block';
-                this.shadowRoot.getElementById('node-detail').style.display = 'none';
-
-                // Get TL profile first
-                const { data: user } = await window.supabaseClient.auth.getUser();
-                if (!user?.user) {
-                    c.innerHTML = '<p style="color:#8899aa;">Utente non autenticato</p>';
-                    return;
-                }
-
-                const { data: tlProfile } = await window.supabaseClient.from('tl_users').select('id').eq('user_id', user.user.id).single();
-                if (!tlProfile) {
-                    c.innerHTML = '<p style="color:#8899aa;">Profilo TL non trovato</p>';
-                    return;
-                }
-
-                const {data,error} = await window.supabaseClient.from('tours').select('*').eq('tl_id',tlProfile.id).order('start_date',{ascending:false}).limit(20);
-                if(error) throw error;
-                this.toursData = data || [];
-
-                c.innerHTML = !data?.length ? '<p style="color:#8899aa;">Nessun tour. Usa la sezione eTickets per gestire i passeggeri.</p>' :
-                    '<p style="color:#8899aa;margin-bottom:16px;">Clicca su un tour per meteo e builder</p><div class="grid">' + data.map((t,i)=>`<div class="card tour-card" data-idx="${i}" style="cursor:pointer;"><h3>${t.name||'N/A'}</h3><p>📋 ${t.code||'N/A'}</p><p>📅 ${t.start_date} → ${t.end_date||'N/A'}</p><p>👥 ${t.passenger_count||0} pax</p><p>📊 ${t.status||'upcoming'}</p><p style="color:#00f0ff;font-size:12px;margin-top:8px;">🌤️ Meteo | 🏗️ Builder →</p></div>`).join('') + '</div>';
-
-                // Add click handlers to tour cards
-                c.querySelectorAll('.tour-card').forEach(card => {
-                    card.onclick = () => {
-                        const idx = parseInt(card.dataset.idx);
-                        const tour = this.toursData[idx];
-                        if (tour) this.showTourWeather(tour);
-                    };
-                });
-                this.loadedSections.add('node');
+                this.renderTastes(c);
+                this.loadedSections.add(v);
             }
-        } catch(e) {
+            else if (v === 'routes') {
+                const { data, error } = await window.supabaseClient.from('blueriot_routes').select('*').order('start_point');
+                if (error) throw error;
+                this.routesData = data || [];
+                this.renderRoutes(c);
+                this.loadedSections.add(v);
+            }
+            else if (v === 'stay') {
+                const { data, error } = await window.supabaseClient.from('blueriot_stay').select('*').order('name');
+                if (error) throw error;
+                this.stayData = data || [];
+                this.renderStay(c);
+                this.loadedSections.add(v);
+            }
+            else if (v === 'node') {
+                const { data, error } = await window.supabaseClient.from('tours').select('*').order('start_date', { ascending: false });
+                if (error) throw error;
+                this.toursData = data || [];
+                this.renderTours(c);
+                this.loadedSections.add(v);
+            }
+        } catch (e) {
             console.error('Load error:', e);
-            c.innerHTML = '<p style="color:#ff4757;">Errore: ' + e.message + '</p>';
+            c.innerHTML = `<p style="color:#ff3333;">Errore: ${e.message}</p>`;
         }
     }
 
-    showTourWeather(tour) {
+    renderTastes(c) {
+        if (!this.tastesData.length) { c.innerHTML = '<p style="color:#666;">Nessun ristorante.</p>'; return; }
+        c.innerHTML = '<div class="grid">' + this.tastesData.map((r, i) => {
+            const cityInfo = getCityInfo(r.city);
+            const tags = [];
+            if (r.tl_free) tags.push('<span class="card-tag tl-free">TL FREE</span>');
+            if (r.commission) tags.push(`<span class="card-tag commission">${r.commission}%</span>`);
+            if (r.discount) tags.push(`<span class="card-tag discount">-${r.discount}%</span>`);
+
+            return `
+                <div class="card">
+                    <div class="card-title">${r.name || 'N/A'}</div>
+                    <div class="card-info">📍 ${r.city || '-'}${cityInfo ? ` (${cityInfo.region})` : ''}</div>
+                    <div class="card-info">🍽️ ${r.restaurant_type || r.cuisine || '-'} ${r.price_range || ''}</div>
+                    ${r.phone ? `<div class="card-info">📞 ${r.phone}</div>` : ''}
+                    ${r.google_maps ? `<div class="card-info"><a href="${r.google_maps}" target="_blank">📍 Google Maps</a></div>` : ''}
+                    ${r.what3words ? `<div class="card-info"><a href="${getWhat3WordsLink(r.what3words)}" target="_blank">///what3words</a></div>` : ''}
+                    ${tags.length ? `<div class="card-tags">${tags.join('')}</div>` : ''}
+                    <div class="card-actions">
+                        <button class="btn" onclick="this.getRootNode().host.editTaste(${i})">MODIFICA</button>
+                        <button class="btn btn-danger" onclick="this.getRootNode().host.deleteTaste('${r.id}')">ELIMINA</button>
+                    </div>
+                </div>
+            `;
+        }).join('') + '</div>';
+    }
+
+    renderRoutes(c) {
+        if (!this.routesData.length) { c.innerHTML = '<p style="color:#666;">Nessuna tratta.</p>'; return; }
+        c.innerHTML = '<div class="grid">' + this.routesData.map((r, i) => `
+            <div class="card">
+                <div class="card-title">${r.start_point || '?'} → ${r.end_point || '?'}</div>
+                <div class="card-info">🚗 ${r.transport_type || '-'}</div>
+                <div class="card-info">⏱️ ${r.duration || '-'}</div>
+                ${r.price ? `<div class="card-info">💰 ${r.price}</div>` : ''}
+                <div class="card-actions">
+                    <button class="btn" onclick="this.getRootNode().host.editRoute(${i})">MODIFICA</button>
+                    <button class="btn btn-danger" onclick="this.getRootNode().host.deleteRoute('${r.id}')">ELIMINA</button>
+                </div>
+            </div>
+        `).join('') + '</div>';
+    }
+
+    renderStay(c) {
+        if (!this.stayData.length) { c.innerHTML = '<p style="color:#666;">Nessun hotel.</p>'; return; }
+        c.innerHTML = '<div class="grid">' + this.stayData.map((r, i) => `
+            <div class="card">
+                <div class="card-title">${r.name || 'N/A'}</div>
+                <div class="card-info">📍 ${r.location || '-'}</div>
+                <div class="card-info">🏨 ${r.type || 'Hotel'}</div>
+                ${r.phone ? `<div class="card-info">📞 ${r.phone}</div>` : ''}
+                <div class="card-actions">
+                    <button class="btn" onclick="this.getRootNode().host.editStay(${i})">MODIFICA</button>
+                    <button class="btn btn-danger" onclick="this.getRootNode().host.deleteStay('${r.id}')">ELIMINA</button>
+                </div>
+            </div>
+        `).join('') + '</div>';
+    }
+
+    renderTours(c) {
+        if (!this.toursData.length) { c.innerHTML = '<p style="color:#666;">Nessun tour.</p>'; return; }
+        c.innerHTML = '<div class="grid">' + this.toursData.map((t, i) => `
+            <div class="card" style="cursor:pointer;" onclick="this.getRootNode().host.showTour(${i})">
+                <div class="card-title">${t.name || 'Tour'}</div>
+                <div class="card-info">📅 ${t.start_date || '-'} → ${t.end_date || '-'}</div>
+                <div class="card-info">👥 ${t.passenger_count || 0} pax</div>
+                <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : 'Nessuna città'}</div>
+                <div style="margin-top:8px;font-size:11px;color:#00F0FF;">🌤️ Meteo | 🏗️ Builder →</div>
+            </div>
+        `).join('') + '</div>';
+    }
+
+    showTour(idx) {
+        const tour = this.toursData[idx];
+        if (!tour) return;
+
         this.currentTour = tour; // Store for tab switching
         this.shadowRoot.getElementById('node-list').style.display = 'none';
         this.shadowRoot.getElementById('node-detail').style.display = 'block';
@@ -829,401 +784,361 @@ export class DashboardFrame extends HTMLElement {
         this.shadowRoot.querySelectorAll('.view-tab').forEach(t => {
             if (t.dataset.view === 'weather') {
                 t.classList.add('active');
-                t.style.background = 'rgba(0,240,255,0.2)';
-                t.style.borderColor = 'rgba(0,240,255,0.4)';
+                t.style.borderColor = '#00F0FF';
+                t.style.color = '#00F0FF';
             } else {
                 t.classList.remove('active');
-                t.style.background = 'rgba(255,0,255,0.1)';
-                t.style.borderColor = 'rgba(255,0,255,0.3)';
+                t.style.borderColor = '#333';
+                t.style.color = '#888';
             }
         });
 
         // Load weather panel
-        const weatherPanel = this.shadowRoot.querySelector('tour-weather-panel');
-        if (weatherPanel) weatherPanel.loadTour(tour);
+        const panel = this.shadowRoot.querySelector('tour-weather-panel');
+        if (panel?.loadTour) panel.loadTour(tour);
     }
 
-    // === TASTES CRUD ===
-    renderTastesGrid(data) {
-        if (!data?.length) return '<p style="color:#8899aa;">Nessun ristorante nel database</p>';
-        return data.map((r,i) => `
-            <div class="card" data-id="${r.id}" data-idx="${i}">
-                <div class="card-actions">
-                    <button class="btn-edit" title="Modifica">✏️</button>
-                    <button class="btn-delete" title="Elimina">🗑️</button>
+    openModal(type, data = null) {
+        this.modalType = type;
+        this.modalData = data;
+        const form = this.shadowRoot.getElementById('crudForm');
+        this.shadowRoot.getElementById('modalTitle').textContent = data ? 'MODIFICA' : 'AGGIUNGI';
+
+        if (type === 'tastes') {
+            const cityInfo = data?.city ? getCityInfo(data.city) : null;
+            form.innerHTML = `
+                <!-- BASIC INFO -->
+                <div class="form-section">
+                    <div class="form-section-title">Informazioni Base</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome Ristorante *</label>
+                            <input name="name" value="${data?.name || ''}" required placeholder="Es: Trattoria da Mario">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo Ristorante</label>
+                            <select name="restaurant_type">
+                                <option value="">-- Seleziona --</option>
+                                ${RESTAURANT_TYPES.map(t => `<option value="${t}" ${data?.restaurant_type === t ? 'selected' : ''}>${t}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fascia Prezzo</label>
+                            <select name="price_range">
+                                <option value="">-- Seleziona --</option>
+                                ${PRICE_RANGES.map(p => `<option value="${p.value}" ${data?.price_range === p.value ? 'selected' : ''}>${p.label}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cucina</label>
+                            <input name="cuisine" value="${data?.cuisine || ''}" placeholder="Es: Romana, Toscana, Pesce...">
+                        </div>
+                    </div>
                 </div>
-                <h3>${r.name || 'N/A'}</h3>
-                <p>🌍 ${r.country || 'N/A'} › ${r.region || 'N/A'} › ${r.city || 'N/A'}</p>
-                <p>🍽️ ${r.cuisine || 'N/A'}</p>
-                ${r.address ? `<p>📍 ${r.address}</p>` : ''}
-                ${r.phone ? `<p>📞 ${r.phone}</p>` : ''}
-                ${r.rating_avg ? `<p>⭐ ${parseFloat(r.rating_avg).toFixed(1)}</p>` : ''}
-                ${r.notes ? `<p style="font-size:12px;color:#667788;margin-top:8px;">${r.notes}</p>` : ''}
-            </div>
-        `).join('');
-    }
 
-    filterTastes() {
-        const country = this.shadowRoot.getElementById('filterCountry').value;
-        const region = this.shadowRoot.getElementById('filterRegion').value;
-        const city = this.shadowRoot.getElementById('filterCity').value;
-
-        let filtered = this.tastesData;
-        if (country) filtered = filtered.filter(r => r.country === country);
-        if (region) filtered = filtered.filter(r => r.region === region);
-        if (city) filtered = filtered.filter(r => r.city === city);
-
-        this.shadowRoot.getElementById('tastesGrid').innerHTML = this.renderTastesGrid(filtered);
-        this.setupTasteCardListeners();
-    }
-
-    setupTasteCardListeners() {
-        this.shadowRoot.querySelectorAll('#tastesGrid .btn-edit').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                const card = btn.closest('.card');
-                const idx = parseInt(card.dataset.idx);
-                this.openTasteModal(this.tastesData[idx]);
-            };
-        });
-        this.shadowRoot.querySelectorAll('#tastesGrid .btn-delete').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                const card = btn.closest('.card');
-                const id = card.dataset.id;
-                if (confirm('Eliminare questo ristorante?')) {
-                    this.deleteTaste(id);
-                }
-            };
-        });
-    }
-
-    openTasteModal(taste = null) {
-        this.editingTaste = taste;
-        const modal = this.shadowRoot.getElementById('crudModal');
-        const title = this.shadowRoot.getElementById('modalTitle');
-        const body = this.shadowRoot.getElementById('modalBody');
-
-        title.textContent = taste ? 'Modifica Ristorante' : 'Nuovo Ristorante';
-        body.innerHTML = `
-            <div class="form-group">
-                <label>Nome *</label>
-                <input type="text" id="tasteName" value="${taste?.name || ''}" required>
-            </div>
-            <div class="form-group">
-                <label>Località (inizia a digitare...)</label>
-                <div class="osm-autocomplete-wrapper">
-                    <input type="text" id="tasteCity" value="${taste?.city || ''}" placeholder="Cerca città, paese, rifugio..." autocomplete="off">
+                <!-- LOCATION -->
+                <div class="form-section">
+                    <div class="form-section-title">Posizione</div>
+                    <div class="form-row">
+                        <div class="form-group city-autocomplete">
+                            <label>Città *</label>
+                            <input name="city" id="cityInput" value="${data?.city || ''}" autocomplete="off" placeholder="Digita per cercare...">
+                            <div class="city-suggestions" id="citySuggestions"></div>
+                            <div class="auto-detect-info" id="cityInfo" style="display:${cityInfo ? 'flex' : 'none'}">
+                                <span>Regione: <span class="value" id="regionValue">${cityInfo?.region || ''}</span></span>
+                                <span>Paese: <span class="value" id="countryValue">${cityInfo?.country || ''}</span></span>
+                            </div>
+                            <input type="hidden" name="region" id="regionInput" value="${cityInfo?.region || ''}">
+                            <input type="hidden" name="country" id="countryInput" value="${cityInfo?.country || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Indirizzo</label>
+                            <input name="address" value="${data?.address || ''}" placeholder="Via/Piazza...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Google Maps Link</label>
+                            <input name="google_maps" value="${data?.google_maps || ''}" placeholder="https://maps.google.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>What3Words</label>
+                            <input name="what3words" value="${data?.what3words || ''}" placeholder="///word.word.word">
+                        </div>
+                    </div>
                 </div>
-                <small style="color:#6b7280;font-size:11px;margin-top:4px;display:block;">Compila automaticamente nazione e regione</small>
-            </div>
-            <div class="form-group">
-                <label>Regione</label>
-                <input type="text" id="tasteRegion" value="${taste?.region || ''}" placeholder="Toscana">
-            </div>
-            <div class="form-group">
-                <label>Nazione</label>
-                <input type="text" id="tasteCountry" value="${taste?.country || ''}" placeholder="Italia">
-            </div>
-            <div class="form-group">
-                <label>Cucina</label>
-                <input type="text" id="tasteCuisine" value="${taste?.cuisine || ''}" placeholder="Italiana, Pesce, Pizza...">
-            </div>
-            <div class="form-group">
-                <label>Indirizzo</label>
-                <input type="text" id="tasteAddress" value="${taste?.address || ''}">
-            </div>
-            <div class="form-group">
-                <label>Telefono</label>
-                <input type="text" id="tastePhone" value="${taste?.phone || ''}">
-            </div>
-            <div class="form-group">
-                <label>Note</label>
-                <textarea id="tasteNotes">${taste?.notes || ''}</textarea>
-            </div>
-        `;
 
-        modal.classList.add('active');
+                <!-- CONTACT -->
+                <div class="form-section">
+                    <div class="form-section-title">Contatti</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Telefono Principale</label>
+                            <input name="phone" id="phoneInput" value="${data?.phone || ''}" placeholder="${cityInfo?.prefix || '+39'} ...">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input name="email" type="email" value="${data?.email || ''}" placeholder="info@ristorante.it">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contatto Aggiuntivo</label>
+                            <input name="contact_name" value="${data?.contact_name || ''}" placeholder="Nome referente">
+                        </div>
+                        <div class="form-group">
+                            <label>Tel. Aggiuntivo</label>
+                            <input name="contact_phone" value="${data?.contact_phone || ''}" placeholder="+39 ...">
+                        </div>
+                    </div>
+                </div>
 
-        // Setup autocomplete on city field
-        const cityInput = this.shadowRoot.getElementById('tasteCity');
-        if (cityInput) {
-            createShadowAutocomplete(this.shadowRoot, cityInput, {}, (result) => {
-                // Auto-fill country and region
-                if (result.country) {
-                    this.shadowRoot.getElementById('tasteCountry').value = result.country;
-                }
-                if (result.region) {
-                    this.shadowRoot.getElementById('tasteRegion').value = result.region;
-                }
-            });
+                <!-- BUSINESS TERMS -->
+                <div class="form-section">
+                    <div class="form-section-title">Condizioni Commerciali</div>
+                    <div class="form-row three">
+                        <div class="form-group">
+                            <label>TL Free</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="tl_free" id="tlFree" ${data?.tl_free ? 'checked' : ''}>
+                                    <label for="tlFree">Tour Leader Gratuito</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Commissione %</label>
+                            <input name="commission" type="number" min="0" max="100" value="${data?.commission || ''}" placeholder="Es: 10">
+                        </div>
+                        <div class="form-group">
+                            <label>Sconto %</label>
+                            <input name="discount" type="number" min="0" max="100" value="${data?.discount || ''}" placeholder="Es: 15">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTES -->
+                <div class="form-section">
+                    <div class="form-section-title">Note</div>
+                    <div class="form-group">
+                        <textarea name="notes" placeholder="Note aggiuntive, orari, specialità...">${data?.notes || ''}</textarea>
+                    </div>
+                </div>
+            `;
+            // Setup city autocomplete
+            this.setupCityAutocomplete();
+        } else if (type === 'routes') {
+            form.innerHTML = `
+                <div class="form-section">
+                    <div class="form-section-title">Tratta</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Partenza *</label>
+                            <input name="start_point" value="${data?.start_point || ''}" required placeholder="Es: Roma Termini">
+                        </div>
+                        <div class="form-group">
+                            <label>Arrivo *</label>
+                            <input name="end_point" value="${data?.end_point || ''}" required placeholder="Es: Firenze SMN">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo Trasporto</label>
+                            <select name="transport_type">
+                                <option value="">-- Seleziona --</option>
+                                <option value="Treno AV" ${data?.transport_type === 'Treno AV' ? 'selected' : ''}>Treno Alta Velocità</option>
+                                <option value="Treno Regionale" ${data?.transport_type === 'Treno Regionale' ? 'selected' : ''}>Treno Regionale</option>
+                                <option value="Bus" ${data?.transport_type === 'Bus' ? 'selected' : ''}>Bus</option>
+                                <option value="Pullman GT" ${data?.transport_type === 'Pullman GT' ? 'selected' : ''}>Pullman GT</option>
+                                <option value="Traghetto" ${data?.transport_type === 'Traghetto' ? 'selected' : ''}>Traghetto</option>
+                                <option value="Aereo" ${data?.transport_type === 'Aereo' ? 'selected' : ''}>Aereo</option>
+                                <option value="Transfer Privato" ${data?.transport_type === 'Transfer Privato' ? 'selected' : ''}>Transfer Privato</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Durata</label>
+                            <input name="duration" value="${data?.duration || ''}" placeholder="Es: 1h 30min">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Prezzo</label>
+                            <input name="price" value="${data?.price || ''}" placeholder="Es: €45">
+                        </div>
+                        <div class="form-group">
+                            <label>Fornitore</label>
+                            <input name="supplier" value="${data?.supplier || ''}" placeholder="Es: Trenitalia">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Note</div>
+                    <div class="form-group">
+                        <textarea name="notes" placeholder="Note aggiuntive...">${data?.notes || ''}</textarea>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'stay') {
+            form.innerHTML = `
+                <div class="form-section">
+                    <div class="form-section-title">Struttura</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome Hotel *</label>
+                            <input name="name" value="${data?.name || ''}" required placeholder="Es: Grand Hotel Roma">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select name="type">
+                                <option value="Hotel" ${data?.type === 'Hotel' ? 'selected' : ''}>Hotel</option>
+                                <option value="B&B" ${data?.type === 'B&B' ? 'selected' : ''}>B&B</option>
+                                <option value="Appartamento" ${data?.type === 'Appartamento' ? 'selected' : ''}>Appartamento</option>
+                                <option value="Resort" ${data?.type === 'Resort' ? 'selected' : ''}>Resort</option>
+                                <option value="Agriturismo" ${data?.type === 'Agriturismo' ? 'selected' : ''}>Agriturismo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Località</label>
+                            <input name="location" value="${data?.location || ''}" placeholder="Es: Roma Centro">
+                        </div>
+                        <div class="form-group">
+                            <label>Indirizzo</label>
+                            <input name="address" value="${data?.address || ''}" placeholder="Via...">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Contatti</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Telefono</label>
+                            <input name="phone" value="${data?.phone || ''}" placeholder="+39 ...">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input name="email" type="email" value="${data?.email || ''}" placeholder="info@hotel.it">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <div class="form-section-title">Note</div>
+                    <div class="form-group">
+                        <textarea name="notes" placeholder="Note aggiuntive, servizi inclusi...">${data?.notes || ''}</textarea>
+                    </div>
+                </div>
+            `;
         }
-
-        // Modal buttons
-        this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveTaste();
+        this.shadowRoot.getElementById('crudModal').classList.add('active');
     }
 
-    async saveTaste() {
-        const name = this.shadowRoot.getElementById('tasteName').value.trim();
-        if (!name) return alert('Il nome è obbligatorio');
+    setupCityAutocomplete() {
+        const cityInput = this.shadowRoot.getElementById('cityInput');
+        const suggestions = this.shadowRoot.getElementById('citySuggestions');
+        const cityInfo = this.shadowRoot.getElementById('cityInfo');
+        const regionValue = this.shadowRoot.getElementById('regionValue');
+        const countryValue = this.shadowRoot.getElementById('countryValue');
+        const regionInput = this.shadowRoot.getElementById('regionInput');
+        const countryInput = this.shadowRoot.getElementById('countryInput');
+        const phoneInput = this.shadowRoot.getElementById('phoneInput');
 
-        const data = {
-            name,
-            country: this.shadowRoot.getElementById('tasteCountry').value.trim() || null,
-            region: this.shadowRoot.getElementById('tasteRegion').value.trim() || null,
-            city: this.shadowRoot.getElementById('tasteCity').value.trim() || null,
-            cuisine: this.shadowRoot.getElementById('tasteCuisine').value.trim() || null,
-            address: this.shadowRoot.getElementById('tasteAddress').value.trim() || null,
-            phone: this.shadowRoot.getElementById('tastePhone').value.trim() || null,
-            notes: this.shadowRoot.getElementById('tasteNotes').value.trim() || null
-        };
+        if (!cityInput) return;
 
-        try {
-            if (this.editingTaste) {
-                await window.supabaseClient.from('blueriot_tastes').update(data).eq('id', this.editingTaste.id);
-            } else {
-                await window.supabaseClient.from('blueriot_tastes').insert(data);
+        cityInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            if (query.length < 2) {
+                suggestions.classList.remove('active');
+                return;
             }
-            this.shadowRoot.getElementById('crudModal').classList.remove('active');
-            this.load('tastes');
-        } catch (err) {
-            alert('Errore: ' + err.message);
-        }
-    }
 
-    async deleteTaste(id) {
-        try {
-            await window.supabaseClient.from('blueriot_tastes').delete().eq('id', id);
-            this.load('tastes');
-        } catch (err) {
-            alert('Errore: ' + err.message);
-        }
-    }
+            const results = searchCities(query);
+            if (results.length === 0) {
+                suggestions.classList.remove('active');
+                return;
+            }
 
-    // === ROUTES CRUD ===
-    renderRoutesGrid(data) {
-        if (!data?.length) return '<p style="color:#8899aa;">Nessuna tratta nel database</p>';
-        return data.map((r,i) => `
-            <div class="card" data-id="${r.id}" data-idx="${i}">
-                <div class="card-actions">
-                    <button class="btn-edit" title="Modifica">✏️</button>
-                    <button class="btn-delete" title="Elimina">🗑️</button>
+            suggestions.innerHTML = results.map(city => `
+                <div class="city-suggestion" data-city="${city.name}" data-region="${city.region}" data-country="${city.country}" data-prefix="${city.prefix}">
+                    <span class="name">${city.name}</span>
+                    <span class="region">${city.region}, ${city.country}</span>
                 </div>
-                <h3>${r.start_point||'?'} → ${r.end_point||'?'}</h3>
-                <p>🚌 ${r.transport_type||'N/A'}</p>
-                <p>🏢 ${r.operator_name||'N/A'}</p>
-                <p>⏱️ ${r.duration||'N/A'}</p>
-                ${r.price ? `<p>💰 ${r.price}</p>` : ''}
-                ${r.notes ? `<p style="font-size:12px;color:#667788;margin-top:8px;">${r.notes}</p>` : ''}
-            </div>
-        `).join('');
-    }
+            `).join('');
+            suggestions.classList.add('active');
 
-    filterRoutes() {
-        const type = this.shadowRoot.getElementById('filterRouteType').value;
-        let filtered = this.routesData;
-        if (type) filtered = filtered.filter(r => r.transport_type === type);
-        this.shadowRoot.getElementById('routesGrid').innerHTML = this.renderRoutesGrid(filtered);
-        this.setupRouteCardListeners();
-    }
+            // Add click handlers
+            suggestions.querySelectorAll('.city-suggestion').forEach(item => {
+                item.onclick = () => {
+                    cityInput.value = item.dataset.city;
+                    regionValue.textContent = item.dataset.region;
+                    countryValue.textContent = item.dataset.country;
+                    regionInput.value = item.dataset.region;
+                    countryInput.value = item.dataset.country;
+                    cityInfo.style.display = 'flex';
+                    suggestions.classList.remove('active');
 
-    setupRouteCardListeners() {
-        this.shadowRoot.querySelectorAll('#routesGrid .btn-edit').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); const idx = parseInt(btn.closest('.card').dataset.idx); this.openRouteModal(this.routesData[idx]); };
-        });
-        this.shadowRoot.querySelectorAll('#routesGrid .btn-delete').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); if(confirm('Eliminare questa tratta?')) this.deleteRoute(btn.closest('.card').dataset.id); };
-        });
-    }
-
-    openRouteModal(route = null) {
-        this.editingRoute = route;
-        const modal = this.shadowRoot.getElementById('crudModal');
-        this.shadowRoot.getElementById('modalTitle').textContent = route ? 'Modifica Tratta' : 'Nuova Tratta';
-        this.shadowRoot.getElementById('modalBody').innerHTML = `
-            <div class="form-group">
-                <label>Partenza * (inizia a digitare...)</label>
-                <div class="osm-autocomplete-wrapper">
-                    <input type="text" id="routeStart" value="${route?.start_point||''}" placeholder="Cerca località..." autocomplete="off" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Arrivo * (inizia a digitare...)</label>
-                <div class="osm-autocomplete-wrapper">
-                    <input type="text" id="routeEnd" value="${route?.end_point||''}" placeholder="Cerca località..." autocomplete="off" required>
-                </div>
-            </div>
-            <div class="form-group"><label>Tipo Trasporto</label>
-                <select id="routeType">
-                    <option value="">Seleziona...</option>
-                    <option value="Bus" ${route?.transport_type==='Bus'?'selected':''}>🚌 Bus</option>
-                    <option value="Train" ${route?.transport_type==='Train'?'selected':''}>🚂 Treno</option>
-                    <option value="Ferry" ${route?.transport_type==='Ferry'?'selected':''}>⛴️ Traghetto</option>
-                    <option value="Taxi" ${route?.transport_type==='Taxi'?'selected':''}>🚕 Taxi</option>
-                    <option value="Flight" ${route?.transport_type==='Flight'?'selected':''}>✈️ Aereo</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Operatore</label><input type="text" id="routeOperator" value="${route?.operator_name||''}"></div>
-            <div class="form-group"><label>Durata</label><input type="text" id="routeDuration" value="${route?.duration||''}" placeholder="2h 30m"></div>
-            <div class="form-group"><label>Prezzo</label><input type="text" id="routePrice" value="${route?.price||''}"></div>
-            <div class="form-group"><label>Note</label><textarea id="routeNotes">${route?.notes||''}</textarea></div>
-        `;
-        modal.classList.add('active');
-
-        // Setup autocomplete on start and end fields
-        const startInput = this.shadowRoot.getElementById('routeStart');
-        const endInput = this.shadowRoot.getElementById('routeEnd');
-        if (startInput) createShadowAutocomplete(this.shadowRoot, startInput);
-        if (endInput) createShadowAutocomplete(this.shadowRoot, endInput);
-
-        this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveRoute();
-    }
-
-    async saveRoute() {
-        const start = this.shadowRoot.getElementById('routeStart').value.trim();
-        const end = this.shadowRoot.getElementById('routeEnd').value.trim();
-        if (!start || !end) return alert('Partenza e arrivo sono obbligatori');
-        const data = {
-            start_point: start, end_point: end,
-            transport_type: this.shadowRoot.getElementById('routeType').value || null,
-            operator_name: this.shadowRoot.getElementById('routeOperator').value.trim() || null,
-            duration: this.shadowRoot.getElementById('routeDuration').value.trim() || null,
-            price: this.shadowRoot.getElementById('routePrice').value.trim() || null,
-            notes: this.shadowRoot.getElementById('routeNotes').value.trim() || null
-        };
-        try {
-            if (this.editingRoute) await window.supabaseClient.from('blueriot_routes').update(data).eq('id', this.editingRoute.id);
-            else await window.supabaseClient.from('blueriot_routes').insert(data);
-            this.shadowRoot.getElementById('crudModal').classList.remove('active');
-            this.load('routes');
-        } catch (err) { alert('Errore: ' + err.message); }
-    }
-
-    async deleteRoute(id) {
-        try { await window.supabaseClient.from('blueriot_routes').delete().eq('id', id); this.load('routes'); }
-        catch (err) { alert('Errore: ' + err.message); }
-    }
-
-    // === STAY CRUD ===
-    renderStayGrid(data) {
-        if (!data?.length) return '<p style="color:#8899aa;">Nessun hotel nel database</p>';
-        return data.map((h,i) => `
-            <div class="card" data-id="${h.id}" data-idx="${i}">
-                <div class="card-actions">
-                    <button class="btn-edit" title="Modifica">✏️</button>
-                    <button class="btn-delete" title="Elimina">🗑️</button>
-                </div>
-                <h3>${h.name||'N/A'}</h3>
-                <p>🌍 ${h.country||'N/A'} › ${h.region||'N/A'} › ${h.location||'N/A'}</p>
-                <p>🏨 ${h.type||'Hotel'}</p>
-                ${h.address ? `<p>📍 ${h.address}</p>` : ''}
-                ${h.phone ? `<p>📞 ${h.phone}</p>` : ''}
-                ${h.price_range ? `<p>💰 ${h.price_range}</p>` : ''}
-                ${h.notes ? `<p style="font-size:12px;color:#667788;margin-top:8px;">${h.notes}</p>` : ''}
-            </div>
-        `).join('');
-    }
-
-    filterStay() {
-        const country = this.shadowRoot.getElementById('filterStayCountry').value;
-        const region = this.shadowRoot.getElementById('filterStayRegion').value;
-        const city = this.shadowRoot.getElementById('filterStayCity').value;
-        let filtered = this.stayData;
-        if (country) filtered = filtered.filter(h => h.country === country);
-        if (region) filtered = filtered.filter(h => h.region === region);
-        if (city) filtered = filtered.filter(h => h.location === city);
-        this.shadowRoot.getElementById('stayGrid').innerHTML = this.renderStayGrid(filtered);
-        this.setupStayCardListeners();
-    }
-
-    setupStayCardListeners() {
-        this.shadowRoot.querySelectorAll('#stayGrid .btn-edit').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); const idx = parseInt(btn.closest('.card').dataset.idx); this.openStayModal(this.stayData[idx]); };
-        });
-        this.shadowRoot.querySelectorAll('#stayGrid .btn-delete').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); if(confirm('Eliminare questo hotel?')) this.deleteStay(btn.closest('.card').dataset.id); };
-        });
-    }
-
-    openStayModal(stay = null) {
-        this.editingStay = stay;
-        const modal = this.shadowRoot.getElementById('crudModal');
-        this.shadowRoot.getElementById('modalTitle').textContent = stay ? 'Modifica Hotel' : 'Nuovo Hotel';
-        this.shadowRoot.getElementById('modalBody').innerHTML = `
-            <div class="form-group"><label>Nome *</label><input type="text" id="stayName" value="${stay?.name||''}" required></div>
-            <div class="form-group">
-                <label>Località (inizia a digitare...)</label>
-                <div class="osm-autocomplete-wrapper">
-                    <input type="text" id="stayCity" value="${stay?.location||''}" placeholder="Cerca città, paese..." autocomplete="off">
-                </div>
-                <small style="color:#6b7280;font-size:11px;margin-top:4px;display:block;">Compila automaticamente nazione e regione</small>
-            </div>
-            <div class="form-group"><label>Regione</label><input type="text" id="stayRegion" value="${stay?.region||''}" placeholder="Toscana"></div>
-            <div class="form-group"><label>Nazione</label><input type="text" id="stayCountry" value="${stay?.country||''}" placeholder="Italia"></div>
-            <div class="form-group"><label>Tipo</label>
-                <select id="stayType">
-                    <option value="Hotel" ${stay?.type==='Hotel'?'selected':''}>🏨 Hotel</option>
-                    <option value="B&B" ${stay?.type==='B&B'?'selected':''}>🛏️ B&B</option>
-                    <option value="Agriturismo" ${stay?.type==='Agriturismo'?'selected':''}>🌾 Agriturismo</option>
-                    <option value="Resort" ${stay?.type==='Resort'?'selected':''}>🏖️ Resort</option>
-                    <option value="Ostello" ${stay?.type==='Ostello'?'selected':''}>🎒 Ostello</option>
-                </select>
-            </div>
-            <div class="form-group"><label>Indirizzo</label><input type="text" id="stayAddress" value="${stay?.address||''}"></div>
-            <div class="form-group"><label>Telefono</label><input type="text" id="stayPhone" value="${stay?.phone||''}"></div>
-            <div class="form-group"><label>Fascia Prezzo</label><input type="text" id="stayPrice" value="${stay?.price_range||''}" placeholder="€€€"></div>
-            <div class="form-group"><label>Note</label><textarea id="stayNotes">${stay?.notes||''}</textarea></div>
-        `;
-        modal.classList.add('active');
-
-        // Setup autocomplete on city field
-        const cityInput = this.shadowRoot.getElementById('stayCity');
-        if (cityInput) {
-            createShadowAutocomplete(this.shadowRoot, cityInput, {}, (result) => {
-                // Auto-fill country and region
-                if (result.country) {
-                    this.shadowRoot.getElementById('stayCountry').value = result.country;
-                }
-                if (result.region) {
-                    this.shadowRoot.getElementById('stayRegion').value = result.region;
-                }
+                    // Update phone prefix
+                    if (phoneInput && !phoneInput.value) {
+                        phoneInput.placeholder = `${item.dataset.prefix} ...`;
+                    }
+                };
             });
+        });
+
+        // Close suggestions on click outside
+        document.addEventListener('click', (e) => {
+            if (!cityInput.contains(e.target) && !suggestions.contains(e.target)) {
+                suggestions.classList.remove('active');
+            }
+        });
+    }
+
+    closeModal() { this.shadowRoot.getElementById('crudModal').classList.remove('active'); }
+
+    async saveModal() {
+        const form = this.shadowRoot.getElementById('crudForm');
+        const formData = new FormData(form);
+        const obj = {};
+
+        // Handle form data properly
+        formData.forEach((value, key) => {
+            if (key === 'tl_free') {
+                obj[key] = true;
+            } else if (key === 'commission' || key === 'discount') {
+                obj[key] = value ? parseFloat(value) : null;
+            } else {
+                obj[key] = value || null;
+            }
+        });
+
+        // Handle checkbox if unchecked
+        if (this.modalType === 'tastes' && !formData.has('tl_free')) {
+            obj.tl_free = false;
         }
 
-        this.shadowRoot.getElementById('modalClose').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalCancel').onclick = () => modal.classList.remove('active');
-        this.shadowRoot.getElementById('modalSave').onclick = () => this.saveStay();
-    }
+        const table = this.modalType === 'tastes' ? 'blueriot_tastes' : this.modalType === 'routes' ? 'blueriot_routes' : 'blueriot_stay';
 
-    async saveStay() {
-        const name = this.shadowRoot.getElementById('stayName').value.trim();
-        if (!name) return alert('Il nome è obbligatorio');
-        const data = {
-            name,
-            country: this.shadowRoot.getElementById('stayCountry').value.trim() || null,
-            region: this.shadowRoot.getElementById('stayRegion').value.trim() || null,
-            location: this.shadowRoot.getElementById('stayCity').value.trim() || null,
-            type: this.shadowRoot.getElementById('stayType').value || 'Hotel',
-            address: this.shadowRoot.getElementById('stayAddress').value.trim() || null,
-            phone: this.shadowRoot.getElementById('stayPhone').value.trim() || null,
-            price_range: this.shadowRoot.getElementById('stayPrice').value.trim() || null,
-            notes: this.shadowRoot.getElementById('stayNotes').value.trim() || null
-        };
         try {
-            if (this.editingStay) await window.supabaseClient.from('blueriot_stay').update(data).eq('id', this.editingStay.id);
-            else await window.supabaseClient.from('blueriot_stay').insert(data);
-            this.shadowRoot.getElementById('crudModal').classList.remove('active');
-            this.load('stay');
-        } catch (err) { alert('Errore: ' + err.message); }
+            if (this.modalData?.id) {
+                await window.supabaseClient.from(table).update(obj).eq('id', this.modalData.id);
+            } else {
+                await window.supabaseClient.from(table).insert([obj]);
+            }
+            this.closeModal();
+            this.loadedSections.delete(this.modalType);
+            this.load(this.modalType, true);
+        } catch (e) { alert('Errore: ' + e.message); }
     }
 
-    async deleteStay(id) {
-        try { await window.supabaseClient.from('blueriot_stay').delete().eq('id', id); this.load('stay'); }
-        catch (err) { alert('Errore: ' + err.message); }
-    }
+    editTaste(i) { this.openModal('tastes', this.tastesData[i]); }
+    editRoute(i) { this.openModal('routes', this.routesData[i]); }
+    editStay(i) { this.openModal('stay', this.stayData[i]); }
+
+    async deleteTaste(id) { if (confirm('Eliminare?')) { await window.supabaseClient.from('blueriot_tastes').delete().eq('id', id); this.loadedSections.delete('tastes'); this.load('tastes', true); } }
+    async deleteRoute(id) { if (confirm('Eliminare?')) { await window.supabaseClient.from('blueriot_routes').delete().eq('id', id); this.loadedSections.delete('routes'); this.load('routes', true); } }
+    async deleteStay(id) { if (confirm('Eliminare?')) { await window.supabaseClient.from('blueriot_stay').delete().eq('id', id); this.loadedSections.delete('stay'); this.load('stay', true); } }
 }
+
 customElements.define('dashboard-frame', DashboardFrame);

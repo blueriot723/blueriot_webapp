@@ -1,7 +1,7 @@
 /**
- * Dashboard - BlueRiot Cyberpunk Style
- * VERSION: 2024-12-10-v9
- * Brand Identity: Greek Letters + Orbitron Font
+ * Dashboard - BlueRiot Bubble Cute Style
+ * VERSION: 2024-12-11-v1
+ * Clean black design, no glow, bubble font
  */
 import { auth } from '../utils/auth.js';
 import { getCityInfo, searchCities, getPhonePrefix, getGoogleMapsLink, getWhat3WordsLink } from '../utils/cities-db.js';
@@ -10,7 +10,7 @@ import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
 import './tour-builder-panel.js';
 
-const VERSION = '2024-12-10-v9';
+const VERSION = '2024-12-11-v1';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
 
 // Restaurant types
@@ -64,27 +64,27 @@ export class DashboardFrame extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                /* ORBITRON FONT */
-                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+                /* QUICKSAND BUBBLE FONT */
+                @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
 
-                /* BLUERIOT CYBERPUNK THEME */
+                /* BLUERIOT CLEAN BLACK THEME - NO GLOW */
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 :host {
                     display: block;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
                     font-size: 14px;
-                    background: #0A0A0A;
+                    background: #000;
                     color: #eee;
                     min-height: 100vh;
                 }
 
                 .container { display: flex; min-height: 100vh; }
 
-                /* SIDEBAR - PURE BLACK */
+                /* SIDEBAR - PURE BLACK, NO GLOW */
                 .sidebar {
                     width: 220px;
-                    background: #000000;
-                    border-right: 1px solid #222;
+                    background: #000;
+                    border-right: 1px solid #1a1a1a;
                     padding: 20px 15px;
                     display: flex;
                     flex-direction: column;
@@ -92,17 +92,22 @@ export class DashboardFrame extends HTMLElement {
 
                 .logo {
                     text-align: center;
-                    padding-bottom: 20px;
+                    padding: 15px;
                     margin-bottom: 20px;
-                    border-bottom: 1px solid #222;
+                    background: #000;
                 }
-                .logo img { max-width: 100px; height: auto; opacity: 0.9; }
+                .logo img {
+                    max-width: 120px;
+                    height: auto;
+                    display: block;
+                    margin: 0 auto 10px;
+                }
                 .logo-text {
-                    font-family: 'Orbitron', sans-serif;
-                    font-size: 18px;
+                    font-family: 'Quicksand', sans-serif;
+                    font-size: 20px;
                     font-weight: 700;
-                    color: #00F0FF;
-                    letter-spacing: 2px;
+                    color: #00D4E8;
+                    letter-spacing: 3px;
                 }
 
                 .nav { list-style: none; flex: 1; }
@@ -110,60 +115,59 @@ export class DashboardFrame extends HTMLElement {
                     padding: 14px 15px;
                     margin-bottom: 5px;
                     cursor: pointer;
-                    color: #666;
-                    border-radius: 4px;
-                    font-family: 'Orbitron', sans-serif;
-                    font-size: 12px;
-                    font-weight: 500;
+                    color: #555;
+                    border-radius: 12px;
+                    font-family: 'Quicksand', sans-serif;
+                    font-size: 13px;
+                    font-weight: 600;
                     letter-spacing: 1px;
                     transition: all 0.2s ease;
                 }
                 .nav-item:hover {
                     background: #111;
-                    color: #00F0FF;
-                    border-left: 2px solid #00F0FF;
+                    color: #00D4E8;
                 }
                 .nav-item.active {
-                    background: #0A0A0A;
-                    color: #00F0FF;
-                    border-left: 2px solid #00F0FF;
+                    background: #111;
+                    color: #00D4E8;
                 }
 
-                .nav-divider { border-top: 1px solid #222; margin: 15px 0; }
+                .nav-divider { border-top: 1px solid #1a1a1a; margin: 15px 0; }
 
                 .logout-btn {
-                    padding: 10px;
-                    background: transparent;
-                    border: 1px solid #333;
+                    padding: 12px;
+                    background: #111;
+                    border: none;
                     color: #666;
                     cursor: pointer;
-                    border-radius: 4px;
-                    font-family: 'Orbitron', sans-serif;
-                    font-size: 10px;
+                    border-radius: 12px;
+                    font-family: 'Quicksand', sans-serif;
+                    font-size: 11px;
+                    font-weight: 600;
                     letter-spacing: 1px;
                     transition: all 0.2s ease;
                 }
-                .logout-btn:hover { border-color: #00F0FF; color: #00F0FF; }
+                .logout-btn:hover { background: #1a1a1a; color: #fff; }
 
                 /* MAIN CONTENT */
-                .main { flex: 1; padding: 25px; overflow-y: auto; background: #0A0A0A; }
+                .main { flex: 1; padding: 25px; overflow-y: auto; background: #0a0a0a; }
 
                 .page { display: none; }
                 .page.active { display: block; }
 
                 h1 {
-                    font-family: 'Orbitron', sans-serif;
-                    font-size: 22px;
-                    font-weight: 600;
+                    font-family: 'Quicksand', sans-serif;
+                    font-size: 24px;
+                    font-weight: 700;
                     margin-bottom: 20px;
-                    color: #00F0FF;
+                    color: #00D4E8;
                     letter-spacing: 2px;
                 }
 
                 .content-box {
-                    background: #111111;
-                    border: 1px solid #222;
-                    border-radius: 6px;
+                    background: #0f0f0f;
+                    border: 1px solid #1a1a1a;
+                    border-radius: 16px;
                     padding: 20px;
                     margin-bottom: 20px;
                 }
@@ -176,28 +180,43 @@ export class DashboardFrame extends HTMLElement {
                 }
 
                 .card {
-                    background: #0F0F0F;
-                    border: 1px solid #222;
-                    border-radius: 6px;
+                    background: #0f0f0f;
+                    border: 1px solid #1a1a1a;
+                    border-radius: 16px;
                     padding: 18px;
                     transition: all 0.2s ease;
+                    position: relative;
                 }
                 .card:hover {
-                    border-color: #00F0FF;
-                    box-shadow: 0 0 15px rgba(0,240,255,0.1);
+                    border-color: #333;
+                    background: #111;
                 }
                 .card-title {
-                    font-family: 'Orbitron', sans-serif;
-                    font-size: 14px;
-                    font-weight: 600;
+                    font-family: 'Quicksand', sans-serif;
+                    font-size: 15px;
+                    font-weight: 700;
                     color: #fff;
                     margin-bottom: 10px;
-                    letter-spacing: 1px;
                 }
-                .card-info { font-size: 13px; color: #888; margin: 6px 0; }
-                .card-info a { color: #00F0FF; text-decoration: none; }
+                .card-info { font-size: 13px; color: #666; margin: 6px 0; }
+                .card-info a { color: #00D4E8; text-decoration: none; }
                 .card-info a:hover { text-decoration: underline; }
                 .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+                .card-delete {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    background: #1a1a1a;
+                    border: none;
+                    color: #666;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: all 0.2s;
+                }
+                .card-delete:hover { background: #ff4444; color: #fff; }
                 .card-tag {
                     background: #1a1a1a;
                     border: 1px solid #333;
@@ -751,13 +770,34 @@ export class DashboardFrame extends HTMLElement {
     renderTours(c) {
         if (!this.toursData.length) { c.innerHTML = '<p style="color:#666;">Nessun tour.</p>'; return; }
         c.innerHTML = '<div class="grid">' + this.toursData.map((t, i) => `
-            <div class="card" style="cursor:pointer;" onclick="this.getRootNode().host.showTour(${i})">
-                <div class="card-title">${t.name || 'Tour'}</div>
-                <div class="card-info">📅 ${t.start_date || '-'} → ${t.end_date || '-'}</div>
-                <div class="card-info">👥 ${t.passenger_count || 0} pax</div>
-                <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : 'Nessuna città'}</div>
+            <div class="card tour-card" data-tour-id="${t.id}" data-idx="${i}">
+                <button class="card-delete" onclick="event.stopPropagation(); this.getRootNode().host.deleteTour('${t.id}')" title="Elimina tour">×</button>
+                <div class="card-content" style="cursor:pointer;" onclick="this.getRootNode().host.showTour(${i})">
+                    <div class="card-title">${t.name || 'Tour'}</div>
+                    <div class="card-info">📅 ${t.start_date || '-'} → ${t.end_date || '-'}</div>
+                    <div class="card-info">👥 ${t.passenger_count || 0} pax</div>
+                    <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : 'Nessuna città'}</div>
+                    <div class="card-info" style="margin-top:10px;color:#00D4E8;">🌤️ Meteo | 🏗️ Builder →</div>
+                </div>
             </div>
         `).join('') + '</div>';
+    }
+
+    async deleteTour(tourId) {
+        if (!confirm('Sei sicuro di voler eliminare questo tour?')) return;
+        try {
+            // Delete tour days first
+            await window.supabaseClient.from('tour_days').delete().eq('tour_id', tourId);
+            // Then delete the tour
+            const { error } = await window.supabaseClient.from('tours').delete().eq('id', tourId);
+            if (error) throw error;
+            // Refresh the list
+            this.loadedSections.delete('node');
+            this.load('node');
+        } catch (e) {
+            console.error('Delete tour error:', e);
+            alert('Errore eliminazione: ' + e.message);
+        }
     }
 
     showTour(idx) {

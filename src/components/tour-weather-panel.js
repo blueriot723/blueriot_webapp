@@ -1,6 +1,6 @@
 /**
- * Tour Weather Panel - BlueRiot Cyberpunk Style
- * VERSION: 2024-12-10-v9
+ * Tour Weather Panel - BlueRiot Bubble Cute Style
+ * VERSION: 2024-12-11-v1
  */
 import { getWeatherForecast, getWeatherSummary, formatTemp } from '../utils/weather.js';
 
@@ -22,29 +22,29 @@ export class TourWeatherPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
 
                 * { box-sizing: border-box; margin: 0; padding: 0; }
                 :host {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, sans-serif;
                     font-size: 14px;
                     color: #eee;
                 }
 
                 .back-btn {
                     background: #111;
-                    border: 1px solid #333;
+                    border: none;
                     color: #888;
-                    padding: 10px 16px;
-                    border-radius: 4px;
+                    padding: 12px 18px;
+                    border-radius: 12px;
                     cursor: pointer;
-                    font-family: 'Orbitron', sans-serif;
-                    font-size: 11px;
-                    letter-spacing: 1px;
+                    font-family: 'Quicksand', sans-serif;
+                    font-size: 12px;
+                    font-weight: 600;
                     margin-bottom: 20px;
                     transition: all 0.2s ease;
                 }
-                .back-btn:hover { background: #1a1a1a; color: #00F0FF; border-color: #00F0FF; }
+                .back-btn:hover { background: #1a1a1a; color: #00D4E8; }
 
                 .tour-header {
                     background: #111111;

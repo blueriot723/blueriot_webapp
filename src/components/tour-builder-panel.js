@@ -1,9 +1,9 @@
 /**
  * Tour Builder Panel - Drag & Drop tour builder with TASTES and STAY integration
- * VERSION: 2024-12-11-v1
+ * VERSION: 2024-12-11-v2 - Quicksand bubble font
  */
 import { getWeatherForecast, formatTemp } from '../utils/weather.js';
-import { createShadowAutocomplete } from '../utils/geocoding.js';
+import { searchCities, getCityInfo } from '../utils/cities-db.js';
 
 export class TourBuilderPanel extends HTMLElement {
     constructor() {
@@ -42,15 +42,17 @@ export class TourBuilderPanel extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
+                @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
                 * { box-sizing: border-box; margin: 0; padding: 0; }
 
                 :host {
-                    --neon-cyan: #00e5ff;
-                    --neon-fuchsia: #ff00ff;
-                    --neon-pink: #ff4fd8;
-                    --bg-dark: #0a0e27;
-                    --bg-darker: #050510;
-                    --text-gray: #6b7280;
+                    --cyan: #00D4E8;
+                    --pink: #E84D9C;
+                    --bg-dark: #0a0a0a;
+                    --bg-darker: #000;
+                    --text-gray: #666;
+                    font-family: 'Quicksand', sans-serif;
                 }
 
                 .builder-container {
@@ -62,26 +64,28 @@ export class TourBuilderPanel extends HTMLElement {
 
                 /* === BACK BUTTON === */
                 .back-btn {
-                    background: rgba(0, 240, 255, 0.1);
-                    border: 1px solid rgba(0, 240, 255, 0.3);
-                    color: #00f0ff;
-                    padding: 10px 20px;
-                    border-radius: 6px;
+                    background: #111;
+                    border: none;
+                    color: #888;
+                    padding: 12px 18px;
+                    border-radius: 12px;
                     cursor: pointer;
-                    font-size: 14px;
+                    font-family: 'Quicksand', sans-serif;
+                    font-size: 12px;
+                    font-weight: 600;
                     margin-bottom: 20px;
                     transition: all 0.2s ease;
                 }
                 .back-btn:hover {
-                    background: rgba(0, 240, 255, 0.2);
-                    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+                    background: #1a1a1a;
+                    color: var(--cyan);
                 }
 
                 /* === PALETTE SIDEBAR === */
                 .palette {
                     background: var(--bg-darker);
-                    border: 1px solid rgba(0, 240, 255, 0.2);
-                    border-radius: 12px;
+                    border: 1px solid #1a1a1a;
+                    border-radius: 16px;
                     padding: 16px;
                     max-height: calc(100vh - 200px);
                     overflow-y: auto;

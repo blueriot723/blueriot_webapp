@@ -621,12 +621,14 @@ export class DashboardFrame extends HTMLElement {
         tabs.forEach(t => {
             if (t.dataset.view === view) {
                 t.classList.add('active');
-                t.style.background = view === 'weather' ? 'rgba(0,240,255,0.2)' : 'rgba(255,0,255,0.2)';
-                t.style.borderColor = view === 'weather' ? 'rgba(0,240,255,0.4)' : 'rgba(255,0,255,0.4)';
+                t.style.background = '#111';
+                t.style.borderColor = '#00F0FF';
+                t.style.color = '#00F0FF';
             } else {
                 t.classList.remove('active');
-                t.style.background = t.dataset.view === 'weather' ? 'rgba(0,240,255,0.1)' : 'rgba(255,0,255,0.1)';
-                t.style.borderColor = t.dataset.view === 'weather' ? 'rgba(0,240,255,0.3)' : 'rgba(255,0,255,0.3)';
+                t.style.background = '#111';
+                t.style.borderColor = '#333';
+                t.style.color = '#888';
             }
         });
 

@@ -8,6 +8,7 @@ import { getCityInfo, searchCities, getPhonePrefix, getGoogleMapsLink, getWhat3W
 import './eticket-panel.js';
 import './pdf-ocr-panel.js';
 import './tour-weather-panel.js';
+import './tour-builder-panel.js';
 
 const VERSION = '2024-12-10-v9';
 console.log(`📦 dashboard-frame.js loaded (${VERSION})`);
@@ -596,6 +597,53 @@ export class DashboardFrame extends HTMLElement {
                 this.shadowRoot.getElementById('node-list').style.display = 'block';
                 this.shadowRoot.getElementById('node-detail').style.display = 'none';
             });
+        }
+        if (!builderPanel) {
+            customElements.whenDefined('tour-builder-panel').then(() => {
+                setupBackHandler(this.shadowRoot.querySelector('tour-builder-panel'));
+            });
+        }
+
+        // View tab switching
+        this.shadowRoot.querySelectorAll('.view-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const view = tab.dataset.view;
+                this.switchNodeView(view);
+            });
+        });
+    }
+
+    switchNodeView(view) {
+        const weatherView = this.shadowRoot.getElementById('weather-view');
+        const builderView = this.shadowRoot.getElementById('builder-view');
+        const tabs = this.shadowRoot.querySelectorAll('.view-tab');
+
+        tabs.forEach(t => {
+            if (t.dataset.view === view) {
+                t.classList.add('active');
+                t.style.background = view === 'weather' ? 'rgba(0,240,255,0.2)' : 'rgba(255,0,255,0.2)';
+                t.style.borderColor = view === 'weather' ? 'rgba(0,240,255,0.4)' : 'rgba(255,0,255,0.4)';
+            } else {
+                t.classList.remove('active');
+                t.style.background = t.dataset.view === 'weather' ? 'rgba(0,240,255,0.1)' : 'rgba(255,0,255,0.1)';
+                t.style.borderColor = t.dataset.view === 'weather' ? 'rgba(0,240,255,0.3)' : 'rgba(255,0,255,0.3)';
+            }
+        });
+
+        if (view === 'weather') {
+            weatherView.style.display = 'block';
+            builderView.style.display = 'none';
+        } else {
+            weatherView.style.display = 'none';
+            builderView.style.display = 'block';
+        }
+
+        // Load the tour in the selected panel if we have one
+        if (this.currentTour) {
+            if (view === 'builder') {
+                const builderPanel = this.shadowRoot.querySelector('tour-builder-panel');
+                if (builderPanel) builderPanel.loadTour(this.currentTour);
+            }
         }
     }
 

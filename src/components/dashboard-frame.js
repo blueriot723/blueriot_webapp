@@ -514,12 +514,20 @@ export class DashboardFrame extends HTMLElement {
                             </div>
                         </div>
                         <div id="node-detail" style="display:none;">
-                            <div class="node-view-tabs" style="display:flex;gap:8px;margin-bottom:16px;">
-                                <button class="view-tab active" data-view="weather" style="background:#111;border:1px solid #00F0FF;color:#00F0FF;padding:10px 20px;border-radius:4px;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:1px;">🌤️ METEO</button>
-                                <button class="view-tab" data-view="builder" style="background:#111;border:1px solid #333;color:#888;padding:10px 20px;border-radius:4px;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:1px;">🏗️ BUILDER</button>
+                            <tour-weather-panel></tour-weather-panel>
+                            <div class="tools-section">
+                                <h2>T00L5</h2>
+                                <div class="tools-grid">
+                                    <div class="content-box">
+                                        <h3 style="margin-bottom:10px;color:#888;">eTickets</h3>
+                                        <eticket-panel></eticket-panel>
+                                    </div>
+                                    <div class="content-box">
+                                        <h3 style="margin-bottom:10px;color:#888;">PDF OCR</h3>
+                                        <pdf-ocr-panel></pdf-ocr-panel>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="weather-view"><tour-weather-panel></tour-weather-panel></div>
-                            <div id="builder-view" style="display:none;"><tour-builder-panel></tour-builder-panel></div>
                         </div>
                     </div>
 
@@ -583,26 +591,11 @@ export class DashboardFrame extends HTMLElement {
         this.shadowRoot.getElementById('modalCancel').onclick = () => this.closeModal();
         this.shadowRoot.getElementById('modalSave').onclick = () => this.saveModal();
 
-        // Back handlers for tour panels
-        const setupBackHandler = (panel) => {
-            if (panel) {
-                panel.addEventListener('back', () => {
-                    this.shadowRoot.getElementById('node-list').style.display = 'block';
-                    this.shadowRoot.getElementById('node-detail').style.display = 'none';
-                });
-            }
-        };
-
         const tourPanel = this.shadowRoot.querySelector('tour-weather-panel');
-        const builderPanel = this.shadowRoot.querySelector('tour-builder-panel');
-
-        setupBackHandler(tourPanel);
-        setupBackHandler(builderPanel);
-
-        // Retry after custom elements defined
-        if (!tourPanel) {
-            customElements.whenDefined('tour-weather-panel').then(() => {
-                setupBackHandler(this.shadowRoot.querySelector('tour-weather-panel'));
+        if (tourPanel) {
+            tourPanel.addEventListener('back', () => {
+                this.shadowRoot.getElementById('node-list').style.display = 'block';
+                this.shadowRoot.getElementById('node-detail').style.display = 'none';
             });
         }
         if (!builderPanel) {
@@ -763,7 +756,6 @@ export class DashboardFrame extends HTMLElement {
                 <div class="card-info">📅 ${t.start_date || '-'} → ${t.end_date || '-'}</div>
                 <div class="card-info">👥 ${t.passenger_count || 0} pax</div>
                 <div class="card-info">🏙️ ${t.cities ? t.cities.join(', ') : 'Nessuna città'}</div>
-                <div style="margin-top:8px;font-size:11px;color:#00F0FF;">🌤️ Meteo | 🏗️ Builder →</div>
             </div>
         `).join('') + '</div>';
     }
@@ -771,29 +763,8 @@ export class DashboardFrame extends HTMLElement {
     showTour(idx) {
         const tour = this.toursData[idx];
         if (!tour) return;
-
-        this.currentTour = tour; // Store for tab switching
         this.shadowRoot.getElementById('node-list').style.display = 'none';
         this.shadowRoot.getElementById('node-detail').style.display = 'block';
-
-        // Reset to weather view
-        this.shadowRoot.getElementById('weather-view').style.display = 'block';
-        this.shadowRoot.getElementById('builder-view').style.display = 'none';
-
-        // Reset tab styles
-        this.shadowRoot.querySelectorAll('.view-tab').forEach(t => {
-            if (t.dataset.view === 'weather') {
-                t.classList.add('active');
-                t.style.borderColor = '#00F0FF';
-                t.style.color = '#00F0FF';
-            } else {
-                t.classList.remove('active');
-                t.style.borderColor = '#333';
-                t.style.color = '#888';
-            }
-        });
-
-        // Load weather panel
         const panel = this.shadowRoot.querySelector('tour-weather-panel');
         if (panel?.loadTour) panel.loadTour(tour);
     }

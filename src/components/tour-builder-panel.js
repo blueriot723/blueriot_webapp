@@ -1,9 +1,9 @@
 /**
  * Tour Builder Panel - Drag & Drop tour builder with TASTES and STAY integration
- * VERSION: 2024-12-11-v2 - Quicksand bubble font
+ * VERSION: 2024-12-11-v3 - Fix imports
  */
 import { getWeatherForecast, formatTemp } from '../utils/weather.js';
-import { searchCities, getCityInfo } from '../utils/cities-db.js';
+import { createShadowAutocomplete } from '../utils/geocoding.js';
 
 export class TourBuilderPanel extends HTMLElement {
     constructor() {

@@ -1,449 +1,363 @@
-# 🔴 blueriot mαtrιχ
+markdown
+# N0DΞ — Tour Operating System (blueriot)
 
-**The Complete Tour Management Ecosystem for Tour Leaders**
+## What this project is
 
-A full-stack monorepo combining PWA frontend, Node.js backend API, and PostgreSQL database for comprehensive tour operations.
+N0DΞ is **not a single web app**, but an **ecosystem of tools** designed to support
+real tour leaders and passengers during real tours.
 
----
+It produces:
+- a **backend operating system** for tour leaders
+- a **public mini-site** for passengers (mobile-first)
+- a **shared knowledge base** across tours and leaders
 
-## 🌐 Live Demo
+The system is designed for:
+- bad connectivity
+- offline usage
+- physical fatigue
+- complex logistics
+- human error
 
-- **Frontend PWA:** https://blueriot723.github.io/blueriot_webapp/
-- **Backend API:** https://blueriot-nodex-api.onrender.com
-- **Database:** Supabase (PostgreSQL)
-
----
-
-## 🎯 Ecosystem Overview
-
-The **blueriot mαtrιχ** consists of 4 interconnected modules:
-
-### 1. ΤΔSΤΞ5 (Tastes)
-**Restaurant & Food Database**
-- Browse curated restaurants by city
-- Filter by cuisine type, price range
-- View photos, menus, contact info
-- Multi-language support (IT, EN, DE, FR, ES)
-
-### 2. R0UT35 (Routes)
-**Transport Database**
-- Train, bus, ferry schedules
-- Route planning between cities
-- Operator information & booking links
-- Real-time availability
-
-### 3. SΤΔΥ (Stay)
-**Accommodation Database**
-- Hotels, hostels, B&Bs
-- Amenities, check-in times
-- Location maps
-- Booking management
-
-### 4. NODΞ (Node)
-**Operational Control Panel** *(Tour Leader Only)*
-- 📅 **Day Engine**: Drag & drop tour day management
-- 🎫 **eTicket Reader**: Parse PDFs, QR codes, barcodes
-- 📄 **PDF OCP Generator**: Create operational control packs
-- 📇 **vCard Ingestion**: Import contacts from phone
-- ☁️ **Weather Engine**: 7-day forecasts with caching
-- 🤖 **Ask NODΞ**: Deterministic Q&A bot
+Offline-first is **mandatory**, not optional.
 
 ---
 
-## 🏗️ Repository Structure
+## Core philosophy (non-negotiable)
+
+- If it does not work offline, it is not acceptable
+- Automation must assist, never decide
+- Tour Leader is always in control
+- Passengers never configure anything
+- OCR suggests, it never overrides
+- Calm UI > feature quantity
+- Dark mode by default (battery, contrast, readability)
+
+This project is **system-first**, not UI-first.
+
+---
+
+## Roles
+
+Exactly four roles are supported:
+
+- **ADMIN**
+  - full system control
+- **TOUR_LEADER (TL)**
+  - creates and manages tours
+- **TRAINEE**
+  - assists TL (draft-only permissions)
+- **PASSENGER**
+  - read-only access to the mini-site
+
+No other roles are allowed.
+
+---
+
+## Ecosystem overview
+
+N0DΞ is part of a larger ecosystem:
 
 ```
-blueriot_webapp/               # Monorepo root
-│
-├── 🌐 Frontend (GitHub Pages)
-│   ├── index.html             # PWA entry point
-│   ├── css/                   # Stylesheets
-│   ├── js/                    # Client-side JavaScript
-│   └── images/                # Assets
-│
-├── 🔴 Backend (Render)
-│   └── nodex/backend/
-│       ├── server.js          # Express server entry
-│       ├── app.js             # App configuration
-│       ├── routes/            # API endpoints
-│       ├── controllers/       # Request handlers
-│       ├── services/          # Business logic
-│       │   ├── weather.service.js
-│       │   ├── day-engine.service.js
-│       │   ├── eticket-reader.service.js
-│       │   ├── vcard.service.js
-│       │   └── pdf-generator.service.js
-│       └── lib/
-│           ├── parsers/       # PDF, QR, Barcode extractors
-│           ├── templates/     # PDF templates
-│           └── utils/         # Helpers
-│
-├── 🗄️ Database (Supabase)
-│   └── database/
-│       ├── schemas/           # Complete SQL schemas
-│       ├── migrations/        # Incremental migrations
-│       │   ├── 001_days.sql
-│       │   ├── 002_tickets.sql
-│       │   ├── 003_eticket_import.sql
-│       │   ├── 004_weather_cache.sql
-│       │   ├── 005_vcard.sql
-│       │   ├── 006_nodex_settings.sql
-│       │   └── 007_day_items.sql
-│       └── seed/              # Test data
-│
-├── 📦 Configuration
-│   ├── package.json           # Monorepo scripts
-│   ├── render.yaml            # Render deployment
-│   └── .gitignore
-│
-└── 📚 Documentation
-    ├── README.md              # This file
-    ├── DEPLOYMENT.md          # Full deployment guide
-    └── database/README.md     # Database documentation
+
+ECOSYSTEM
+├── ΤΔSΤΞ5  (TASTES)   → food & places knowledge base
+├── R0UT35  (ROUTES)   → transport & mobility knowledge base
+├── SΤΔΥ    (STAY)     → accommodation knowledge base
+└── N0DΞ    (NODE)     → tour operating system
+
 ```
 
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+
-- Git
-- Accounts: GitHub, Render, Supabase
-
-### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/blueriot723/blueriot_webapp.git
-cd blueriot_webapp
-
-# Install all dependencies
-npm run setup
-
-# Start backend dev server
-npm run backend:dev
-
-# In another terminal, serve frontend
-npm run frontend:serve
-```
-
-### Environment Variables
-
-Create `nodex/backend/.env`:
-
-```env
-NODE_ENV=development
-PORT=3000
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_KEY=your_service_key
-CORS_ORIGIN=http://localhost:8080
-```
+Each module has a **specific responsibility** and must not overlap incorrectly.
 
 ---
 
-## 📡 API Endpoints
+## ΤΔSΤΞ5 — TASTES (Food & Places Database)
 
-### Weather
-```http
-GET /api/weather/:city/:date
-GET /api/weather/forecast/:city
-GET /api/weather/tour/:tourId
-```
+ΤΔSΤΞ5 is a **shared, growing database** of:
+- restaurants
+- refuges
+- huts
+- cafés
+- food-related places
 
-### Day Management
-```http
-GET    /api/days/tour/:tourId
-POST   /api/days
-PUT    /api/days/:id
-DELETE /api/days/:id
-POST   /api/days/reorder
-POST   /api/days/:id/swap/:targetId
-```
+### Core rules
 
-### Day Items
-```http
-GET    /api/day-items/day/:dayId
-POST   /api/day-items
-PUT    /api/day-items/:id
-DELETE /api/day-items/:id
-POST   /api/day-items/:id/move
-POST   /api/day-items/reorder
-POST   /api/day-items/:id/duplicate
-```
+- ΤΔSΤΞ5 is **writeable by Tour Leaders**
+- Data added during a tour **can be reused by other tours**
+- Data added via N0DΞ widgets **can be saved into ΤΔSΤΞ5**
 
-### eTicket Reader
-```http
-POST   /api/parser/eticket/pdf
-POST   /api/parser/eticket/image
-POST   /api/parser/batch
-GET    /api/parser/eticket/tour/:tourId
-```
+### Integration with N0DΞ
 
-### vCard Ingestion
-```http
-POST   /api/vcard/import
-POST   /api/vcard/import/batch
-POST   /api/vcard/parse
-POST   /api/vcard/:importId/map
-GET    /api/vcard/pending
-GET    /api/vcard/:importId
-```
+When a TL creates:
+- **Food (group)**
+- **Food suggestion**
+- **Lunch / Dinner widget**
 
-### PDF OCP Generator
-```http
-GET    /api/pdf/stay/:stayId
-GET    /api/pdf/routes/:routeId
-GET    /api/pdf/nodex/day/:dayId
-GET    /api/pdf/nodex/tour/:tourId
-POST   /api/pdf/batch
-GET    /api/pdf/preview/:type/:id
-```
+They can:
+- select an existing entry from ΤΔSΤΞ5
+- OR create a new place
 
-Full API documentation: See `nodex/backend/README.md`
+If a new place is created:
+- it can optionally be **saved into ΤΔSΤΞ5**
+- becomes available for future tours and leaders
+
+OCR-detected food places are:
+- suggested only
+- never auto-saved
+- require confirmation
+
+ΤΔSΤΞ5 is **active** and **central** to the ecosystem.
 
 ---
 
-## 🛠️ NPM Scripts
+## SΤΔΥ — STAY (Accommodation Database)
 
-```bash
-# Development
-npm run backend:dev          # Start backend with hot reload
-npm run frontend:serve       # Serve frontend locally
+SΤΔΥ is a **structured database** of accommodations:
+- hotels
+- tour leader hotels
+- transfer hotels
 
-# Production
-npm run backend:start        # Start backend (production)
-npm run backend:install      # Install backend dependencies
+### Core rules
 
-# Deployment
-npm run deploy:render        # Deploy to Render
-npm run deploy:pages         # Deploy to GitHub Pages
+- SΤΔΥ is **not interactive for passengers**
+- Used only by TL and Admin
+- Contains operational data:
+  - contacts
+  - services
+  - rules
+  - notes
 
-# Database
-npm run db:migrate           # Apply migrations to Supabase
-npm run db:seed              # Seed database with test data
+### Integration with N0DΞ
 
-# Utilities
-npm run setup                # Install all dependencies
-npm run install:all          # Install workspace dependencies
-```
+- Hotel / Accommodation widgets in N0DΞ
+  pull data directly from SΤΔΥ
+- No commercial logic is exposed to passengers
+- SΤΔΥ is **read-only for widgets**
+- No automatic saving from N0DΞ into SΤΔΥ without confirmation
 
----
-
-## 🗄️ Database Schema
-
-### Core Tables
-- **tl_users** - Tour leaders (authentication)
-- **tours** - Tour definitions
-- **tour_days** - Tour days with dual numbering system
-- **day_items** - Movable day blocks (activities, meals, transport)
-
-### Module Tables
-- **blueriot_tastes** - Restaurants (ΤΔSΤΞ5)
-- **blueriot_routes** - Transport (R0UT35)
-- **blueriot_stay** - Hotels (SΤΔΥ)
-
-### NODΞ Tables
-- **tickets** - Ticket management
-- **eticket_imports** - eTicket parsing audit log
-- **weather_cache** - Weather forecast cache (6h TTL)
-- **vcard_imports** - vCard contact import staging
-- **nodex_settings** - User preferences
-
-Full schema documentation: See `database/README.md`
+SΤΔΥ is **stable infrastructure**, not dynamic content.
 
 ---
 
-## 🎨 Key Features
+## R0UT35 — ROUTES (Mobility Knowledge Base)
 
-### Day Engine
-- **Dual Numbering**: Calendar dates (fixed) + logical day numbers (reorderable)
-- **Drag & Drop**: Reorder days without changing calendar dates
-- **Linked Items**: Connect restaurants, hotels, routes to days
-- **Swap Days**: Exchange content between days
+R0UT35 is a **passive knowledge database**:
+- transport providers
+- NCC
+- trains
+- ferries
+- mobility notes
 
-### Day Items System
-- **Color-Coded Blocks**:
-  - 🟠 Activities (orange)
-  - 🔵 Lunch (light blue)
-  - 🔵 Dinner (blue)
-  - 🟢 Transport (green)
-  - 🟣 Suggestions (purple)
-- **Move Between Days**: Drag items across days independently
-- **Time-Based Ordering**: Schedule items with start times
+### Core rules
 
-### eTicket Reader
-- **Multi-Format Support**:
-  - PDF text extraction (pdfjs-dist)
-  - QR code reading (jsQR)
-  - Barcode scanning (ZXing - 13+ formats)
-- **Smart Parsing**:
-  - Auto-extract ticket numbers, operators, dates
-  - Support for Italian & English
-  - Pattern matching for multiple date formats
-- **Audit Log**: All imports saved to database
+- R0UT35 does **not manage tickets**
+- R0UT35 does **not control transport execution**
+- Used for:
+  - reference
+  - suggestions
+  - historical knowledge
 
-### vCard Ingestion
-- **Auto-Classification**:
-  - Restaurant (85% confidence)
-  - Hotel (90% confidence)
-  - Driver (80% confidence)
-  - Emergency (95% confidence)
-  - Guide (85% confidence)
-- **Keyword Matching**: Detects type from organization/notes
-- **Direct Mapping**: Map to ΤΔSΤΞ5 or SΤΔΥ modules
+### Integration with N0DΞ
 
-### PDF OCP Generator
-- **3 Templates**:
-  - SΤΔΥ: Hotel operational packs
-  - R0UT35: Transport schedules
-  - NODΞ: Daily operative plans
-- **Professional Design**: Branded, color-coded, multi-page
-- **Weather Integration**: Auto-fetch forecast for NODΞ plans
-- **Batch Generation**: Create multiple PDFs at once
+- N0DΞ transport widgets do **not sync automatically** with R0UT35
+- TL manually chooses what to use
+- R0UT35 exists to **reduce friction**, not to automate transport
 
-### Weather Engine
-- **Open-Meteo API**: Free, no key required
-- **6-Hour Caching**: Reduce API calls
-- **40+ European Cities**: Pre-configured coordinates
-- **7-Day Forecast**: Temperature, precipitation, wind
+R0UT35 is **informational**, not operational.
 
 ---
 
-## 🌍 Multi-Language Support
+## N0DΞ — Node (Tour Operating System)
 
-Frontend supports 5 languages:
-- 🇮🇹 Italian (IT)
-- 🇬🇧 English (EN)
-- 🇩🇪 German (DE)
-- 🇫🇷 French (FR)
-- 🇪🇸 Spanish (ES)
+N0DΞ is a **mini-site builder for tours**.
 
-Backend API responses include language-appropriate content.
+Each N0DΞ site:
+- is identified by a **tour code**
+- has a **start & end date**
+- contains a **day-by-day calendar**
+- each day contains **widgets**
 
----
-
-## 📱 PWA Features
-
-- ✅ **Installable**: Add to home screen (iOS & Android)
-- ✅ **Offline-first**: Service worker caching
-- ✅ **Responsive**: Mobile, tablet, desktop
-- ✅ **Fast**: Optimized bundle size
-- ✅ **Secure**: HTTPS only
+Output:
+- a **public passenger mini-site**
+- a **backend operating interface** for TL
 
 ---
 
-## 🔐 Security
+## Widgets (conceptual)
 
-- **Row Level Security (RLS)**: Enabled on all Supabase tables
-- **API Keys**: Environment variables only (never committed)
-- **CORS**: Configured for specific origins
-- **HTTPS**: Required for all connections
-- **Service Role Key**: Backend only (never exposed to frontend)
+Widgets are the atomic units of the system.
 
----
+### Categories
 
-## 🚀 Deployment
+#### Basic Info
+- Base information
+- Location
+- Transport
 
-This monorepo deploys to **3 services**:
+#### Activities (mandatory / contract)
+- Activity (walk)
+- Cultural activity
+- Sport activity
 
-1. **GitHub Pages** (Frontend PWA)
-   - Auto-deploys on push to `main`
-   - Free, fast CDN
-   - Custom domain support
+#### Suggestions (optional)
+- Sport suggestion
+- Cultural suggestion
+- Food suggestion
 
-2. **Render** (Backend API)
-   - Auto-deploys via `render.yaml`
-   - Free tier available
-   - Auto-scaling
+#### Group Services
+- Food (group)
+- Transport
+- Tickets
 
-3. **Supabase** (Database)
-   - PostgreSQL with real-time
-   - Authentication built-in
-   - Auto-backups
+#### System
+- Weather
+- Wallet
+- OCR
+- Announcements
 
-**Full deployment guide:** See `DEPLOYMENT.md`
-
----
-
-## 🧪 Testing
-
-```bash
-# Test backend locally
-cd nodex/backend
-npm test
-
-# Test API endpoints
-curl http://localhost:3000/health
-curl http://localhost:3000/api/weather/roma/2024-06-15
-
-# Test frontend
-python3 -m http.server 8080
-# Open http://localhost:8080
-```
+Widgets can be:
+- day-bound
+- global
+- reorderable
 
 ---
 
-## 📦 Tech Stack
+## Announcements (not chat)
 
-### Frontend
-- HTML5, CSS3, JavaScript (ES6+)
-- Progressive Web App (PWA)
-- Service Worker for offline support
+Announcements are:
+- one-way messages
+- sent by TL or Admin
+- received by all passengers
+- linked to tour or day
 
-### Backend
-- Node.js 18+
-- Express.js 4.18+
-- ES Modules (`type: "module"`)
+No replies.  
+No chat.  
+No reactions.
 
-### Database
-- PostgreSQL (via Supabase)
-- Row Level Security (RLS)
-- Real-time subscriptions
-
-### Libraries
-- **PDF**: pdf-lib, pdfjs-dist
-- **Images**: sharp, canvas
-- **Parsing**: jsQR, @zxing/library, vcf
-- **Weather**: Open-Meteo API
-- **Utilities**: date-fns, uuid
+They may be:
+- manual
+- auto-generated by widgets (time-based events)
 
 ---
 
-## 🤝 Contributing
+## Offline-first rules
 
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open Pull Request
+The system must support these states:
 
----
+- SYNCED
+- LOCAL_EDIT
+- PENDING_SYNC
+- CONFLICT
 
-## 📄 License
+Rules:
+- read is always available
+- write is always local first
+- sync happens when possible
+- conflicts are explicit and visible
 
-MIT License - See LICENSE file for details
-
----
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/blueriot723/blueriot_webapp/issues)
-- **Documentation**: See `/docs` folder
-- **Email**: support@blueriot.com
+Passenger mini-site must be **fully readable offline**.
 
 ---
 
-## 🎉 Acknowledgments
+## OCR philosophy
 
-- Open-Meteo for free weather API
-- Supabase for database & auth
-- Render for backend hosting
-- GitHub for Pages & version control
+OCR is an **assistant**, not an authority.
+
+Used for:
+- tour PDFs
+- passenger manifests
+- tickets
+
+OCR output:
+- suggested data only
+- requires confirmation
+- never auto-publishes
 
 ---
 
-**Built with ❤️ for tour leaders**
+## Wallet & Tickets
 
-*blueriot mαtrιχ v1.0 - 2024*
+The system provides a **BlueRiot internal wallet**.
+
+Rules:
+- PDF-based
+- fully offline accessible
+- passenger read-only
+- external wallets (Apple / Google) are linked only, not managed
+
+---
+
+## UI & visual principles
+
+- Dark mode by default
+- High contrast
+- Minimal animations
+- Mobile-first
+- Touch-friendly
+- No visual noise
+
+UI must reduce cognitive load, not add it.
+
+---
+
+## Build order (mandatory)
+
+Development must follow this order:
+
+1. **Foundation**
+   - roles
+   - permissions
+   - data model
+   - offline states
+
+2. **Core Node**
+   - create tour
+   - calendar
+   - empty widget system
+
+3. **Databases**
+   - ΤΔSΤΞ5
+   - SΤΔΥ
+   - R0UT35
+
+4. **Single widgets**
+   - one at a time
+   - no automation initially
+
+5. **Integrations**
+   - OCR
+   - semantic location
+   - notifications
+
+Skipping steps is not allowed.
+
+---
+
+## Current constraints
+
+- GitHub: free (public repository)
+- Supabase: free tier
+- No paid services assumed
+- Architecture must respect these limits
+
+---
+
+## What this repository is NOT
+
+- not a chat app
+- not a booking engine
+- not a payment platform
+- not a CMS
+- not a social network
+
+---
+
+## Final note
+
+This system is built for **real tours**, not ideal demos.
+
+If something feels calm, it is correct.
+If something feels fragile, it is wrong.
+
+Build slow.  
+Build solid.
